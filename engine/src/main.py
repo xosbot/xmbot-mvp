@@ -26,6 +26,8 @@ from src.agents.technical import TechnicalAnalysisAgent
 from src.ai.providers import ClaudeProvider, GeminiProvider
 from src.ai.registry import AIRegistry
 from src.api.server import app, init_api
+from src.api.routes.trading import init_trading_api
+from src.broker.binance import BinanceBroker
 from src.broker.mt5 import MT5Broker
 from src.broker.paper import PaperBroker
 from src.core.config import EngineConfig, load_config
@@ -50,6 +52,11 @@ def setup_logging(level: str = "INFO") -> None:
 
 
 def create_broker(config: EngineConfig, broker_type: str):
+    if broker_type == "binance":
+        return BinanceBroker(
+            api_key=config.binance_api_key,
+            api_secret=config.binance_api_secret,
+        )
     if broker_type == "mt5":
         return MT5Broker(
             path=config.mt5_path,
@@ -95,7 +102,7 @@ def setup_agents(engine: Engine, ai_registry: AIRegistry) -> None:
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="XMBot Engine")
-    parser.add_argument("--broker", choices=["paper", "mt5"], default="paper")
+    parser.add_argument("--broker", choices=["paper", "mt5", "binance"], default="paper")
     parser.add_argument("--config", type=str, help="Path to config JSON")
     parser.add_argument("--data-dir", type=str, help="Data directory for persistence")
     args = parser.parse_args()
@@ -132,6 +139,7 @@ async def main() -> None:
 
     engine = Engine(config=config, broker=broker, gate=gate, risk=risk)
     init_api(engine)
+    init_trading_api(engine)
 
     from src.api.routes.sync import init_persistence
 

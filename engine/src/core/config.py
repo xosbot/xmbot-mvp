@@ -29,6 +29,10 @@ class EngineConfig:
     mt5_password: str = ""
     mt5_server: str = ""
 
+    # Binance
+    binance_api_key: str = ""
+    binance_api_secret: str = ""
+
     # AI Providers
     claude_api_key: str = ""
     gemini_api_key: str = ""
@@ -70,6 +74,8 @@ class EngineConfig:
             mt5_login=int(os.getenv("MT5_LOGIN", "0")),
             mt5_password=os.getenv("MT5_PASSWORD", ""),
             mt5_server=os.getenv("MT5_SERVER", ""),
+            binance_api_key=os.getenv("BINANCE_API_KEY", ""),
+            binance_api_secret=os.getenv("BINANCE_API_SECRET", ""),
             claude_api_key=os.getenv("CLAUDE_API_KEY", ""),
             gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
             openai_api_key=os.getenv("OPENAI_API_KEY", ""),

@@ -162,10 +162,24 @@ class Engine:
             await asyncio.sleep(30)
 
     async def _monitor_positions(self) -> None:
-        """Monitor open positions and trail stop loss."""
+        """Monitor open positions and trail stop loss, check drawdown."""
         while self._running:
             try:
                 positions = await self.broker.get_positions()
+                account = await self.broker.get_account()
+
+                if account:
+                    user_id = self._resolve_user_id()
+                    user_config = self._user_configs.get(user_id)
+                    if user_config:
+                        drawdown_breached = await self.risk.check_drawdown(
+                            user_id, account.balance, user_config.max_drawdown_percent
+                        )
+                        if drawdown_breached:
+                            log.warning(f"Drawdown limit breached — pausing new trades for {user_id}")
+                            for pos in positions:
+                                await self.broker.cancel_order(pos.id)
+
                 for pos in positions:
                     entry_atr = self._position_atr.get(pos.id)
                     if entry_atr is None or entry_atr <= 0:

@@ -25,7 +25,7 @@ NEW_YORK_END = 21
 OFF_PEAK_ADX_BONUS = 5.0
 
 
-def is伦敦_active(now: datetime | None = None) -> bool:
+def is_london_active(now: datetime | None = None) -> bool:
     """Check if London session is active."""
     if now is None:
         now = datetime.now(timezone.utc)
@@ -64,7 +64,7 @@ def get_session_name(now: datetime | None = None) -> str:
 
     if is_overlap_active(now):
         return "London-NY Overlap"
-    elif is伦敦_active(now):
+    elif is_london_active(now):
         return "London"
     elif is_new_york_active(now):
         return "New York"

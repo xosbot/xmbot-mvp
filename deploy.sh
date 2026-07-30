@@ -1,94 +1,64 @@
 #!/bin/bash
-# XMBot Production Deployment Script
-# Run this on your VPS after cloning the repo
+# XMBot MVP — VPS Setup Script
+# Run this on the VPS to deploy xmbot-mvp
 
-set -e
+set -euo pipefail
 
-echo "🚀 XMBot Production Deployment"
-echo "================================"
+APP_DIR="/xos/services/xmbot"
+REPO_URL="https://github.com/xosbot/xmbot-mvp.git"
+BRANCH="main"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
+echo "[$(date)] Starting XMBot MVP deployment..."
 
-# Check if .env exists
+# Clone or update repo
+if [ -d "$APP_DIR" ]; then
+    echo "[$(date)] Updating existing repo..."
+    cd "$APP_DIR"
+    git pull origin "$BRANCH"
+else
+    echo "[$(date)] Cloning repo..."
+    git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
+    cd "$APP_DIR"
+fi
+
+# Create .env if not exists
 if [ ! -f .env ]; then
-    echo -e "${RED}❌ Error: .env file not found${NC}"
-    echo "Please copy .env.production to .env and configure it:"
-    echo "  cp .env.production .env"
-    echo "  nano .env"
-    exit 1
+    echo "[$(date)] Creating .env from template..."
+    cp .env.example .env
+    
+    # Generate secrets
+    NEXTAUTH_SECRET=$(openssl rand -base64 32)
+    POSTGRES_PASSWORD=$(openssl rand -base64 16)
+    
+    sed -i "s/NEXTAUTH_SECRET=.*/NEXTAUTH_SECRET=$NEXTAUTH_SECRET/" .env
+    sed -i "s/POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
+    
+    echo "[$(date)] .env created — edit it to add API keys"
 fi
-
-# Check if required vars are set
-source .env
-
-if [ -z "$DATABASE_URL" ] || [ "$DATABASE_URL" = "postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres" ]; then
-    echo -e "${RED}❌ Error: DATABASE_URL not configured${NC}"
-    echo "Please edit .env and set your database URL"
-    exit 1
-fi
-
-if [ -z "$TELEGRAM_TOKEN" ] || [ "$TELEGRAM_TOKEN" = "YOUR_BOT_TOKEN_FROM_BOTFATHER" ]; then
-    echo -e "${YELLOW}⚠️  Warning: TELEGRAM_TOKEN not set. Telegram alerts will be disabled.${NC}"
-fi
-
-echo -e "${GREEN}✓ Configuration validated${NC}"
-
-# Stop existing containers
-echo ""
-echo "📦 Stopping existing containers..."
-docker-compose down 2>/dev/null || true
 
 # Build and start services
-echo ""
-echo "🔨 Building and starting services..."
-docker-compose up -d --build
+echo "[$(date)] Building Docker images..."
+docker compose build
 
-# Wait for services to start
-echo ""
-echo "⏳ Waiting for services to start..."
+echo "[$(date)] Starting services..."
+docker compose up -d
+
+# Wait for health checks
+echo "[$(date)] Waiting for services to be healthy..."
 sleep 10
 
 # Check health
-echo ""
-echo "🏥 Checking service health..."
+echo "[$(date)] Checking health..."
+curl -s http://localhost:8080/health | python3 -m json.tool || echo "Engine not ready yet"
 
-# Engine health
-if curl -f http://localhost:8080/health > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Engine: Healthy${NC}"
-else
-    echo -e "${RED}✗ Engine: Unhealthy${NC}"
-    echo "Checking logs..."
-    docker-compose logs --tail=20 engine
-fi
-
-# Frontend health
-if curl -f http://localhost:3000 > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Frontend: Healthy${NC}"
-else
-    echo -e "${RED}✗ Frontend: Unhealthy${NC}"
-    echo "Checking logs..."
-    docker-compose logs --tail=20 web
-fi
-
+echo "[$(date)] Deployment complete!"
 echo ""
-echo "================================"
-echo -e "${GREEN}✅ Deployment complete!${NC}"
+echo "Services:"
+echo "  Engine API:  http://localhost:8080"
+echo "  Web App:     http://localhost:3000"
+echo "  Caddy:       http://localhost:80"
 echo ""
-echo "🌐 Your app is live at: https://xmbot.online"
-echo ""
-echo "📊 Useful commands:"
-echo "  docker-compose logs -f          # View all logs"
-echo "  docker-compose logs -f engine   # View engine logs"
-echo "  docker-compose restart          # Restart all services"
-echo "  docker-compose down             # Stop all services"
-echo ""
-echo "📝 Next steps:"
-echo "  1. Open https://xmbot.online"
-echo "  2. Create an account"
-echo "  3. Connect your Telegram bot"
-echo "  4. Start with paper trading"
-echo ""
+echo "Next steps:"
+echo "  1. Edit .env to add Binance API keys"
+echo "  2. Run: docker compose restart engine"
+echo "  3. Point DNS to this VPS"

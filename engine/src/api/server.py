@@ -12,6 +12,7 @@ from ..core.types import Signal, SignalAction
 from .routes.sync import router as sync_router
 from .routes.config import router as config_router
 from .routes.ai import router as ai_router
+from .routes.trading import router as trading_router
 
 
 log = logging.getLogger("xmbot.api")
@@ -20,6 +21,7 @@ app = FastAPI(title="XMBot Engine API", version="0.1.0")
 app.include_router(sync_router)
 app.include_router(config_router)
 app.include_router(ai_router)
+app.include_router(trading_router)
 
 engine_ref: Optional[Engine] = None
 _api_key: str = ""
