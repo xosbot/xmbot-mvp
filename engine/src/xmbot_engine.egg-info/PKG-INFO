@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: xmbot-engine
+Version: 0.1.0
+Summary: XMBot AI Trading Engine — Human-in-the-loop multi-agent trading platform
+Requires-Python: >=3.11
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: uvicorn[standard]>=0.27.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: python-dotenv>=1.0.0
+Provides-Extra: ibkr
+Requires-Dist: ibapi>=9.81.1; extra == "ibkr"
+Provides-Extra: mt5
+Requires-Dist: MetaTrader5>=5.0.0; extra == "mt5"
+Provides-Extra: ai
+Requires-Dist: anthropic>=0.30.0; extra == "ai"
+Requires-Dist: google-genai>=0.3.0; extra == "ai"
+Requires-Dist: openai>=1.0.0; extra == "ai"
+Provides-Extra: all
+Requires-Dist: ibapi; extra == "all"
+Requires-Dist: MetaTrader5; extra == "all"
+Requires-Dist: anthropic; extra == "all"
+Requires-Dist: google-genai; extra == "all"
+Requires-Dist: openai; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.24.0; extra == "dev"
+Requires-Dist: ruff>=0.3.0; extra == "dev"

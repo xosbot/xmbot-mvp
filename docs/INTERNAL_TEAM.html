@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMBot Internal Documentation</title>
+    <style>
+        @page { size: A4; margin: 20mm; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+            h1 { page-break-before: always; }
+            h1:first-of-type { page-break-before: avoid; }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.7; 
+            color: #333; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 40px; 
+            background: white; 
+        }
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1E3A5F;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .print-btn:hover { background: #2d5a87; }
+        h1 { 
+            color: #1E3A5F; 
+            font-size: 26px; 
+            border-bottom: 3px solid #F4B942; 
+            padding-bottom: 10px; 
+            margin: 30px 0 20px; 
+        }
+        h2 { 
+            color: #1E3A5F; 
+            font-size: 20px; 
+            margin: 25px 0 15px; 
+            border-left: 4px solid #F4B942; 
+            padding-left: 10px; 
+        }
+        h3 { 
+            color: #2d5a87; 
+            font-size: 16px; 
+            margin: 20px 0 10px; 
+        }
+        p { margin: 10px 0; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0; 
+            font-size: 13px; 
+        }
+        th { 
+            background: #1E3A5F; 
+            color: white; 
+            padding: 10px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 8px 10px; 
+            border-bottom: 1px solid #ddd; 
+        }
+        tr:nth-child(even) { background: #f8f9fa; }
+        code { 
+            background: #f4f4f4; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px; 
+        }
+        pre { 
+            background: #1E3A5F; 
+            color: #f4f4f4; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            margin: 15px 0; 
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+        strong { color: #1E3A5F; }
+        blockquote { 
+            border-left: 4px solid #F4B942; 
+            padding: 10px 20px; 
+            margin: 15px 0; 
+            background: #fffbf0; 
+            font-style: italic; 
+        }
+        hr { border: none; border-top: 2px solid #eee; margin: 30px 0; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">📥 Save as PDF</button>
+    <h1 id="xmbot-internal-team-documentation">XMBot — Internal Team Documentation</h1>
+<p><strong>Version:</strong> 1.0
+<strong>Last Updated:</strong> July 24, 2026
+<strong>Status:</strong> MVP Complete, Ready for Deployment</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#architecture-overview">Architecture Overview</a></li>
+<li><a href="#current-status">Current Status</a></li>
+<li><a href="#tech-stack">Tech Stack</a></li>
+<li><a href="#development-guide">Development Guide</a></li>
+<li><a href="#deployment">Deployment</a></li>
+<li><a href="#trading-strategy">Trading Strategy</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#monitoring--alerts">Monitoring &amp; Alerts</a></li>
+<li><a href="#incident-response">Incident Response</a></li>
+<li><a href="#roadmap">Roadmap</a></li>
+<li><a href="#contributing">Contributing</a></li>
+</ol>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<h3 id="system-diagram">System Diagram</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        XMBot Architecture                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────┐     ┌──────────┐     ┌──────────┐               │
+│  │ Telegram  │────▶│  Next.js │────▶│  Python  │               │
+│  │   Bot     │     │ Frontend │     │  Engine  │               │
+│  └──────────┘     └──────────┘     └──────────┘               │
+│       │                │                  │                     │
+│       ▼                ▼                  ▼                     │
+│  ┌──────────┐     ┌──────────┐     ┌──────────┐               │
+│  │ Telegram │     │ PostgreSQL│    │  Broker  │               │
+│  │   API    │     │ Database │     │  (MT5/   │               │
+│  └──────────┘     └──────────┘     │  Paper)  │               │
+│                                     └──────────┘               │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    AI Providers                          │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │  │
+│  │  │  Claude  │  │  Gemini  │  │  OpenAI  │              │  │
+│  │  └──────────┘  └──────────┘  └──────────┘              │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="data-flow">Data Flow</h3>
+<pre><code>Market Data (Binance/MT5)
+    │
+    ▼
+Technical Analysis Agent (RSI + Supertrend + ADX)
+    │
+    ▼
+Risk Engine (2% rule, daily limits)
+    │
+    ▼
+Human Gate (Telegram notification)
+    │
+    ▼
+User Approval/Rejection
+    │
+    ▼
+Broker Execution (Paper/MT5)
+    │
+    ▼
+Trade Logging &amp; PnL Tracking
+</code></pre>
+<hr />
+<h2 id="current-status">Current Status</h2>
+<h3 id="completed-features">Completed Features</h3>
+<table>
+<thead>
+<tr>
+<th>Track</th>
+<th>Feature</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>Market dataclass (open field)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>ATR-based stop loss (3.0x ATR)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Trailing stop mechanism</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>Risk engine (PnL tracking)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Risk-based position sizing (2%)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>Multi-timeframe confirmation</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A7</td>
+<td>Trading session filter</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A8</td>
+<td>Backtesting framework</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>Engine proxy (auth, timeout)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>Engine APIs (status, positions)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>Cashfree webhook (HMAC)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B4</td>
+<td>Admin users API</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B5</td>
+<td>Dashboard polling (10s)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B6</td>
+<td>Mobile responsive layout</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B7</td>
+<td>Telegram integration</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>AI registry integration</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Market regime detection</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Post-trade analysis</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Daily reports</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>AI cost controls</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>Frontend AI settings</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="backtest-results">Backtest Results</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Optimized</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total Trades</td>
+<td>1,083</td>
+<td>1,479</td>
+</tr>
+<tr>
+<td>Win Rate</td>
+<td>64.0%</td>
+<td>63.6%</td>
+</tr>
+<tr>
+<td>Total Return</td>
+<td><strong>+84.3%</strong></td>
+<td>+52.7%</td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>4.3%</td>
+<td>2.0%</td>
+</tr>
+<tr>
+<td>Walk-Forward</td>
+<td>+19%</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="known-issues">Known Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-existing TS errors</td>
+<td>Low</td>
+<td>Need <code>npm install --legacy-peer-deps</code></td>
+</tr>
+<tr>
+<td>Yahoo Finance limits</td>
+<td>Low</td>
+<td>Using Binance as alternative</td>
+</tr>
+<tr>
+<td>No automated tests</td>
+<td>Medium</td>
+<td>Backtest framework needs pytest</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tech-stack">Tech Stack</h2>
+<h3 id="backend-engine">Backend (Engine)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language</td>
+<td>Python</td>
+<td>3.12</td>
+</tr>
+<tr>
+<td>Framework</td>
+<td>FastAPI</td>
+<td>0.110+</td>
+</tr>
+<tr>
+<td>Server</td>
+<td>Uvicorn</td>
+<td>0.27+</td>
+</tr>
+<tr>
+<td>HTTP Client</td>
+<td>httpx</td>
+<td>0.27+</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Pydantic</td>
+<td>2.0+</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>SQLAlchemy</td>
+<td>2.0+</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>Sentry</td>
+<td>2.0+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend">Frontend</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>Next.js</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>TypeScript</td>
+<td>5.x</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>Prisma</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>PostgreSQL</td>
+<td>15+ (Supabase)</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>NextAuth</td>
+<td>v5 beta</td>
+</tr>
+<tr>
+<td>UI</td>
+<td>shadcn/ui</td>
+<td>Latest</td>
+</tr>
+<tr>
+<td>Payments</td>
+<td>Cashfree PG SDK</td>
+<td>Latest</td>
+</tr>
+</tbody>
+</table>
+<h3 id="infrastructure">Infrastructure</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Container</td>
+<td>Docker</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>Docker Compose</td>
+</tr>
+<tr>
+<td>Reverse Proxy</td>
+<td>Caddy</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>xmbot.online</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>VPS (Hetzner/DigitalOcean)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-providers">AI Providers</h3>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Model</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude</td>
+<td>claude-sonnet-4-20250514</td>
+<td>~$0.30/mo</td>
+</tr>
+<tr>
+<td>Gemini</td>
+<td>gemini-2.5-flash</td>
+<td>~$0.05/mo</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>gpt-4o-mini</td>
+<td>~$0.10/mo</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="development-guide">Development Guide</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li>Python 3.12+</li>
+<li>Node.js 20+</li>
+<li>PostgreSQL 15+</li>
+<li>Redis (optional)</li>
+<li>Docker (for deployment)</li>
+</ul>
+<h3 id="local-setup">Local Setup</h3>
+<h4 id="1-clone-repository">1. Clone Repository</h4>
+<pre><code class="language-bash">git clone &lt;repo-url&gt;
+cd XMBot
+</code></pre>
+<h4 id="2-engine-setup">2. Engine Setup</h4>
+<pre><code class="language-bash">cd engine
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your config
+python -m src.main
+</code></pre>
+<h4 id="3-frontend-setup">3. Frontend Setup</h4>
+<pre><code class="language-bash">cd xmbot-mvp
+npm install --legacy-peer-deps
+cp .env.example .env
+# Edit .env with your config
+npm run dev
+</code></pre>
+<h4 id="4-database-setup">4. Database Setup</h4>
+<pre><code class="language-bash"># Using Supabase or local PostgreSQL
+npx prisma generate
+npx prisma db push
+</code></pre>
+<h3 id="project-structure">Project Structure</h3>
+<pre><code>XMBot/
+├── engine/                    # Python trading engine
+│   ├── src/
+│   │   ├── agents/           # Trading agents
+│   │   │   ├── technical.py  # RSI + Supertrend + ADX
+│   │   │   ├── regime.py     # Market regime detection
+│   │   │   └── analysis.py   # Post-trade analysis
+│   │   ├── ai/               # AI providers
+│   │   │   ├── providers/    # Claude, Gemini, OpenAI
+│   │   │   ├── registry.py   # Provider registry
+│   │   │   └── costs.py      # Cost tracking
+│   │   ├── broker/           # Broker integrations
+│   │   │   ├── paper.py      # Paper trading
+│   │   │   └── mt5.py        # MetaTrader 5
+│   │   ├── core/             # Core engine
+│   │   │   ├── engine.py     # Main engine loop
+│   │   │   ├── config.py     # Configuration
+│   │   │   ├── types.py      # Data models
+│   │   │   └── session.py    # Trading sessions
+│   │   ├── risk/             # Risk management
+│   │   │   └── engine.py     # Risk engine
+│   │   ├── api/              # FastAPI routes
+│   │   ├── telegram/         # Telegram bot
+│   │   └── backtest/         # Backtesting framework
+│   ├── tests/                # Test files
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── xmbot-mvp/                # Next.js frontend
+│   ├── app/                  # App router
+│   │   ├── api/              # API routes
+│   │   ├── dashboard/        # Dashboard pages
+│   │   └── admin/            # Admin pages
+│   ├── components/           # React components
+│   ├── lib/                  # Utilities
+│   ├── prisma/               # Database schema
+│   └── package.json
+│
+├── docker-compose.yml        # Orchestration
+├── Caddyfile                 # Reverse proxy
+└── .env                      # Environment variables
+</code></pre>
+<h3 id="code-conventions">Code Conventions</h3>
+<h4 id="python-engine">Python (Engine)</h4>
+<ul>
+<li>Use type hints everywhere</li>
+<li>Follow PEP 8</li>
+<li>Use dataclasses for data models</li>
+<li>Use async/await for I/O operations</li>
+<li>Log with <code>logging</code> module, not print</li>
+<li>Use <code>snake_case</code> for functions/variables</li>
+<li>Use <code>PascalCase</code> for classes</li>
+</ul>
+<h4 id="typescript-frontend">TypeScript (Frontend)</h4>
+<ul>
+<li>Use strict TypeScript</li>
+<li>Prefer <code>const</code> over <code>let</code></li>
+<li>Use interfaces over types</li>
+<li>Follow Next.js App Router conventions</li>
+<li>Use <code>camelCase</code> for functions/variables</li>
+<li>Use <code>PascalCase</code> for components</li>
+</ul>
+<hr />
+<h2 id="deployment">Deployment</h2>
+<h3 id="production-setup">Production Setup</h3>
+<h4 id="1-vps-requirements">1. VPS Requirements</h4>
+<ul>
+<li>Ubuntu 22.04+</li>
+<li>2GB RAM minimum</li>
+<li>20GB SSD</li>
+<li>Docker + Docker Compose installed</li>
+<li>Domain DNS configured (xmbot.online → VPS IP)</li>
+</ul>
+<h4 id="2-environment-variables">2. Environment Variables</h4>
+<p>Create <code>.env</code> in project root:</p>
+<pre><code class="language-bash"># Core
+XMBOT_ENV=production
+DATABASE_URL=postgresql://xmbot:password@localhost:5432/xmbot
+
+# Telegram
+TELEGRAM_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+
+# AI (at least one required)
+CLAUDE_API_KEY=your_key
+GEMINI_API_KEY=your_key
+
+# Risk Limits
+MAX_DAILY_LOSS=10000
+MAX_POSITIONS=20
+
+# Monitoring
+LOG_LEVEL=INFO
+SENTRY_DSN=your_dsn
+</code></pre>
+<h4 id="3-deploy">3. Deploy</h4>
+<pre><code class="language-bash"># Clone on VPS
+git clone &lt;repo-url&gt;
+cd XMBot
+
+# Configure
+cp .env.example .env
+nano .env  # Edit with production values
+
+# Start
+docker-compose up -d
+
+# Verify
+curl http://localhost:8080/health
+</code></pre>
+<h4 id="4-ssltls">4. SSL/TLS</h4>
+<p>Caddy auto-provisions SSL via Let's Encrypt. Ensure:
+- Domain DNS points to VPS IP
+- Ports 80 and 443 are open
+- Caddy has write access to <code>/etc/caddy/</code></p>
+<h3 id="docker-services">Docker Services</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Port</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>engine</td>
+<td>8080</td>
+<td>Trading engine + API</td>
+</tr>
+<tr>
+<td>web</td>
+<td>3000 → 3006</td>
+<td>Next.js frontend</td>
+</tr>
+<tr>
+<td>caddy</td>
+<td>80, 443</td>
+<td>Reverse proxy, SSL</td>
+</tr>
+</tbody>
+</table>
+<h3 id="updating">Updating</h3>
+<pre><code class="language-bash">git pull
+docker-compose build --no-cache
+docker-compose up -d
+</code></pre>
+<hr />
+<h2 id="trading-strategy">Trading Strategy</h2>
+<h3 id="signal-generation">Signal Generation</h3>
+<p><strong>Primary Strategy: RSI + Supertrend + ADX</strong></p>
+<pre><code>Entry Conditions:
+├── BUY Signal:
+│   ├── Supertrend flips from -1 to +1 (bullish)
+│   └── OR RSI crosses above 50 (momentum)
+│
+├── SELL Signal:
+│   ├── Supertrend flips from +1 to -1 (bearish)
+│   └── OR RSI crosses below 50 (momentum)
+│
+└── Filter:
+    └── ADX &gt; 20 (trending market)
+</code></pre>
+<h3 id="risk-management">Risk Management</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risk per trade</td>
+<td>2%</td>
+<td>Max 2% of account per trade</td>
+</tr>
+<tr>
+<td>Stop loss</td>
+<td>3.0x ATR</td>
+<td>Dynamic based on volatility</td>
+</tr>
+<tr>
+<td>Take profit</td>
+<td>2.0x SL</td>
+<td>2:1 reward-to-risk ratio</td>
+</tr>
+<tr>
+<td>Max daily loss</td>
+<td>$10,000</td>
+<td>Circuit breaker</td>
+</tr>
+<tr>
+<td>Max positions</td>
+<td>20</td>
+<td>Diversification limit</td>
+</tr>
+<tr>
+<td>Session filter</td>
+<td>London/NY</td>
+<td>Skip low-volume Asian session</td>
+</tr>
+</tbody>
+</table>
+<h3 id="parameters-optimized">Parameters (Optimized)</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Range Tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADX threshold</td>
+<td>20</td>
+<td>15-35</td>
+</tr>
+<tr>
+<td>SL multiplier</td>
+<td>3.0x</td>
+<td>1.0-4.0x</td>
+</tr>
+<tr>
+<td>TP ratio</td>
+<td>2.0x</td>
+<td>1.5-3.0x</td>
+</tr>
+<tr>
+<td>RSI period</td>
+<td>14</td>
+<td>10-20</td>
+</tr>
+<tr>
+<td>ATR period</td>
+<td>14</td>
+<td>10-20</td>
+</tr>
+<tr>
+<td>Supertrend mult</td>
+<td>2.5</td>
+<td>2.0-3.0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="trading-sessions">Trading Sessions</h3>
+<table>
+<thead>
+<tr>
+<th>Session</th>
+<th>Hours (UTC)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>London</td>
+<td>07:00-16:00</td>
+<td>✅ Active</td>
+</tr>
+<tr>
+<td>New York</td>
+<td>12:00-21:00</td>
+<td>✅ Active</td>
+</tr>
+<tr>
+<td>Asian</td>
+<td>00:00-07:00</td>
+<td>❌ Skipped</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<h3 id="engine-endpoints">Engine Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/engine/status</code></td>
+<td>Engine health status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/engine/positions</code></td>
+<td>Open positions</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/engine/account</code></td>
+<td>Account balance</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/engine/signal/:id/approve</code></td>
+<td>Approve signal</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/engine/signal/:id/reject</code></td>
+<td>Reject signal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sync-endpoints">Sync Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/sync/trades</code></td>
+<td>Get trade history</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/sync/metrics</code></td>
+<td>Get performance metrics</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/sync/trades</code></td>
+<td>Sync trades to DB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="config-endpoints">Config Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/config</code></td>
+<td>Get user config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/config</code></td>
+<td>Update user config</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-endpoints">AI Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/ai/config</code></td>
+<td>Get AI provider config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/ai/config</code></td>
+<td>Update AI provider</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/ai/regime</code></td>
+<td>Get market regime</td>
+</tr>
+</tbody>
+</table>
+<h3 id="payment-endpoints">Payment Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/payment/webhook</code></td>
+<td>Cashfree webhook</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/payment/status/:id</code></td>
+<td>Payment status</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="monitoring-alerts">Monitoring &amp; Alerts</h2>
+<h3 id="health-checks">Health Checks</h3>
+<pre><code class="language-bash"># Engine health
+curl http://localhost:8080/health
+
+# Frontend health
+curl http://localhost:3000
+
+# Docker status
+docker-compose ps
+</code></pre>
+<h3 id="logs">Logs</h3>
+<pre><code class="language-bash"># Engine logs
+docker-compose logs -f engine
+
+# Frontend logs
+docker-compose logs -f web
+
+# All logs
+docker-compose logs -f
+</code></pre>
+<h3 id="metrics-to-watch">Metrics to Watch</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Alert Threshold</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine health</td>
+<td>Down for 1min</td>
+<td>Restart service</td>
+</tr>
+<tr>
+<td>Daily loss</td>
+<td>&gt; $5,000</td>
+<td>Notify, consider pause</td>
+</tr>
+<tr>
+<td>Win rate</td>
+<td>&lt; 50% over 100 trades</td>
+<td>Review strategy</td>
+</tr>
+<tr>
+<td>Max drawdown</td>
+<td>&gt; 5%</td>
+<td>Pause trading</td>
+</tr>
+<tr>
+<td>API errors</td>
+<td>&gt; 10/hour</td>
+<td>Check provider status</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sentry-integration">Sentry Integration</h3>
+<pre><code class="language-python"># In engine
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn=&quot;your-dsn&quot;,
+    environment=&quot;production&quot;,
+    traces_sample_rate=0.1,
+)
+
+# Capture errors
+sentry_sdk.capture_exception(e)
+</code></pre>
+<hr />
+<h2 id="incident-response">Incident Response</h2>
+<h3 id="severity-levels">Severity Levels</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Description</th>
+<th>Response Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Engine down, trading halted</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>High loss, strategy misbehaving</td>
+<td>1 hour</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Feature broken, non-critical</td>
+<td>4 hours</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Minor bug, cosmetic</td>
+<td>24 hours</td>
+</tr>
+</tbody>
+</table>
+<h3 id="incident-playbook">Incident Playbook</h3>
+<h4 id="p1-engine-down">P1: Engine Down</h4>
+<pre><code class="language-bash"># 1. Check status
+docker-compose ps
+curl http://localhost:8080/health
+
+# 2. Check logs
+docker-compose logs --tail=100 engine
+
+# 3. Restart
+docker-compose restart engine
+
+# 4. Verify
+curl http://localhost:8080/health
+
+# 5. Notify team
+# Send Telegram message
+</code></pre>
+<h4 id="p2-high-loss">P2: High Loss</h4>
+<pre><code class="language-bash"># 1. Pause trading
+curl -X POST http://localhost:8080/api/engine/pause
+
+# 2. Review recent trades
+curl http://localhost:8080/api/sync/trades?limit=20
+
+# 3. Check risk limits
+curl http://localhost:8080/api/engine/account
+
+# 4. Adjust parameters if needed
+# Edit config, restart engine
+
+# 5. Resume when safe
+curl -X POST http://localhost:8080/api/engine/resume
+</code></pre>
+<h4 id="p3-feature-broken">P3: Feature Broken</h4>
+<pre><code class="language-bash"># 1. Identify issue
+# Check logs, reproduce locally
+
+# 2. Fix in feature branch
+git checkout -b fix/issue-description
+# Make changes
+
+# 3. Test
+npm run test  # or pytest
+
+# 4. Deploy
+git checkout main
+git merge fix/issue-description
+docker-compose up -d
+</code></pre>
+<hr />
+<h2 id="roadmap">Roadmap</h2>
+<h3 id="q3-2026-aug-sep-launch">Q3 2026 (Aug-Sep): LAUNCH</h3>
+<ul>
+<li>[ ] Deploy to production</li>
+<li>[ ] Set up monitoring (Sentry, health checks)</li>
+<li>[ ] Onboard first 20 beta users</li>
+<li>[ ] Gather feedback, fix bugs</li>
+<li>[ ] Target: 20 users, $800 MRR</li>
+</ul>
+<h3 id="q4-2026-oct-dec-grow">Q4 2026 (Oct-Dec): GROW</h3>
+<ul>
+<li>[ ] Marketing push (Twitter, YouTube)</li>
+<li>[ ] Referral program</li>
+<li>[ ] Add MT5 broker support</li>
+<li>[ ] Improve win rate to 65%+</li>
+<li>[ ] Target: 100 users, $5K MRR</li>
+</ul>
+<h3 id="q1-2027-jan-mar-scale">Q1 2027 (Jan-Mar): SCALE</h3>
+<ul>
+<li>[ ] Mobile app (React Native)</li>
+<li>[ ] Multi-pair support (BTC, EUR)</li>
+<li>[ ] API access for developers</li>
+<li>[ ] Advanced backtesting dashboard</li>
+<li>[ ] Target: 300 users, $15K MRR</li>
+</ul>
+<h3 id="q2-2027-apr-jun-expand">Q2 2027 (Apr-Jun): EXPAND</h3>
+<ul>
+<li>[ ] RL overlay for position sizing</li>
+<li>[ ] Copy-trading feature</li>
+<li>[ ] B2B offering for funds</li>
+<li>[ ] Institutional-grade reporting</li>
+<li>[ ] Target: 500 users, $25K MRR</li>
+</ul>
+<hr />
+<h2 id="marketing-branding-plan">Marketing &amp; Branding Plan</h2>
+<h3 id="brand-identity">Brand Identity</h3>
+<h4 id="brand-positioning">Brand Positioning</h4>
+<p><strong>Tagline:</strong> "Trade Gold. Trust the Bot. You Decide."</p>
+<p><strong>Value Proposition:</strong>
+XMBot is the only AI-powered gold trading platform that gives you complete control. Our bot identifies opportunities, but you approve every trade. No surprises. No hidden algorithms. Just transparent, data-driven trading.</p>
+<h4 id="brand-personality">Brand Personality</h4>
+<table>
+<thead>
+<tr>
+<th>Trait</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Trustworthy</strong></td>
+<td>Backtested results, transparent signals</td>
+</tr>
+<tr>
+<td><strong>Empowering</strong></td>
+<td>Human-in-the-loop, you're always in control</td>
+</tr>
+<tr>
+<td><strong>Intelligent</strong></td>
+<td>AI-powered analysis, not just gut feeling</td>
+</tr>
+<tr>
+<td><strong>Accessible</strong></td>
+<td>Telegram-first, works on any device</td>
+</tr>
+<tr>
+<td><strong>Professional</strong></td>
+<td>Institutional-grade technology for retail traders</td>
+</tr>
+</tbody>
+</table>
+<h4 id="visual-identity">Visual Identity</h4>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary Color</strong></td>
+<td>#1E3A5F (Deep Blue - trust, stability)</td>
+</tr>
+<tr>
+<td><strong>Secondary Color</strong></td>
+<td>#F4B942 (Gold - luxury, gold trading)</td>
+</tr>
+<tr>
+<td><strong>Accent Color</strong></td>
+<td>#2ECC71 (Green - profit, success)</td>
+</tr>
+<tr>
+<td><strong>Font (Heading)</strong></td>
+<td>Inter Bold</td>
+</tr>
+<tr>
+<td><strong>Font (Body)</strong></td>
+<td>Inter Regular</td>
+</tr>
+<tr>
+<td><strong>Logo</strong></td>
+<td>Gold bull icon + "XMBot" text</td>
+</tr>
+<tr>
+<td><strong>Icon Style</strong></td>
+<td>Minimalist, modern, flat design</td>
+</tr>
+</tbody>
+</table>
+<h3 id="target-audience">Target Audience</h3>
+<h4 id="primary-segments">Primary Segments</h4>
+<table>
+<thead>
+<tr>
+<th>Segment</th>
+<th>Demographics</th>
+<th>Pain Points</th>
+<th>Channels</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Active Day Traders</strong></td>
+<td>25-45, $50K+ income, tech-savvy</td>
+<td>Time-consuming analysis, emotional decisions</td>
+<td>Twitter, YouTube, TradingView</td>
+</tr>
+<tr>
+<td><strong>Crypto-Native Gold Traders</strong></td>
+<td>20-35, crypto investors, risk-takers</td>
+<td>Looking for stable assets, gold exposure</td>
+<td>Twitter, Reddit, Discord</td>
+</tr>
+<tr>
+<td><strong>Indian Retail Traders</strong></td>
+<td>22-40, INR income, mobile-first</td>
+<td>Limited access to global markets, language barriers</td>
+<td>Telegram, YouTube (Hindi), Instagram</td>
+</tr>
+<tr>
+<td><strong>Passive Income Seekers</strong></td>
+<td>30-50, professionals, busy</td>
+<td>Want automated income, not full-time trading</td>
+<td>LinkedIn, Facebook, Email</td>
+</tr>
+</tbody>
+</table>
+<h4 id="buyer-personas">Buyer Personas</h4>
+<p><strong>Persona 1: "Trader Raj" (Indian Market)</strong>
+- Age: 28, Mumbai
+- Income: ₹15L/year
+- Tech: Mobile-first, uses Telegram daily
+- Pain: Wants to trade gold but limited time
+- Channel: Telegram groups, YouTube (Hindi)</p>
+<p><strong>Persona 2: "Crypto Carlos" (Global)</strong>
+- Age: 32, US
+- Income: $80K/year
+- Tech: Desktop + mobile, uses Discord
+- Pain: Volatile crypto, wants stability
+- Channel: Twitter, Reddit r/cryptocurrency</p>
+<p><strong>Persona 3: "Busy Professional" (India + Global)</strong>
+- Age: 35, Bangalore/Remote
+- Income: $100K/year
+- Tech: All devices, uses WhatsApp/Telegram
+- Pain: No time to analyze charts
+- Channel: LinkedIn, email newsletters</p>
+<h3 id="marketing-channels">Marketing Channels</h3>
+<h4 id="phase-1-launch-month-1-3">Phase 1: Launch (Month 1-3)</h4>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Strategy</th>
+<th>Budget</th>
+<th>KPI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Telegram Groups</strong></td>
+<td>Join gold/crypto groups, share insights</td>
+<td>$0</td>
+<td>100 group members</td>
+</tr>
+<tr>
+<td><strong>Twitter/X</strong></td>
+<td>Daily market updates, signal previews</td>
+<td>$0</td>
+<td>500 followers</td>
+</tr>
+<tr>
+<td><strong>YouTube</strong></td>
+<td>Tutorial videos, backtest walkthrough</td>
+<td>$0</td>
+<td>100 subscribers</td>
+</tr>
+<tr>
+<td><strong>Reddit</strong></td>
+<td>r/gold, r/trading, r/algotrading</td>
+<td>$0</td>
+<td>50 upvotes</td>
+</tr>
+<tr>
+<td><strong>Product Hunt</strong></td>
+<td>Launch day push</td>
+<td>$0</td>
+<td>Top 10 daily</td>
+</tr>
+</tbody>
+</table>
+<h4 id="phase-2-growth-month-4-6">Phase 2: Growth (Month 4-6)</h4>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Strategy</th>
+<th>Budget</th>
+<th>KPI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Twitter Ads</strong></td>
+<td>Targeted ads to traders</td>
+<td>$500/mo</td>
+<td>50 signups/mo</td>
+</tr>
+<tr>
+<td><strong>YouTube Ads</strong></td>
+<td>Pre-roll on trading videos</td>
+<td>$300/mo</td>
+<td>30 signups/mo</td>
+</tr>
+<tr>
+<td><strong>Influencers</strong></td>
+<td>Partner with trading YouTubers</td>
+<td>$500/mo</td>
+<td>100 signups/mo</td>
+</tr>
+<tr>
+<td><strong>Content SEO</strong></td>
+<td>Blog posts on gold trading</td>
+<td>$0</td>
+<td>1K organic visitors/mo</td>
+</tr>
+<tr>
+<td><strong>Email Newsletter</strong></td>
+<td>Weekly market insights</td>
+<td>$0</td>
+<td>500 subscribers</td>
+</tr>
+</tbody>
+</table>
+<h4 id="phase-3-scale-month-7-12">Phase 3: Scale (Month 7-12)</h4>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Strategy</th>
+<th>Budget</th>
+<th>KPI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Google Ads</strong></td>
+<td>"Gold trading bot" keywords</td>
+<td>$1,000/mo</td>
+<td>100 signups/mo</td>
+</tr>
+<tr>
+<td><strong>Facebook/Instagram</strong></td>
+<td>Retargeting, lookalike audiences</td>
+<td>$500/mo</td>
+<td>50 signups/mo</td>
+</tr>
+<tr>
+<td><strong>Podcast Sponsorship</strong></td>
+<td>Trading/finance podcasts</td>
+<td>$500/mo</td>
+<td>30 signups/mo</td>
+</tr>
+<tr>
+<td><strong>Referral Program</strong></td>
+<td>20% commission for referrals</td>
+<td>$0</td>
+<td>20% of signups</td>
+</tr>
+<tr>
+<td><strong>Partnerships</strong></td>
+<td>Broker integrations, affiliates</td>
+<td>$0</td>
+<td>50 signups/mo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="content-strategy">Content Strategy</h3>
+<h4 id="content-calendar-monthly">Content Calendar (Monthly)</h4>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Content Type</th>
+<th>Platform</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Blog Post</td>
+<td>Website</td>
+<td>"How to Trade Gold with AI"</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Twitter Thread</td>
+<td>Twitter</td>
+<td>Weekly market analysis</td>
+</tr>
+<tr>
+<td>2</td>
+<td>YouTube Video</td>
+<td>YouTube</td>
+<td>Backtest walkthrough</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Telegram Post</td>
+<td>Telegram</td>
+<td>Signal preview</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Blog Post</td>
+<td>Website</td>
+<td>"Risk Management 101"</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Twitter Thread</td>
+<td>Twitter</td>
+<td>Trading tips</td>
+</tr>
+<tr>
+<td>4</td>
+<td>YouTube Video</td>
+<td>YouTube</td>
+<td>User testimonials</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Email Newsletter</td>
+<td>Email</td>
+<td>Monthly performance report</td>
+</tr>
+</tbody>
+</table>
+<h4 id="content-pillars">Content Pillars</h4>
+<ol>
+<li><strong>Education</strong>: How to trade gold, risk management, technical analysis</li>
+<li><strong>Proof</strong>: Backtest results, user testimonials, live trading demos</li>
+<li><strong>Transparency</strong>: Signal explanations, win/loss breakdowns, strategy logic</li>
+<li><strong>Community</strong>: User stories, Q&amp;A sessions, market discussions</li>
+</ol>
+<h4 id="seo-keywords">SEO Keywords</h4>
+<table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Volume</th>
+<th>Difficulty</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gold trading bot</td>
+<td>1,200/mo</td>
+<td>Medium</td>
+<td>High</td>
+</tr>
+<tr>
+<td>XAUUSD bot</td>
+<td>800/mo</td>
+<td>Low</td>
+<td>High</td>
+</tr>
+<tr>
+<td>automated gold trading</td>
+<td>600/mo</td>
+<td>Medium</td>
+<td>High</td>
+</tr>
+<tr>
+<td>gold trading signals</td>
+<td>2,400/mo</td>
+<td>High</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>AI trading bot</td>
+<td>3,600/mo</td>
+<td>High</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Telegram trading bot</td>
+<td>1,800/mo</td>
+<td>Medium</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<h3 id="referral-program">Referral Program</h3>
+<h4 id="structure">Structure</h4>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Referrals</th>
+<th>Reward</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bronze</strong></td>
+<td>1-5</td>
+<td>Free month</td>
+</tr>
+<tr>
+<td><strong>Silver</strong></td>
+<td>6-15</td>
+<td>2 free months</td>
+</tr>
+<tr>
+<td><strong>Gold</strong></td>
+<td>16-30</td>
+<td>5 free months</td>
+</tr>
+<tr>
+<td><strong>Platinum</strong></td>
+<td>31+</td>
+<td>Lifetime free</td>
+</tr>
+</tbody>
+</table>
+<h4 id="mechanics">Mechanics</h4>
+<ol>
+<li>User gets unique referral link</li>
+<li>Friend signs up using link</li>
+<li>Friend gets 14-day free trial</li>
+<li>Referrer gets credit after friend pays</li>
+<li>Rewards stack (10 referrals = 2 free months)</li>
+</ol>
+<h3 id="launch-plan">Launch Plan</h3>
+<h4 id="pre-launch-2-weeks-before">Pre-Launch (2 weeks before)</h4>
+<ul>
+<li>[ ] Create landing page with email capture</li>
+<li>[ ] Set up Twitter/YouTube/Telegram accounts</li>
+<li>[ ] Prepare launch day content</li>
+<li>[ ] Reach out to 10 trading influencers</li>
+<li>[ ] Set up Product Hunt page</li>
+</ul>
+<h4 id="launch-day">Launch Day</h4>
+<ul>
+<li>[ ] Post on Product Hunt (8am PST)</li>
+<li>[ ] Tweet launch announcement (9am PST)</li>
+<li>[ ] Send email to waitlist (10am PST)</li>
+<li>[ ] Post in Telegram groups (11am PST)</li>
+<li>[ ] Go live on YouTube (12pm PST)</li>
+</ul>
+<h4 id="post-launch-1-week-after">Post-Launch (1 week after)</h4>
+<ul>
+<li>[ ] Respond to all comments/questions</li>
+<li>[ ] Share user testimonials</li>
+<li>[ ] Publish backtest results blog post</li>
+<li>[ ] Run Twitter poll for feedback</li>
+<li>[ ] Schedule user onboarding calls</li>
+</ul>
+<h3 id="metrics-kpis">Metrics &amp; KPIs</h3>
+<h4 id="north-star-metric">North Star Metric</h4>
+<p><strong>Monthly Active Users (MAU)</strong> — Users who execute at least 1 trade per month</p>
+<h4 id="supporting-metrics">Supporting Metrics</h4>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Metric</th>
+<th>Target (Month 6)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Acquisition</strong></td>
+<td>Website visitors</td>
+<td>10,000/mo</td>
+</tr>
+<tr>
+<td><strong>Acquisition</strong></td>
+<td>Signups</td>
+<td>500/mo</td>
+</tr>
+<tr>
+<td><strong>Activation</strong></td>
+<td>Trial → Paid conversion</td>
+<td>20%</td>
+</tr>
+<tr>
+<td><strong>Revenue</strong></td>
+<td>MRR</td>
+<td>$10,000</td>
+</tr>
+<tr>
+<td><strong>Revenue</strong></td>
+<td>ARPU</td>
+<td>$50</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>Monthly churn</td>
+<td>&lt;8%</td>
+</tr>
+<tr>
+<td><strong>Referral</strong></td>
+<td>Referral rate</td>
+<td>15%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="budget-allocation-year-1">Budget Allocation (Year 1)</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Q3 2026</th>
+<th>Q4 2026</th>
+<th>Q1 2027</th>
+<th>Q2 2027</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ads</strong></td>
+<td>$0</td>
+<td>$1,500</td>
+<td>$2,000</td>
+<td>$2,500</td>
+<td>$6,000</td>
+</tr>
+<tr>
+<td><strong>Influencers</strong></td>
+<td>$0</td>
+<td>$500</td>
+<td>$1,000</td>
+<td>$1,500</td>
+<td>$3,000</td>
+</tr>
+<tr>
+<td><strong>Content</strong></td>
+<td>$0</td>
+<td>$200</td>
+<td>$300</td>
+<td>$400</td>
+<td>$900</td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td>$0</td>
+<td>$100</td>
+<td>$100</td>
+<td>$100</td>
+<td>$300</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$0</strong></td>
+<td><strong>$2,300</strong></td>
+<td><strong>$3,400</strong></td>
+<td><strong>$4,500</strong></td>
+<td><strong>$10,200</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="contributing">Contributing</h2>
+<h3 id="branch-strategy">Branch Strategy</h3>
+<pre><code>main          ← Production
+├── develop   ← Development
+│   ├── feature/*  ← New features
+│   ├── fix/*      ← Bug fixes
+│   └── refactor/* ← Code cleanup
+</code></pre>
+<h3 id="pr-process">PR Process</h3>
+<ol>
+<li>Create feature branch from <code>develop</code></li>
+<li>Make changes, write tests</li>
+<li>Run linter and type checker</li>
+<li>Create PR with description</li>
+<li>Review (self-review OK for solo)</li>
+<li>Merge to <code>develop</code></li>
+<li>Deploy to staging</li>
+<li>Test</li>
+<li>Merge to <code>main</code></li>
+<li>Deploy to production</li>
+</ol>
+<h3 id="commit-messages">Commit Messages</h3>
+<pre><code>feat: Add new feature
+fix: Fix bug
+docs: Update documentation
+refactor: Refactor code
+test: Add tests
+chore: Maintenance tasks
+</code></pre>
+<h3 id="code-review-checklist">Code Review Checklist</h3>
+<ul>
+<li>[ ] Type hints present</li>
+<li>[ ] Error handling added</li>
+<li>[ ] Logs added for debugging</li>
+<li>[ ] Tests added/updated</li>
+<li>[ ] No secrets in code</li>
+<li>[ ] Documentation updated</li>
+<li>[ ] Performance considered</li>
+<li>[ ] Security reviewed</li>
+</ul>
+<hr />
+<h2 id="appendix">Appendix</h2>
+<h3 id="key-files-reference">Key Files Reference</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine/src/core/engine.py</code></td>
+<td>Main engine loop</td>
+</tr>
+<tr>
+<td><code>engine/src/agents/technical.py</code></td>
+<td>Signal generation</td>
+</tr>
+<tr>
+<td><code>engine/src/risk/engine.py</code></td>
+<td>Risk management</td>
+</tr>
+<tr>
+<td><code>engine/src/backtest/engine.py</code></td>
+<td>Backtesting</td>
+</tr>
+<tr>
+<td><code>xmbot-mvp/app/api/engine/</code></td>
+<td>API endpoints</td>
+</tr>
+<tr>
+<td><code>docker-compose.yml</code></td>
+<td>Deployment</td>
+</tr>
+<tr>
+<td><code>.env.example</code></td>
+<td>Environment config</td>
+</tr>
+</tbody>
+</table>
+<h3 id="useful-commands">Useful Commands</h3>
+<pre><code class="language-bash"># Engine
+python -m src.main                    # Start engine
+python -m src.backtest.engine         # Run backtest
+python -m src.backtest.optimize       # Optimize params
+
+# Frontend
+npm run dev                           # Development
+npm run build                         # Production build
+npm run start                         # Production start
+
+# Docker
+docker-compose up -d                  # Start all
+docker-compose down                   # Stop all
+docker-compose logs -f engine         # Engine logs
+docker-compose exec engine bash       # Shell into engine
+</code></pre>
+<h3 id="contact">Contact</h3>
+<ul>
+<li><strong>Slack</strong>: #xmbot-dev</li>
+<li><strong>Email</strong>: dev@xmbot.online</li>
+<li><strong>Telegram</strong>: @xmbot_support</li>
+</ul>
+<hr />
+<p><strong>Document maintained by:</strong> XMBot Development Team
+<strong>Last reviewed:</strong> July 24, 2026
+<strong>Next review:</strong> August 24, 2026</p>
+</body>
+</html>

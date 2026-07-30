@@ -1,0 +1,41 @@
+# Root
+.env
+.env.local
+.env.production
+.env.staging
+
+# Engine
+engine/.venv/
+engine/__pycache__/
+engine/src/__pycache__/
+engine/*.egg-info/
+
+# Web app
+xmbot-mvp/node_modules/
+xmbot-mvp/.next/
+xmbot-mvp/app/generated/
+
+# Docker
+pgdata/
+
+# OS
+.DS_Store
+Thumbs.db
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+*.pyc
+__pycache__/
+.venv/
+venv/
+
+# Logs
+*.log

@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMBot Investor Pitch</title>
+    <style>
+        @page { size: A4; margin: 20mm; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+            h1 { page-break-before: always; }
+            h1:first-of-type { page-break-before: avoid; }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.7; 
+            color: #333; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 40px; 
+            background: white; 
+        }
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1E3A5F;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .print-btn:hover { background: #2d5a87; }
+        h1 { 
+            color: #1E3A5F; 
+            font-size: 26px; 
+            border-bottom: 3px solid #F4B942; 
+            padding-bottom: 10px; 
+            margin: 30px 0 20px; 
+        }
+        h2 { 
+            color: #1E3A5F; 
+            font-size: 20px; 
+            margin: 25px 0 15px; 
+            border-left: 4px solid #F4B942; 
+            padding-left: 10px; 
+        }
+        h3 { 
+            color: #2d5a87; 
+            font-size: 16px; 
+            margin: 20px 0 10px; 
+        }
+        p { margin: 10px 0; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0; 
+            font-size: 13px; 
+        }
+        th { 
+            background: #1E3A5F; 
+            color: white; 
+            padding: 10px; 
+            text-align: left; 
+        }
+        td { 
+            padding: 8px 10px; 
+            border-bottom: 1px solid #ddd; 
+        }
+        tr:nth-child(even) { background: #f8f9fa; }
+        code { 
+            background: #f4f4f4; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px; 
+        }
+        pre { 
+            background: #1E3A5F; 
+            color: #f4f4f4; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            margin: 15px 0; 
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+        strong { color: #1E3A5F; }
+        blockquote { 
+            border-left: 4px solid #F4B942; 
+            padding: 10px 20px; 
+            margin: 15px 0; 
+            background: #fffbf0; 
+            font-style: italic; 
+        }
+        hr { border: none; border-top: 2px solid #eee; margin: 30px 0; }
+        ul, ol { margin: 10px 0 10px 25px; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">📥 Save as PDF</button>
+    <h1 id="xmbot-investor-pitch-deck">XMBot — Investor Pitch Deck</h1>
+<p><strong>Pre-Seed Round | $75,000</strong>
+<strong>Date: July 2026</strong></p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>XMBot is an AI-powered trading platform that gives retail traders a quantifiable edge in the $5 trillion/day gold market. Unlike pure algorithmic systems, XMBot combines machine speed with human judgment through a <strong>human-in-the-loop</strong> architecture — the bot identifies opportunities, but you approve every trade.</p>
+<p><strong>Key Metrics:</strong>
+- +84.3% backtested return (6 months, 1,083 trades)
+- 64% win rate with 4.3% max drawdown
+- Walk-forward validated: +19% on unseen data
+- MVP complete, ready for deployment</p>
+<p><strong>The Ask:</strong> $75,000 pre-seed for 12 months runway to launch, acquire 200 users, and reach break-even.</p>
+<hr />
+<h2 id="the-problem">The Problem</h2>
+<h3 id="gold-trading-is-booming-but-retail-traders-are-losing">Gold Trading Is Booming — But Retail Traders Are Losing</h3>
+<table>
+<thead>
+<tr>
+<th>Statistic</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily gold trading volume</td>
+<td>$5 trillion</td>
+</tr>
+<tr>
+<td>Retail traders who lose money</td>
+<td>70%</td>
+</tr>
+<tr>
+<td>Average time spent analyzing charts</td>
+<td>4+ hours/day</td>
+</tr>
+<tr>
+<td>Emotional trading decisions</td>
+<td>80% of losses</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why retail traders fail:</strong>
+1. <strong>Speed</strong>: Institutional traders execute in microseconds. Retail takes minutes.
+2. <strong>Emotion</strong>: Fear and greed drive bad decisions.
+3. <strong>Analysis paralysis</strong>: Too much data, no clear signal.
+4. <strong>No edge</strong>: Trading on gut feeling, not data.</p>
+<blockquote>
+<p>"The market is a device for transferring money from the impatient to the patient." — Warren Buffett</p>
+</blockquote>
+<p><strong>XMBot makes you patient AND fast.</strong></p>
+<hr />
+<h2 id="our-solution">Our Solution</h2>
+<h3 id="human-in-the-loop-ai-trading">Human-in-the-Loop AI Trading</h3>
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│                    XMBot Architecture                     │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│   Market Data ──→ AI Analysis ──→ Risk Check ──→ You    │
+│                    (RSI +            (2% rule)   Approve │
+│                     Supertrend                    via     │
+│                     + ADX)                     Telegram  │
+│                                                          │
+│   Execution: 200ms signal-to-notification                │
+│   Cost: $0.01/day (vs $100+/day for pure AI)            │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+</code></pre>
+<p><strong>How it works:</strong>
+1. <strong>Monitor</strong>: Bot watches XAUUSD 24/7 on 5-minute timeframe
+2. <strong>Analyze</strong>: Technical indicators (RSI, Supertrend, ADX) generate signals
+3. <strong>Filter</strong>: Risk engine checks position sizing and daily limits
+4. <strong>Notify</strong>: Telegram alert with one-tap approve/reject
+5. <strong>Execute</strong>: Trade executes automatically on your broker</p>
+<p><strong>Why human-in-the-loop?</strong>
+- <strong>Transparency</strong>: You see every signal before execution
+- <strong>Control</strong>: Reject any trade you disagree with
+- <strong>Learning</strong>: Understand why each trade was taken
+- <strong>Trust</strong>: No surprise trades while you sleep</p>
+<hr />
+<h2 id="market-opportunity">Market Opportunity</h2>
+<h3 id="the-gold-trading-market">The Gold Trading Market</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily gold trading volume</td>
+<td>$5 trillion</td>
+</tr>
+<tr>
+<td>Annual gold trading volume</td>
+<td>$1.25 quadrillion</td>
+</tr>
+<tr>
+<td>Gold price growth (5 years)</td>
+<td>+40%</td>
+</tr>
+<tr>
+<td>Retail gold traders globally</td>
+<td>15 million+</td>
+</tr>
+<tr>
+<td>Average monthly trading fees</td>
+<td>$50-200</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-gold-xauusd">Why Gold (XAUUSD)?</h3>
+<ol>
+<li><strong>High volatility</strong>: $20-50 daily moves = profit opportunities</li>
+<li><strong>Safe haven demand</strong>: Growing in uncertain times</li>
+<li><strong>24/5 market</strong>: Fits bot monitoring (no overnight gaps)</li>
+<li><strong>Indian market</strong>: Gold is culturally significant (weddings, festivals)</li>
+<li><strong>Crypto-adjacent</strong>: PAXG (tokenized gold) bridges crypto and traditional</li>
+</ol>
+<h3 id="target-customers">Target Customers</h3>
+<table>
+<thead>
+<tr>
+<th>Segment</th>
+<th>Size</th>
+<th>Willingness to Pay</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Active day traders</td>
+<td>2 million</td>
+<td>$50-100/mo</td>
+</tr>
+<tr>
+<td>Swing traders</td>
+<td>5 million</td>
+<td>$29-50/mo</td>
+</tr>
+<tr>
+<td>Crypto-native gold traders</td>
+<td>1 million</td>
+<td>$50-100/mo</td>
+</tr>
+<tr>
+<td>Indian retail traders</td>
+<td>3 million</td>
+<td>₹2,000-5,000/mo</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Addressable Market (TAM):</strong> $10 billion/year
+<strong>Serviceable Obtainable Market (SOM):</strong> $100 million/year
+<strong>Year 1 Target:</strong> $200K ARR (200 users × $100/mo average)</p>
+<hr />
+<h2 id="competitive-landscape">Competitive Landscape</h2>
+<h3 id="how-xmbot-compares">How XMBot Compares</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>XMBot</th>
+<th>3Commas</th>
+<th>Pionex</th>
+<th>Pure AI Bots</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Human approval</td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Gold-specific</td>
+<td>✅ Yes</td>
+<td>❌ Multi</td>
+<td>❌ Multi</td>
+<td>⚠️ Some</td>
+</tr>
+<tr>
+<td>AI analysis</td>
+<td>✅ Yes</td>
+<td>❌ Rules</td>
+<td>⚠️ Basic</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Telegram native</td>
+<td>✅ Yes</td>
+<td>❌ App</td>
+<td>❌ App</td>
+<td>⚠️ Some</td>
+</tr>
+<tr>
+<td>Backtested</td>
+<td>✅ Yes</td>
+<td>❌ Unknown</td>
+<td>❌ Unknown</td>
+<td>⚠️ Some</td>
+</tr>
+<tr>
+<td>INR pricing</td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+<td>❌ No</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Monthly cost</td>
+<td>$29-99</td>
+<td>$49</td>
+<td>Free</td>
+<td>$100+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Our moat:</strong>
+1. <strong>Human-in-the-loop</strong>: Trust and transparency
+2. <strong>Gold-specialized</strong>: Deep expertise, not generic
+3. <strong>Telegram-first</strong>: Low friction, works everywhere
+4. <strong>Backtested</strong>: Proven on real data, not marketing claims</p>
+<hr />
+<h2 id="technology">Technology</h2>
+<h3 id="three-layer-ai-architecture">Three-Layer AI Architecture</h3>
+<pre><code>Layer 1: Rule-Based (Real-time, $0 cost)
+├── RSI oversold/overbought
+├── Supertrend direction
+├── ADX trend strength
+└── Multi-timeframe confirmation
+
+Layer 2: Strategic AI (Periodic, ~$0.30/month)
+├── Market regime detection
+├── Daily market reports
+└── Post-trade analysis
+
+Layer 3: Risk Management (Real-time, $0 cost)
+├── 2% risk per trade
+├── 3.0x ATR stop loss
+├── Daily loss limits
+└── Maximum position limits
+</code></pre>
+<p><strong>Why this architecture?</strong>
+- <strong>Speed</strong>: Layer 1 runs in milliseconds (no AI latency)
+- <strong>Cost</strong>: Layer 2 uses AI strategically (~$0.30/month vs $100+/month)
+- <strong>Reliability</strong>: Rule-based system works even if AI is down
+- <strong>Backtestability</strong>: Rules can be optimized and validated</p>
+<h3 id="backtest-results">Backtest Results</h3>
+<p><strong>Optimized Strategy (Applied to Engine):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backtest Period</td>
+<td>6 months (Feb-Jul 2026)</td>
+</tr>
+<tr>
+<td>Data Points</td>
+<td>51,840 M5 candles</td>
+</tr>
+<tr>
+<td>Total Trades</td>
+<td>1,083</td>
+</tr>
+<tr>
+<td>Win Rate</td>
+<td>64.0%</td>
+</tr>
+<tr>
+<td>Total Return</td>
+<td><strong>+84.3%</strong></td>
+</tr>
+<tr>
+<td>Max Drawdown</td>
+<td>4.3%</td>
+</tr>
+<tr>
+<td>Profit Factor</td>
+<td>2.13</td>
+</tr>
+<tr>
+<td>Sharpe Ratio</td>
+<td>1.8</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walk-Forward Validation (Realistic):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Out-of-sample return</td>
+<td>+19%</td>
+</tr>
+<tr>
+<td>Consistent months</td>
+<td>2/2 profitable</td>
+</tr>
+<tr>
+<td>Overfitting ratio</td>
+<td>0.77 (acceptable)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="business-model">Business Model</h2>
+<h3 id="saas-subscriptions">SaaS Subscriptions</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Price</th>
+<th>Features</th>
+<th>Target Segment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Starter</strong></td>
+<td>$29/mo</td>
+<td>1 strategy, 5 trades/day, basic signals</td>
+<td>Beginners, testers</td>
+</tr>
+<tr>
+<td><strong>Pro</strong></td>
+<td>$69/mo</td>
+<td>3 strategies, 20 trades/day, AI reports</td>
+<td>Active traders</td>
+</tr>
+<tr>
+<td><strong>Premium</strong></td>
+<td>$99/mo</td>
+<td>Unlimited, priority execution, custom strategies</td>
+<td>Serious traders</td>
+</tr>
+<tr>
+<td><strong>Enterprise</strong></td>
+<td>$299/mo</td>
+<td>API access, white-label, dedicated support</td>
+<td>Funds, prop firms</td>
+</tr>
+</tbody>
+</table>
+<h3 id="revenue-projections-conservative">Revenue Projections (Conservative)</h3>
+<table>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>Users</th>
+<th>ARPU</th>
+<th>MRR</th>
+<th>ARR</th>
+<th>Growth Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q3 2026 (Launch)</td>
+<td>20</td>
+<td>$40</td>
+<td>$800</td>
+<td>$9,600</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Q4 2026</td>
+<td>75</td>
+<td>$45</td>
+<td>$3,375</td>
+<td>$40,500</td>
+<td>322%</td>
+</tr>
+<tr>
+<td>Q1 2027</td>
+<td>200</td>
+<td>$50</td>
+<td>$10,000</td>
+<td>$120,000</td>
+<td>196%</td>
+</tr>
+<tr>
+<td>Q2 2027</td>
+<td>400</td>
+<td>$55</td>
+<td>$22,000</td>
+<td>$264,000</td>
+<td>120%</td>
+</tr>
+<tr>
+<td>Q3 2027</td>
+<td>700</td>
+<td>$60</td>
+<td>$42,000</td>
+<td>$504,000</td>
+<td>91%</td>
+</tr>
+<tr>
+<td>Q4 2027</td>
+<td>1,000</td>
+<td>$65</td>
+<td>$65,000</td>
+<td>$780,000</td>
+<td>55%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="revenue-projections-optimistic">Revenue Projections (Optimistic)</h3>
+<table>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>Users</th>
+<th>ARPU</th>
+<th>MRR</th>
+<th>ARR</th>
+<th>Growth Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q3 2026 (Launch)</td>
+<td>30</td>
+<td>$45</td>
+<td>$1,350</td>
+<td>$16,200</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Q4 2026</td>
+<td>150</td>
+<td>$50</td>
+<td>$7,500</td>
+<td>$90,000</td>
+<td>456%</td>
+</tr>
+<tr>
+<td>Q1 2027</td>
+<td>500</td>
+<td>$55</td>
+<td>$27,500</td>
+<td>$330,000</td>
+<td>267%</td>
+</tr>
+<tr>
+<td>Q2 2027</td>
+<td>1,200</td>
+<td>$60</td>
+<td>$72,000</td>
+<td>$864,000</td>
+<td>162%</td>
+</tr>
+<tr>
+<td>Q3 2027</td>
+<td>2,500</td>
+<td>$65</td>
+<td>$162,500</td>
+<td>$1,950,000</td>
+<td>126%</td>
+</tr>
+<tr>
+<td>Q4 2027</td>
+<td>5,000</td>
+<td>$70</td>
+<td>$350,000</td>
+<td>$4,200,000</td>
+<td>115%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unit-economics">Unit Economics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Benchmark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Average Revenue Per User (ARPU)</td>
+<td>$50/mo</td>
+<td>Industry: $30-100</td>
+</tr>
+<tr>
+<td>Customer Acquisition Cost (CAC)</td>
+<td>$30</td>
+<td>Industry: $50-200</td>
+</tr>
+<tr>
+<td>Lifetime Value (LTV)</td>
+<td>$300 (6 months)</td>
+<td>Industry: $200-500</td>
+</tr>
+<tr>
+<td>LTV/CAC Ratio</td>
+<td><strong>10:1</strong></td>
+<td>Good: &gt;3:1, Great: &gt;5:1</td>
+</tr>
+<tr>
+<td>Gross Margin</td>
+<td><strong>85%</strong></td>
+<td>SaaS avg: 70-80%</td>
+</tr>
+<tr>
+<td>Payback Period</td>
+<td><strong>0.6 months</strong></td>
+<td>Industry: 6-12 months</td>
+</tr>
+<tr>
+<td>Monthly Churn Rate</td>
+<td>8%</td>
+<td>Industry: 5-10%</td>
+</tr>
+<tr>
+<td>Net Revenue Retention</td>
+<td>110%</td>
+<td>Good: &gt;100%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-structure-12-month-projection">Cost Structure (12-Month Projection)</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Monthly</th>
+<th>Annual</th>
+<th>% of Revenue (Year 2)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fixed Costs</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>VPS Hosting</td>
+<td>$200</td>
+<td>$2,400</td>
+<td>1.2%</td>
+</tr>
+<tr>
+<td>Database (Supabase)</td>
+<td>$50</td>
+<td>$600</td>
+<td>0.3%</td>
+</tr>
+<tr>
+<td>Domain/SSL</td>
+<td>$10</td>
+<td>$120</td>
+<td>0.1%</td>
+</tr>
+<tr>
+<td>Sentry Monitoring</td>
+<td>$26</td>
+<td>$312</td>
+<td>0.2%</td>
+</tr>
+<tr>
+<td><strong>Subtotal Fixed</strong></td>
+<td><strong>$286</strong></td>
+<td><strong>$3,432</strong></td>
+<td><strong>1.7%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Variable Costs</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>AI API (Claude/Gemini)</td>
+<td>$100-500</td>
+<td>$1,200-6,000</td>
+<td>0.6-3.0%</td>
+</tr>
+<tr>
+<td>Payment Processing (3%)</td>
+<td>$0-1,950</td>
+<td>$0-23,400</td>
+<td>0-11.7%</td>
+</tr>
+<tr>
+<td>Customer Support</td>
+<td>$0</td>
+<td>$0</td>
+<td>0%</td>
+</tr>
+<tr>
+<td><strong>Subtotal Variable</strong></td>
+<td><strong>$100-2,450</strong></td>
+<td><strong>$1,200-29,400</strong></td>
+<td><strong>0.6-14.7%</strong></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Total Costs</strong></td>
+<td><strong>$386-2,736</strong></td>
+<td><strong>$4,632-32,832</strong></td>
+<td><strong>2.3-16.4%</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="profitability-analysis">Profitability Analysis</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Break-Even Users</th>
+<th>Break-Even MRR</th>
+<th>Time to Break-Even</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Conservative</strong></td>
+<td>15 users</td>
+<td>$600/mo</td>
+<td>Month 2</td>
+</tr>
+<tr>
+<td><strong>Base Case</strong></td>
+<td>10 users</td>
+<td>$400/mo</td>
+<td>Month 1</td>
+</tr>
+<tr>
+<td><strong>Optimistic</strong></td>
+<td>8 users</td>
+<td>$320/mo</td>
+<td>Month 1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-year-financial-summary">3-Year Financial Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Year 1</th>
+<th>Year 2</th>
+<th>Year 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>500</td>
+<td>2,000</td>
+<td>5,000</td>
+</tr>
+<tr>
+<td><strong>ARR</strong></td>
+<td>$300K</td>
+<td>$1.2M</td>
+<td>$3M</td>
+</tr>
+<tr>
+<td><strong>Gross Margin</strong></td>
+<td>85%</td>
+<td>88%</td>
+<td>90%</td>
+</tr>
+<tr>
+<td><strong>Operating Costs</strong></td>
+<td>$50K</td>
+<td>$150K</td>
+<td>$300K</td>
+</tr>
+<tr>
+<td><strong>EBITDA</strong></td>
+<td>$205K</td>
+<td>$906K</td>
+<td>$2.4M</td>
+</tr>
+<tr>
+<td><strong>EBITDA Margin</strong></td>
+<td>68%</td>
+<td>76%</td>
+<td>80%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-assumptions">Key Assumptions</h3>
+<ol>
+<li><strong>User Growth</strong>: 20% month-over-month (conservative for SaaS)</li>
+<li><strong>ARPU Growth</strong>: $5/mo increase every 6 months (tier upgrades)</li>
+<li><strong>Churn</strong>: 8% monthly (industry average for trading tools)</li>
+<li><strong>CAC</strong>: $30 (organic + referral-heavy acquisition)</li>
+<li><strong>Gross Margin</strong>: 85% (low COGS, mostly infrastructure)</li>
+</ol>
+<h3 id="sensitivity-analysis">Sensitivity Analysis</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Year 1 ARR</th>
+<th>Year 1 EITDA</th>
+<th>Users</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bear Case</strong> (-50% users)</td>
+<td>$150K</td>
+<td>$78K</td>
+<td>250</td>
+</tr>
+<tr>
+<td><strong>Base Case</strong></td>
+<td>$300K</td>
+<td>$205K</td>
+<td>500</td>
+</tr>
+<tr>
+<td><strong>Bull Case</strong> (+50% users)</td>
+<td>$450K</td>
+<td>$338K</td>
+<td>750</td>
+</tr>
+<tr>
+<td><strong>Moon Case</strong> (+100% users)</td>
+<td>$600K</td>
+<td>$470K</td>
+<td>1,000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cash-flow-projection">Cash Flow Projection</h3>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Revenue</th>
+<th>Costs</th>
+<th>Net Cash</th>
+<th>Cumulative</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>$800</td>
+<td>$360</td>
+<td>$440</td>
+<td>$440</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>$1,600</td>
+<td>$400</td>
+<td>$1,200</td>
+<td>$1,640</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>$3,375</td>
+<td>$500</td>
+<td>$2,875</td>
+<td>$4,515</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>$5,000</td>
+<td>$600</td>
+<td>$4,400</td>
+<td>$8,915</td>
+</tr>
+<tr>
+<td>M5</td>
+<td>$7,500</td>
+<td>$750</td>
+<td>$6,750</td>
+<td>$15,665</td>
+</tr>
+<tr>
+<td>M6</td>
+<td>$10,000</td>
+<td>$900</td>
+<td>$9,100</td>
+<td>$24,765</td>
+</tr>
+<tr>
+<td>M7</td>
+<td>$12,500</td>
+<td>$1,050</td>
+<td>$11,450</td>
+<td>$36,215</td>
+</tr>
+<tr>
+<td>M8</td>
+<td>$15,000</td>
+<td>$1,200</td>
+<td>$13,800</td>
+<td>$50,015</td>
+</tr>
+<tr>
+<td>M9</td>
+<td>$18,000</td>
+<td>$1,400</td>
+<td>$16,600</td>
+<td>$66,615</td>
+</tr>
+<tr>
+<td>M10</td>
+<td>$21,000</td>
+<td>$1,600</td>
+<td>$19,400</td>
+<td>$86,015</td>
+</tr>
+<tr>
+<td>M11</td>
+<td>$24,000</td>
+<td>$1,800</td>
+<td>$22,200</td>
+<td>$108,215</td>
+</tr>
+<tr>
+<td>M12</td>
+<td>$27,000</td>
+<td>$2,000</td>
+<td>$25,000</td>
+<td>$133,215</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Year 1 Cumulative Cash Flow: +$133,215</strong></p>
+<h3 id="use-of-funds-detailed">Use of Funds (Detailed)</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Amount</th>
+<th>Timeline</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td>$3,600</td>
+<td>12 months</td>
+<td>VPS, database, monitoring, domain</td>
+</tr>
+<tr>
+<td><strong>API Costs</strong></td>
+<td>$3,600</td>
+<td>12 months</td>
+<td>Claude, Gemini, OpenAI for strategic AI</td>
+</tr>
+<tr>
+<td><strong>Marketing</strong></td>
+<td>$12,000</td>
+<td>12 months</td>
+<td>Content, ads, influencers, referrals</td>
+</tr>
+<tr>
+<td><strong>Legal &amp; Compliance</strong></td>
+<td>$3,000</td>
+<td>12 months</td>
+<td>Company setup, terms, privacy policy</td>
+</tr>
+<tr>
+<td><strong>Living Expenses</strong></td>
+<td>$24,000</td>
+<td>12 months</td>
+<td>Founder salary (survival level)</td>
+</tr>
+<tr>
+<td><strong>Contingency</strong></td>
+<td>$8,800</td>
+<td>12 months</td>
+<td>Unexpected costs, opportunities</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$55,000</strong></td>
+<td>12 months</td>
+<td>Full runway</td>
+</tr>
+</tbody>
+</table>
+<h3 id="return-on-investment">Return on Investment</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Valuation (Y2)</th>
+<th>Investor Return</th>
+<th>Multiple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Conservative</strong></td>
+<td>$3M (10x ARR)</td>
+<td>$450K</td>
+<td>6x</td>
+</tr>
+<tr>
+<td><strong>Base Case</strong></td>
+<td>$6M (5x ARR)</td>
+<td>$900K</td>
+<td>12x</td>
+</tr>
+<tr>
+<td><strong>Optimistic</strong></td>
+<td>$12M (10x ARR)</td>
+<td>$1.8M</td>
+<td>24x</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="traction">Traction</h2>
+<h3 id="whats-built">What's Built</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python trading engine</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Next.js frontend</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Telegram integration</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Backtesting framework</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Risk management</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>AI analysis layer</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Paper trading mode</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>Docker deployment</td>
+<td>✅ Ready</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-milestones">Key Milestones</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Milestone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jun 2026</td>
+<td>Started development</td>
+</tr>
+<tr>
+<td>Jul 2026</td>
+<td>MVP complete</td>
+</tr>
+<tr>
+<td>Jul 2026</td>
+<td>Backtested: +84.3% return</td>
+</tr>
+<tr>
+<td>Aug 2026</td>
+<td>Deploy to production</td>
+</tr>
+<tr>
+<td>Sep 2026</td>
+<td>First 20 paying users</td>
+</tr>
+<tr>
+<td>Dec 2026</td>
+<td>100 users, $5K MRR</td>
+</tr>
+<tr>
+<td>Jun 2027</td>
+<td>500 users, $25K MRR</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="roadmap">Roadmap</h2>
+<h3 id="12-month-plan">12-Month Plan</h3>
+<pre><code>Q3 2026 (Aug-Sep): LAUNCH
+├── Deploy to production
+├── Onboard first 20 beta users
+├── Gather feedback, iterate
+└── Target: 20 users, $800 MRR
+
+Q4 2026 (Oct-Dec): GROW
+├── Marketing push (Twitter, YouTube)
+├── Referral program
+├── Add MT5 broker support
+└── Target: 100 users, $5K MRR
+
+Q1 2027 (Jan-Mar): SCALE
+├── Mobile app (React Native)
+├── Multi-pair support (BTC, EUR)
+├── API access for developers
+└── Target: 300 users, $15K MRR
+
+Q2 2027 (Apr-Jun): EXPAND
+├── RL overlay for position sizing
+├── Copy-trading feature
+├── B2B offering for funds
+└── Target: 500 users, $25K MRR
+</code></pre>
+<hr />
+<h2 id="risk-mitigation">Risk &amp; Mitigation</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Regulatory</strong></td>
+<td>High</td>
+<td>Disclaimer: Not financial advice. Compliance-first approach.</td>
+</tr>
+<tr>
+<td><strong>Market crash</strong></td>
+<td>High</td>
+<td>Drawdown limits (5%). Daily loss caps. No overnight positions.</td>
+</tr>
+<tr>
+<td><strong>Technical failure</strong></td>
+<td>Medium</td>
+<td>Paper trading mode. Failover to manual. Health monitoring.</td>
+</tr>
+<tr>
+<td><strong>Competition</strong></td>
+<td>Medium</td>
+<td>Gold-specialized. Human-in-the-loop. Telegram UX.</td>
+</tr>
+<tr>
+<td><strong>Slow adoption</strong></td>
+<td>Medium</td>
+<td>Freemium tier. Referral incentives. Content marketing.</td>
+</tr>
+<tr>
+<td><strong>API cost spike</strong></td>
+<td>Low</td>
+<td>Strategic AI usage ($0.30/mo). Rate limiting. Budget caps.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="the-team">The Team</h2>
+<h3 id="founder">Founder</h3>
+<p><strong>[Your Name]</strong> — Solo Founder &amp; Developer</p>
+<ul>
+<li>Full-stack engineer (Python, TypeScript, React, Next.js)</li>
+<li>Trading experience: 3+ years gold/crypto</li>
+<li>Built and deployed multiple SaaS products</li>
+<li>Deep expertise in AI/ML integration</li>
+</ul>
+<h3 id="advisors-planned">Advisors (Planned)</h3>
+<ul>
+<li><strong>Trading advisor</strong>: Professional gold trader</li>
+<li><strong>Growth advisor</strong>: SaaS marketing expert</li>
+<li><strong>Legal advisor</strong>: Fintech compliance</li>
+</ul>
+<hr />
+<h2 id="the-ask">The Ask</h2>
+<h3 id="funding-75000-pre-seed">Funding: $75,000 Pre-Seed</h3>
+<table>
+<thead>
+<tr>
+<th>Use of Funds</th>
+<th>Amount</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPS &amp; Infrastructure</td>
+<td>$2,400</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>API Costs</td>
+<td>$1,200</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>Marketing</td>
+<td>$3,000</td>
+<td>6 months</td>
+</tr>
+<tr>
+<td>Legal &amp; Compliance</td>
+<td>$2,000</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>Living Expenses</td>
+<td>$12,000</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td>Contingency</td>
+<td>$4,400</td>
+<td>12 months</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$25,000</strong></td>
+<td>12 months runway</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-you-get">What You Get</h3>
+<ul>
+<li>15% equity (post-money)</li>
+<li>Advisory board seat</li>
+<li>Monthly investor updates</li>
+<li>Early access to premium features</li>
+<li>Revenue share option (alternative to equity)</li>
+</ul>
+<h3 id="milestones-with-funding">Milestones with Funding</h3>
+<table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Timeline</th>
+<th>Metric</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Launch</td>
+<td>Month 1</td>
+<td>Production deployment</td>
+</tr>
+<tr>
+<td>First revenue</td>
+<td>Month 2</td>
+<td>20 paying users</td>
+</tr>
+<tr>
+<td>Product-market fit</td>
+<td>Month 6</td>
+<td>100 users, &lt;5% churn</td>
+</tr>
+<tr>
+<td>Break-even</td>
+<td>Month 8</td>
+<td>$360+ MRR</td>
+</tr>
+<tr>
+<td>Series A ready</td>
+<td>Month 12</td>
+<td>500 users, $25K MRR</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix">Appendix</h2>
+<h3 id="backtest-data">Backtest Data</h3>
+<ul>
+<li><strong>Data Source</strong>: PAXGUSDT (tokenized gold) from Binance</li>
+<li><strong>Period</strong>: February 2026 — July 2026 (6 months)</li>
+<li><strong>Timeframe</strong>: M5 (5-minute candles)</li>
+<li><strong>Total Candles</strong>: 51,840</li>
+<li><strong>Optimization</strong>: 135 parameter combinations tested</li>
+</ul>
+<h3 id="technical-indicators">Technical Indicators</h3>
+<ul>
+<li><strong>RSI (14)</strong>: Oversold (&lt;30) / Overbought (&gt;70)</li>
+<li><strong>Supertrend (2.5x ATR)</strong>: Trend direction</li>
+<li><strong>ADX (14)</strong>: Trend strength filter (&gt;20)</li>
+<li><strong>ATR (14)</strong>: Stop loss distance (3.0x ATR)</li>
+</ul>
+<h3 id="risk-parameters">Risk Parameters</h3>
+<ul>
+<li><strong>Risk per trade</strong>: 2% of account</li>
+<li><strong>Stop loss</strong>: 3.0x ATR (~$15-25)</li>
+<li><strong>Take profit</strong>: 2.0x stop loss (~$30-50)</li>
+<li><strong>Max daily loss</strong>: $10,000</li>
+<li><strong>Max positions</strong>: 20</li>
+</ul>
+<hr />
+<p><strong>Contact:</strong>
+- Email: [your@email.com]
+- Twitter: [@yourtwitter]
+- Website: xmbot.online</p>
+<p><strong>Disclaimer:</strong> Trading involves substantial risk of loss. Past performance does not guarantee future results. XMBot is not a registered investment advisor. Use at your own risk.</p>
+</body>
+</html>
