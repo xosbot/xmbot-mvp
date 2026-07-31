@@ -41,6 +41,12 @@ TIMEFRAME_MAP = {
     "D1": "1d",
 }
 
+SYMBOL_MAP = {
+    "XAUUSD": "PAXGUSDT",
+    "XAU/USD": "PAXGUSDT",
+    "PAXGUSDT": "PAXGUSDT",
+}
+
 
 class BinanceBroker(Broker):
     def __init__(
@@ -157,7 +163,7 @@ class BinanceBroker(Broker):
             )
 
         try:
-            symbol = order.market.replace("/", "").upper()
+            symbol = SYMBOL_MAP.get(order.market.replace("/", "").upper(), order.market.replace("/", "").upper())
             side = "BUY" if order.action == SignalAction.BUY else "SELL"
 
             params = {
@@ -261,7 +267,7 @@ class BinanceBroker(Broker):
         self, symbol: str, timeframe: str, count: int = 100
     ) -> list[Market]:
         binance_tf = TIMEFRAME_MAP.get(timeframe.upper(), "5m")
-        clean_symbol = symbol.replace("/", "").upper()
+        clean_symbol = SYMBOL_MAP.get(symbol.replace("/", "").upper(), symbol.replace("/", "").upper())
 
         try:
             url = f"{self._get_base_url()}/api/v3/klines"

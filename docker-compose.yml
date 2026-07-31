@@ -21,6 +21,7 @@ services:
     build:
       context: ./engine
       dockerfile: Dockerfile
+    command: --broker binance
     env_file:
       - .env
     volumes:
