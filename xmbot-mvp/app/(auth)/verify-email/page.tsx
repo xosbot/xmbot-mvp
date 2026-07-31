@@ -1,13 +1,13 @@
 "use client"
 
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { CheckCircle, Mail, ArrowLeft, XCircle } from "lucide-react"
-import { useEffect, useState } from "react"
+import { CheckCircle, Mail, ArrowLeft, XCircle, Loader2 } from "lucide-react"
 
-export default function VerifyEmailPage() {
+function VerifyEmailInner() {
   const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [sending, setSending] = useState(false)
@@ -109,5 +109,19 @@ export default function VerifyEmailPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        </div>
+      }
+    >
+      <VerifyEmailInner />
+    </Suspense>
   )
 }
