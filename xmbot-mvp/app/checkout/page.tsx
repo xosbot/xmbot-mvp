@@ -11,7 +11,7 @@ import { PLANS } from "@/lib/plans"
 
 const betaFeatures = [
   "Full bot access for XAUUSD",
-  "Auto-execution 24/5",
+  "AI-powered trading 24/5",
   "Telegram trade alerts",
   "Risk management built-in",
   "Setup assistance",

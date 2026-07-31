@@ -40,19 +40,19 @@ export const metadata: Metadata = {
   creator: "XMBot",
   publisher: "XMBot",
   alternates: {
-    canonical: "https://xmbot.app",
+    canonical: "https://xmbot.online",
   },
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://xmbot.app",
+    url: "https://xmbot.online",
     siteName: "XMBot",
     title: "XMBot — AI-Powered Gold Trading Platform",
     description:
       "Multi-agent AI system for XAUUSD trading with human-in-the-loop approval. 64% backtested win rate.",
     images: [
       {
-        url: "https://xmbot.app/og-image.png",
+        url: "https://xmbot.online/og-image.png",
         width: 1200,
         height: 630,
         alt: "XMBot — AI Gold Trading",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "XMBot — AI-Powered Gold Trading",
     description:
       "Multi-agent AI system for XAUUSD trading. You approve every trade.",
-    images: ["https://xmbot.app/og-image.png"],
+    images: ["https://xmbot.online/og-image.png"],
   },
   icons: {
     icon: "/favicon.svg",

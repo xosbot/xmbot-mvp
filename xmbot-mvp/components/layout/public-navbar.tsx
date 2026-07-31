@@ -4,7 +4,6 @@ import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Zap } from "lucide-react"
-import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 
 const navLinks = [
   { label: "Features", href: "/features" },

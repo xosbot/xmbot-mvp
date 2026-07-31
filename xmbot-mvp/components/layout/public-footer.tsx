@@ -25,7 +25,7 @@ const footerLinks = {
   ],
 }
 
-export function Footer() {
+export function PublicFooter() {
   return (
     <footer className="border-t border-white/10" style={{ background: "#010102" }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">

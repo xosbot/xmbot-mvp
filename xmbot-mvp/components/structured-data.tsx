@@ -3,8 +3,8 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "XMBot",
-    url: "https://xmbot.app",
-    logo: "https://xmbot.app/logo.svg",
+    url: "https://xmbot.online",
+    logo: "https://xmbot.online/logo.svg",
     description: "AI-powered gold trading platform with human-in-the-loop approval",
     sameAs: [
       "https://x.com/xmbot",
@@ -16,7 +16,7 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "XMBot",
-    url: "https://xmbot.app",
+    url: "https://xmbot.online",
     description: "AI-powered gold trading platform with human-in-the-loop approval",
   }
 
