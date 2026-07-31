@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
+import { cookies } from "next/headers"
 
 export const dynamic = "force-dynamic"
 
@@ -21,11 +22,15 @@ export async function GET() {
       },
     })
 
+    const cookieStore = await cookies()
+    const currentToken = cookieStore.get("next-auth.session-token")?.value
+      ?? cookieStore.get("__Secure-next-auth.session-token")?.value
+
     return NextResponse.json({
       sessions: sessions.map((s) => ({
         id: s.id,
         expires: s.expires.toISOString(),
-        isCurrent: s.sessionToken === session.sessionToken,
+        isCurrent: currentToken ? s.sessionToken === currentToken : false,
       })),
     })
   } catch (error) {
@@ -44,7 +49,6 @@ export async function DELETE(req: Request) {
     const { sessionId } = await req.json()
 
     if (sessionId) {
-      // Delete specific session
       await db.session.deleteMany({
         where: {
           id: sessionId,
@@ -52,13 +56,18 @@ export async function DELETE(req: Request) {
         },
       })
     } else {
-      // Delete all other sessions
-      await db.session.deleteMany({
-        where: {
-          userId: session.user.id,
-          sessionToken: { not: session.sessionToken },
-        },
-      })
+      const cookieStore = await cookies()
+      const currentToken = cookieStore.get("next-auth.session-token")?.value
+        ?? cookieStore.get("__Secure-next-auth.session-token")?.value
+
+      if (currentToken) {
+        await db.session.deleteMany({
+          where: {
+            userId: session.user.id,
+            sessionToken: { not: currentToken },
+          },
+        })
+      }
     }
 
     return NextResponse.json({ success: true })
