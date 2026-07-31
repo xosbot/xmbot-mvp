@@ -32,6 +32,7 @@ model User {
   role                        Role     @default(USER)
   phone                       String?
   isActive                    Boolean  @default(false)
+  emailVerified               DateTime?
   telegramChatId              String?
   binanceApiKeyEncrypted      String?
   binanceApiSecretEncrypted   String?

@@ -1,0 +1,113 @@
+"use client"
+
+import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { CheckCircle, Mail, ArrowLeft, XCircle } from "lucide-react"
+import { useEffect, useState } from "react"
+
+export default function VerifyEmailPage() {
+  const searchParams = useSearchParams()
+  const [email, setEmail] = useState("")
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const verified = searchParams.get("verified") === "true"
+  const error = searchParams.get("error")
+
+  useEffect(() => {
+    const stored = localStorage.getItem("pendingVerificationEmail")
+    if (stored) {
+      setEmail(stored)
+    }
+  }, [])
+
+  const handleResend = async () => {
+    if (!email) return
+    setSending(true)
+    try {
+      await fetch("/api/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+      setSent(true)
+    } catch {
+      // ignore
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (verified) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+        <Card className="w-full max-w-md bg-slate-900/50 border-slate-800">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-emerald-500" />
+            </div>
+            <CardTitle className="text-white">Email Verified!</CardTitle>
+            <CardDescription>Your email has been verified. You can now sign in.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/login">
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-500">Sign In</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+      <Card className="w-full max-w-md bg-slate-900/50 border-slate-800">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
+            <Mail className="h-6 w-6 text-emerald-500" />
+          </div>
+          <CardTitle className="text-white">Verify Your Email</CardTitle>
+          <CardDescription>
+            {error === "invalid-token"
+              ? "Invalid verification link."
+              : error === "expired-token"
+              ? "Verification link has expired."
+              : "Check your email for the verification link."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {error && (
+            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300 flex items-center gap-2">
+              <XCircle className="h-4 w-4" />
+              {error === "invalid-token" && "This verification link is invalid."}
+              {error === "expired-token" && "This verification link has expired. Please request a new one."}
+              {error === "verification-failed" && "Verification failed. Please try again."}
+            </div>
+          )}
+
+          {email && (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-400 text-center">
+                Didn&apos;t receive the email? Check spam or request a new one.
+              </p>
+              <Button
+                onClick={handleResend}
+                disabled={sending || sent}
+                variant="outline"
+                className="w-full border-slate-700 text-slate-300"
+              >
+                {sent ? "Email sent!" : sending ? "Sending..." : "Resend Verification Email"}
+              </Button>
+            </div>
+          )}
+
+          <Link href="/login" className="flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-white transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Login
+          </Link>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

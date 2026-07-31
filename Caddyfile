@@ -43,3 +43,24 @@ xm1.space {
 www.xm1.space {
     redir https://xm1.space{uri} permanent
 }
+
+fractalstrategylab.com {
+    log {
+        output file /data/caddy/fractal_access.log
+    }
+
+    encode gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    reverse_proxy 172.22.0.1:3001
+}
+
+www.fractalstrategylab.com {
+    redir https://fractalstrategylab.com{uri} permanent
+}

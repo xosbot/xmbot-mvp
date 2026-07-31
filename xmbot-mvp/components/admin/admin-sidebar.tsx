@@ -14,6 +14,7 @@ import {
   LogOut,
   Shield,
   Menu,
+  BarChart3,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -22,6 +23,7 @@ const adminNavItems = [
   { title: "Users", href: "/admin/users", icon: Users },
   { title: "Bot Instances", href: "/admin/bots", icon: Bot },
   { title: "Payments", href: "/admin/payments", icon: CreditCard },
+  { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
 ]
 
 function AdminSidebarContent({ onNavigate }: { onNavigate?: () => void }) {

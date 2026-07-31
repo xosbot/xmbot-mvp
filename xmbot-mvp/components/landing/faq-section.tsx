@@ -2,40 +2,17 @@
 
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
 
 const faqs = [
-  {
-    question: "Is my money safe?",
-    answer: "XMBot never has direct access to your funds. We connect via API keys with trading permissions only (no withdrawal). You can revoke access anytime. The 2% risk rule ensures no single trade can cause significant damage.",
-  },
-  {
-    question: "What if I'm not satisfied?",
-    answer: "We offer a full refund within 7 days of purchase if you're not satisfied. No questions asked. We want you to be confident in your decision.",
-  },
-  {
-    question: "What is XMBot?",
-    answer: "XMBot is an AI-powered trading platform for gold (XAUUSD). It uses a multi-agent system to analyze the market 24/5 and sends trading signals to your Telegram. You approve or reject each trade — no auto-execution without your say.",
-  },
-  {
-    question: "How does the human-in-the-loop work?",
-    answer: "When the AI identifies a trading opportunity, it sends a signal card to your Telegram with entry price, stop loss, take profit, and confidence score. You tap Approve or Reject. Only after your approval does the system execute the trade.",
-  },
-  {
-    question: "Do I need to keep my computer running?",
-    answer: "No. The engine runs on our servers 24/5 during market hours. You just need Telegram on your phone to receive signals and approve trades. No computer required.",
-  },
-  {
-    question: "What's the minimum capital needed?",
-    answer: "We recommend starting with at least $500 for paper trading. For live trading, $1,000+ is ideal to properly implement the 2% risk management rule. The bot trades 0.05 lot sizes by default.",
-  },
-  {
-    question: "What broker do you support?",
-    answer: "Currently: Paper Trading (for testing) and Binance (for PAXGUSDT). MetaTrader 5 and Interactive Brokers are coming soon. You can switch brokers without changing your strategy.",
-  },
-  {
-    question: "How is this different from other trading bots?",
-    answer: "Most bots trade automatically without your input. XMBot requires human approval for every trade. We also use a multi-agent architecture (not just simple indicators) and AI validation for higher-quality signals.",
-  },
+  { question: "Is my money safe?", answer: "XMBot never has direct access to your funds. We connect via API keys with trading permissions only (no withdrawal). You can revoke access anytime. The 2% risk rule ensures no single trade can cause significant damage." },
+  { question: "What if I'm not satisfied?", answer: "We offer a full refund within 7 days of purchase if you're not satisfied. No questions asked. We want you to be confident in your decision." },
+  { question: "What is XMBot?", answer: "XMBot is an AI-powered trading platform for gold (XAUUSD). It uses a multi-agent system to analyze the market 24/5 and sends trading signals to your Telegram. You approve or reject each trade — no auto-execution without your say." },
+  { question: "How does the human-in-the-loop work?", answer: "When the AI identifies a trading opportunity, it sends a signal card to your Telegram with entry price, stop loss, take profit, and confidence score. You tap Approve or Reject. Only after your approval does the system execute the trade." },
+  { question: "Do I need to keep my computer running?", answer: "No. The engine runs on our servers 24/5 during market hours. You just need Telegram on your phone to receive signals and approve trades. No computer required." },
+  { question: "What's the minimum capital needed?", answer: "We recommend starting with at least $500 for paper trading. For live trading, $1,000+ is ideal to properly implement the 2% risk management rule. The bot trades 0.05 lot sizes by default." },
+  { question: "What broker do you support?", answer: "Currently: Paper Trading (for testing) and Binance (for PAXGUSDT). MetaTrader 5 and Interactive Brokers are coming soon. You can switch brokers without changing your strategy." },
+  { question: "How is this different from other trading bots?", answer: "Most bots trade automatically without your input. XMBot requires human approval for every trade. We also use a multi-agent architecture (not just simple indicators) and AI validation for higher-quality signals." },
 ]
 
 function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
@@ -43,7 +20,7 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
   const id = `faq-answer-${index}`
 
   return (
-    <div className="border-b border-border/50 last:border-0">
+    <div className="border-b border-white/10 last:border-0">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center justify-between w-full py-5 text-left group"
@@ -53,19 +30,13 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
         <span className="text-base font-medium text-white group-hover:text-emerald-400 transition-colors pr-4">
           {question}
         </span>
-        <ChevronDown
-          className={`h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-300 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
+        <ChevronDown className={`h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       <div
         id={id}
         role="region"
         aria-labelledby={`faq-question-${index}`}
-        className={`overflow-hidden transition-all duration-300 ${
-          open ? "max-h-96 pb-5" : "max-h-0"
-        }`}
+        className={`overflow-hidden transition-all duration-300 ${open ? "max-h-96 pb-5" : "max-h-0"}`}
       >
         <p className="text-sm text-slate-400 leading-relaxed">{answer}</p>
       </div>
@@ -76,25 +47,29 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
 export function FAQSection() {
   return (
     <section id="faq" className="py-24 sm:py-32 relative" aria-labelledby="faq-heading">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
-            FAQ
+        <ScrollReveal>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
+              FAQ
+            </div>
+            <h2 id="faq-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+              Frequently Asked
+              <br />
+              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Questions</span>
+            </h2>
           </div>
-          <h2 id="faq-heading" className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-            Frequently Asked
-            <br />
-            <span className="text-gradient">Questions</span>
-          </h2>
-        </div>
+        </ScrollReveal>
 
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-6 sm:p-8" role="list">
-          {faqs.map((faq, index) => (
-            <FAQItem key={faq.question} {...faq} index={index} />
-          ))}
-        </div>
+        <ScrollReveal>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8" role="list">
+            {faqs.map((faq, index) => (
+              <FAQItem key={faq.question} {...faq} index={index} />
+            ))}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   )

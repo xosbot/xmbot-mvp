@@ -2,8 +2,10 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Activity, Zap, Bot, Lock } from "lucide-react"
+import { ArrowRight, Shield, Eye, TrendingUp, Activity } from "lucide-react"
 import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import { ParticleBackground } from "./particle-background"
 
 function TerminalSimulation() {
   const [lines, setLines] = useState<string[]>([])
@@ -24,7 +26,7 @@ function TerminalSimulation() {
     { text: "[APPROVAL] ✓ Approved by user in 12s", delay: 10500 },
     { text: "[ORDER] Filled: 0.05 lots @ $3,247.82", delay: 11500 },
     { text: "[MONITOR] Position active — trailing stop engaged", delay: 12500 },
-    { text: "[P&L] +$47.20 (+1.45%) 🟢", delay: 14000 },
+    { text: "[P&L] +$47.20 (+1.45%)", delay: 14000 },
   ]
 
   useEffect(() => {
@@ -54,8 +56,12 @@ function TerminalSimulation() {
   }
 
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-emerald-500/10">
-      {/* Terminal header */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+      className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-emerald-500/10"
+    >
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -68,14 +74,9 @@ function TerminalSimulation() {
           <span className="text-xs text-emerald-400 font-mono">LIVE</span>
         </div>
       </div>
-
-      {/* Terminal content */}
       <div className="p-5 font-mono text-[11px] leading-relaxed space-y-1 min-h-[340px]">
         {lines.map((line, i) => (
-          <div
-            key={`${i}-${line}`}
-            className={`${getLineColor(line)} animate-[fade-in_0.3s_ease-out]`}
-          >
+          <div key={`${i}-${line}`} className={`${getLineColor(line)} animate-[fade-in_0.3s_ease-out]`}>
             {line}
           </div>
         ))}
@@ -83,10 +84,8 @@ function TerminalSimulation() {
           <div className="w-2 h-4 bg-emerald-400 animate-[blink_1s_step-end_infinite]" />
         )}
       </div>
-
-      {/* Bottom glow */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
-    </div>
+    </motion.div>
   )
 }
 
@@ -99,14 +98,20 @@ function StatsBar() {
 
   return (
     <div className="grid grid-cols-3 gap-6 max-w-lg">
-      {stats.map((s) => (
-        <div key={s.label} className="text-center">
+      {stats.map((s, i) => (
+        <motion.div
+          key={s.label}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+          className="text-center"
+        >
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <s.icon className="h-3.5 w-3.5 text-emerald-400" />
             <span className="text-xl sm:text-2xl font-bold text-white font-mono">{s.value}</span>
           </div>
           <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
-        </div>
+        </motion.div>
       ))}
     </div>
   )
@@ -117,43 +122,60 @@ export function HeroSection() {
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
       {/* Background effects */}
       <div className="absolute inset-0 -z-10">
-        {/* Gradient mesh */}
         <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-emerald-500/[0.08] blur-[150px]" />
         <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-violet-600/[0.06] blur-[120px]" />
         <div className="absolute left-1/3 bottom-0 h-[600px] w-[600px] rounded-full bg-emerald-500/[0.04] blur-[100px]" />
-        {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
-        {/* Radial vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_70%)]" />
+      </div>
+
+      {/* Particle Network */}
+      <div className="absolute inset-0 -z-5">
+        <ParticleBackground />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Copy */}
           <div className="max-w-xl">
-            {/* Badge */}
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-400 animate-[fade-in_0.6s_ease-out]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-400"
+            >
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>AI-Powered Trading — Beta Open</span>
-            </div>
+            </motion.div>
 
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] animate-[slide-up_0.6s_ease-out_0.1s_both]">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
+            >
               <span className="text-white">Trade Gold</span>
               <br />
               <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">with AI Agents</span>
               <br />
               <span className="text-slate-300 text-4xl sm:text-5xl lg:text-6xl">You Stay in Control</span>
-            </h1>
+            </motion.h1>
 
-            {/* Subheadline */}
-            <p className="mt-8 text-lg text-slate-400 leading-relaxed animate-[slide-up_0.6s_ease-out_0.2s_both]">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mt-8 text-lg text-slate-400 leading-relaxed"
+            >
               Multi-agent system analyzes XAUUSD 24/5. Signals sent to your Telegram.
               You approve or reject. <span className="text-white font-medium">No auto-execution without your say.</span>
-            </p>
+            </motion.p>
 
-            {/* Trust badges */}
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-500 animate-[slide-up_0.6s_ease-out_0.3s_both]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-500"
+            >
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-emerald-500" />
                 <span>2% max risk per trade</span>
@@ -166,10 +188,14 @@ export function HeroSection() {
                 <TrendingUp className="h-4 w-4 text-emerald-500" />
                 <span>Backtested 6 months</span>
               </div>
-            </div>
+            </motion.div>
 
-            {/* CTAs */}
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 animate-[slide-up_0.6s_ease-out_0.4s_both]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-10 flex flex-col sm:flex-row gap-4"
+            >
               <Link href="/register">
                 <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
                   Start Free Trial
@@ -181,22 +207,20 @@ export function HeroSection() {
                   See How It Works
                 </Button>
               </Link>
-            </div>
+            </motion.div>
 
-            {/* Stats */}
-            <div className="mt-14 animate-[slide-up_0.6s_ease-out_0.5s_both]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="mt-14"
+            >
               <StatsBar />
-            </div>
+            </motion.div>
           </div>
 
-          {/* Right: Terminal */}
-          <div className="hidden lg:block animate-[scale-in_0.6s_ease-out_0.3s_both]">
-            <div aria-hidden="true">
-              <TerminalSimulation />
-            </div>
-            <p className="sr-only">
-              XMBot trading terminal simulation showing real-time AI analysis and trade execution
-            </p>
+          <div className="hidden lg:block">
+            <TerminalSimulation />
           </div>
         </div>
       </div>

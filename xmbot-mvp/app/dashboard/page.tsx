@@ -7,6 +7,8 @@ import { StatCard } from "@/components/dashboard/stats-cards"
 import { RecentTrades } from "@/components/dashboard/recent-trades"
 import { EngineStatus } from "@/components/dashboard/engine-status"
 import { PositionsPanel } from "@/components/dashboard/positions-panel"
+import { LivePnL } from "@/components/dashboard/live-pnl"
+import { TradeFeed } from "@/components/dashboard/trade-feed"
 import { TrendingUp, Bot, DollarSign, BarChart } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -76,53 +78,14 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-          <div className="lg:col-span-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title="Account Status"
-              value={user?.isActive ? "Active" : "Inactive"}
-              icon={Bot}
-              badge={
-                user?.isActive
-                  ? { label: "Active", variant: "default" }
-                  : { label: "Inactive", variant: "destructive" }
-              }
-            />
-            <StatCard
-              title="Active Bots"
-              value={String(activeBots)}
-              icon={Bot}
-              description="Running bot instances"
-            />
-            <StatCard
-              title="Win Rate"
-              value={`${winRate}%`}
-              icon={TrendingUp}
-              description={`${winStats} of ${totalTrades} trades`}
-            />
-            <StatCard
-              title="Total P&L"
-              value={`${totalPnL >= 0 ? "+" : ""}$${totalPnL.toFixed(2)}`}
-              icon={DollarSign}
-              description="Closed positions"
-            />
-            <StatCard
-              title="Total Trades"
-              value={String(totalTrades)}
-              icon={BarChart}
-              description="All time"
-            />
-            <StatCard
-              title="Open Trades"
-              value={String(openTradesCount)}
-              icon={TrendingUp}
-              description="Currently running"
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <LivePnL />
           <div>
             <EngineStatus />
           </div>
         </div>
+
+        <TradeFeed />
 
         <PositionsPanel />
 

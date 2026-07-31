@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectItem } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User, Wallet, CreditCard } from "lucide-react"
+import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User, Wallet, CreditCard, Monitor } from "lucide-react"
 import { BinanceForm } from "@/components/dashboard/binance-form"
 import { SubscriptionCard } from "@/components/dashboard/subscription-card"
+import { SessionsCard } from "@/components/dashboard/sessions-card"
 import { useToast } from "@/hooks/use-toast"
 import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes"
 
@@ -282,6 +283,10 @@ export default function SettingsPage() {
               <CreditCard className="h-4 w-4 mr-2" />
               Subscription
             </TabsTrigger>
+            <TabsTrigger value="sessions" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+              <Monitor className="h-4 w-4 mr-2" />
+              Sessions
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -524,6 +529,21 @@ export default function SettingsPage() {
 
           <TabsContent value="subscription">
             <SubscriptionCard />
+          </TabsContent>
+
+          <TabsContent value="sessions">
+            <Card className="bg-slate-900/50 border-slate-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Monitor className="h-5 w-5" />
+                  Active Sessions
+                </CardTitle>
+                <CardDescription>Manage your active login sessions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SessionsCard />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
