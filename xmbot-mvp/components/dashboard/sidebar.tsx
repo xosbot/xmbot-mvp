@@ -13,12 +13,15 @@ import {
   LogOut,
   Bot,
   Menu,
+  CreditCard,
 } from "lucide-react"
 import { useState } from "react"
 
 const navItems = [
   { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Bots", href: "/dashboard/bots", icon: Bot },
   { title: "Trades", href: "/dashboard/trades", icon: BarChart3 },
+  { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 

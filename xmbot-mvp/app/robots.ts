@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/dashboard/", "/admin/", "/api/"],
       },
     ],
-    sitemap: "https://xmbot.app/sitemap.xml",
+    sitemap: "https://xmbot.online/sitemap.xml",
   }
 }
