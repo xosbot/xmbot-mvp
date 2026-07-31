@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn"
 export function Spotlight({
   children,
   className,
-  fill = "rgba(16, 185, 129, 0.12)",
+  fill = "rgba(212, 175, 55, 0.12)",
 }: {
   children: React.ReactNode
   className?: string

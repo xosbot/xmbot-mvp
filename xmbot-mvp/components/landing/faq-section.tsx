@@ -17,18 +17,18 @@ const faqs = [
 export function FAQSection() {
   return (
     <section id="faq" className="py-24 sm:py-32 relative" aria-labelledby="faq-heading">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
               FAQ
             </div>
             <h2 id="faq-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Frequently Asked
               <br />
-              <span className="text-gradient-emerald">Questions</span>
+              <span className="text-gradient-gold">Questions</span>
             </h2>
           </div>
         </ScrollReveal>

@@ -10,7 +10,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 6%;
     --popover-foreground: 210 40% 98%;
-    --primary: 160 84% 39%;
+    --primary: 46 65% 52%;
     --primary-foreground: 222 47% 4%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -22,8 +22,11 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 160 84% 39%;
+    --ring: 46 65% 52%;
     --radius: 0.75rem;
+    /* Brand: gold is the identity/action color (logo, CTAs, chrome).
+       Emerald is reserved for positive financial data (P&L, win rate, returns) — never decorative. */
+    --gain: 160 84% 39%;
   }
 
   * {
@@ -68,13 +71,13 @@
 
 /* Selection */
 ::selection {
-  background: rgba(16, 185, 129, 0.3);
+  background: rgba(212, 175, 55, 0.35);
   color: white;
 }
 
-/* Gradient text utility */
+/* Gradient text utility — brand (gold) */
 .text-gradient {
-  background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
+  background: linear-gradient(135deg, #d4af37, #e4be55, #f6e6b4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -83,6 +86,10 @@
 /* Glow effects */
 .glow-emerald {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.2), 0 0 40px rgba(16, 185, 129, 0.1);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.25), 0 0 40px rgba(212, 175, 55, 0.12);
 }
 
 /* Animations */
@@ -121,7 +128,7 @@
   to { background-position: 200% 0; }
 }
 
-/* Gradient text utility */
+/* Gradient text utility — reserved for positive financial data (win rate, returns, P&L) */
 .text-gradient-emerald {
   background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
   -webkit-background-clip: text;
@@ -129,8 +136,9 @@
   background-clip: text;
 }
 
-.text-gradient-violet {
-  background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+/* Gradient text utility — brand identity accent (headlines, CTAs) */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d4af37, #e4be55, #f6e6b4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

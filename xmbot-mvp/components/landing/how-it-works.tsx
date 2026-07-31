@@ -9,51 +9,51 @@ const steps = [
   {
     icon: MessageSquare,
     number: "01",
+    time: "~2 min",
     title: "Connect Telegram",
-    description: "Link your Telegram account in 2 minutes. Set your risk preferences — max loss per trade, daily limits.",
-    color: "emerald" as const,
+    description: "Link your Telegram account and set your risk preferences — max loss per trade, daily limits. No install, no code.",
   },
   {
     icon: Brain,
     number: "02",
+    time: "Runs 24/5",
     title: "AI Scans the Market",
-    description: "Multi-agent engine analyzes XAUUSD every 5 minutes. RSI + Supertrend + ADX filters. AI validates every signal.",
-    color: "violet" as const,
+    description: "Multi-agent engine analyzes XAUUSD every 5 minutes — RSI, Supertrend, ADX — then an AI validator double-checks every candidate signal.",
   },
   {
     icon: CheckCircle,
     number: "03",
+    time: "~10 sec",
     title: "You Approve or Reject",
-    description: "Signal card arrives on Telegram with entry price, stop loss, take profit. Tap Approve or Reject.",
-    color: "emerald" as const,
+    description: "A signal card lands on Telegram with entry price, stop loss, and take profit already worked out. Tap Approve or Reject — nothing fires without you.",
   },
   {
     icon: BarChart3,
     number: "04",
+    time: "Anytime",
     title: "Track & Optimize",
-    description: "Monitor P&L on your dashboard. Review signal history. Adjust parameters. Get monthly reports.",
-    color: "violet" as const,
+    description: "Watch P&L on your dashboard, review past signals, and adjust risk settings whenever you want. Monthly reports keep you honest.",
   },
 ]
 
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
               How It Works
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
-              Four Steps to
+              Four Steps.
               <br />
-              <span className="text-gradient-emerald">Smarter Trading</span>
+              <span className="text-gradient-gold">15 Minutes Total.</span>
             </h2>
             <p className="mt-6 text-lg text-slate-400 leading-relaxed">
-              From setup to live signals in under 15 minutes. No coding required.
+              Start to finish, on your phone. No coding, no charts to learn, no software to install.
             </p>
           </div>
         </ScrollReveal>
@@ -61,21 +61,17 @@ export function HowItWorks() {
         {/* Timeline */}
         <div className="relative max-w-4xl mx-auto">
           {/* Tracing beam line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-emerald-500/50 via-violet-500/50 to-emerald-500/50" />
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-gold-500/50 via-gold-500/20 to-gold-500/50" />
 
           <StaggerChildren className="space-y-12" staggerDelay={0.2}>
-            {steps.map((step, i) => (
+            {steps.map((step) => (
               <StaggerItem key={step.number}>
                 <div className="relative flex gap-8 items-start">
                   {/* Step number circle */}
                   <div className="relative z-10 flex-shrink-0">
                     <LampEffect>
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
-                        step.color === "emerald"
-                          ? "bg-emerald-500/10 border border-emerald-500/20"
-                          : "bg-violet-500/10 border border-violet-500/20"
-                      }`}>
-                        <step.icon className={`h-7 w-7 ${step.color === "emerald" ? "text-emerald-400" : "text-violet-400"}`} />
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gold-500/10 border border-gold-500/20">
+                        <step.icon className="h-7 w-7 text-gold-400" />
                       </div>
                     </LampEffect>
                   </div>
@@ -83,14 +79,11 @@ export function HowItWorks() {
                   {/* Step content */}
                   <GlareCard className="flex-1 p-6 sm:p-8">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
-                        step.color === "emerald"
-                          ? "bg-emerald-500/10 text-emerald-400"
-                          : "bg-violet-500/10 text-violet-400"
-                      }`}>
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-gold-500/10 text-gold-400">
                         {step.number}
                       </span>
                       <h3 className="text-lg font-semibold text-white">{step.title}</h3>
+                      <span className="ml-auto text-xs font-mono text-slate-500">{step.time}</span>
                     </div>
                     <p className="text-sm text-slate-400 leading-relaxed">{step.description}</p>
                   </GlareCard>

@@ -38,7 +38,7 @@ export function CardSpotlight({
         className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
         style={{
           opacity,
-          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(16, 185, 129, 0.1), transparent 40%)`,
+          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(212, 175, 55, 0.1), transparent 40%)`,
         }}
       />
       <div className="relative z-10">{children}</div>

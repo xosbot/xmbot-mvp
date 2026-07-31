@@ -26,7 +26,7 @@ export function ExpandableCard({
         className="flex items-center justify-between w-full py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className="text-base font-medium text-white group-hover:text-emerald-400 transition-colors pr-4">
+        <span className="text-base font-medium text-white group-hover:text-gold-400 transition-colors pr-4">
           {title}
         </span>
         <div

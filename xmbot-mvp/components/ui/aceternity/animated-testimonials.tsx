@@ -56,14 +56,14 @@ export function AnimatedTestimonials({
                 &ldquo;{testimonial.content}&rdquo;
               </p>
               {testimonial.highlight && (
-                <div className="mb-6 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="text-xs font-medium text-emerald-400">
+                <div className="mb-6 px-3 py-2 rounded-lg bg-gold-500/10 border border-gold-500/20">
+                  <span className="text-xs font-medium text-gold-400">
                     &ldquo;{testimonial.highlight}&rdquo;
                   </span>
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500/20 to-violet-500/20 flex items-center justify-center text-sm font-bold text-white">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-500/20 to-emerald-500/20 flex items-center justify-center text-sm font-bold text-white">
                   {testimonial.name.charAt(0)}
                 </div>
                 <div>
@@ -82,7 +82,7 @@ export function AnimatedTestimonials({
             onClick={() => setActive(idx)}
             className={cn(
               "w-2 h-2 rounded-full transition-all duration-300",
-              idx === active ? "bg-emerald-400 w-6" : "bg-white/20 hover:bg-white/30"
+              idx === active ? "bg-gold-400 w-6" : "bg-white/20 hover:bg-white/30"
             )}
             aria-label={`Go to testimonial ${idx + 1}`}
           />

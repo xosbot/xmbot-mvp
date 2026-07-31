@@ -16,7 +16,7 @@ export function MovingBorder({
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: `conic-gradient(from 0deg, transparent 0%, #10b981 12.5%, transparent 25%, transparent 50%, #8b5cf6 62.5%, transparent 75%)`,
+          background: `conic-gradient(from 0deg, transparent 0%, #d4af37 12.5%, transparent 25%, transparent 50%, #10b981 62.5%, transparent 75%)`,
           animation: `spin ${duration}ms linear infinite`,
         }}
       />

@@ -30,7 +30,7 @@ export function BackgroundBeams({ className }: { className?: string }) {
       speed: 0.2 + Math.random() * 0.3,
       width: 1 + Math.random() * 2,
       opacity: 0.03 + Math.random() * 0.05,
-      hue: Math.random() > 0.5 ? 160 : 270,
+      hue: Math.random() > 0.5 ? 46 : 160,
     }))
 
     const animate = () => {

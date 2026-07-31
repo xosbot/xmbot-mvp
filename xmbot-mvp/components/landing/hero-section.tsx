@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Activity } from "lucide-react"
+import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { BackgroundBeams } from "@/components/ui/aceternity/background-beams"
@@ -52,7 +52,7 @@ function TerminalSimulation() {
   }, [currentLine])
 
   const getLineColor = (line: string) => {
-    if (line.includes("$")) return "text-emerald-400"
+    if (line.includes("$")) return "text-gold-400"
     if (line.includes("[SIGNAL]") || line.includes("[ORDER]") || line.includes("[APPROVAL]")) return "text-emerald-400 font-medium"
     if (line.includes("[P&L]")) return "text-emerald-400 font-bold text-sm"
     if (line.includes("[SCAN]")) return "text-slate-300"
@@ -65,9 +65,9 @@ function TerminalSimulation() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-      className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-emerald-500/10"
+      className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-gold-500/10"
     >
-      <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent opacity-50 pointer-events-none" />
+      <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-gold-500/20 via-transparent to-transparent opacity-50 pointer-events-none" />
       <div className="relative">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
           <div className="flex gap-1.5">
@@ -88,20 +88,20 @@ function TerminalSimulation() {
             </div>
           ))}
           {currentLine < terminalLines.length && (
-            <div className="w-2 h-4 bg-emerald-400 animate-[blink_1s_step-end_infinite]" />
+            <div className="w-2 h-4 bg-gold-400 animate-[blink_1s_step-end_infinite]" />
           )}
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gold-500/5 to-transparent pointer-events-none" />
     </motion.div>
   )
 }
 
 function StatsBar() {
   const stats = [
-    { label: "Win Rate", value: "64%", icon: TrendingUp },
-    { label: "6-Month Return", value: "+84.3%", icon: Activity },
-    { label: "Max Drawdown", value: "4.3%", icon: Shield },
+    { label: "Setup Time", value: "15 min", icon: Zap, tone: "gold" as const },
+    { label: "Win Rate", value: "64%", icon: TrendingUp, tone: "emerald" as const },
+    { label: "Max Drawdown", value: "4.3%", icon: Shield, tone: "emerald" as const },
   ]
 
   return (
@@ -115,7 +115,7 @@ function StatsBar() {
           className="text-center"
         >
           <div className="flex items-center justify-center gap-1.5 mb-1">
-            <s.icon className="h-3.5 w-3.5 text-emerald-400" />
+            <s.icon className={`h-3.5 w-3.5 ${s.tone === "gold" ? "text-gold-400" : "text-emerald-400"}`} />
             <span className="text-xl sm:text-2xl font-bold text-white font-mono tracking-tight">{s.value}</span>
           </div>
           <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
@@ -131,8 +131,8 @@ export function HeroSection() {
       <BackgroundBeams className="absolute inset-0 -z-10" />
 
       <div className="absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-emerald-500/[0.08] blur-[150px]" />
-        <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-violet-600/[0.06] blur-[120px]" />
+        <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-gold-500/[0.08] blur-[150px]" />
+        <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-emerald-600/[0.06] blur-[120px]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_70%)]" />
       </div>
@@ -144,10 +144,10 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-400"
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-sm text-gold-400"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>AI-Powered Trading — Beta Open</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
+              <span>Beta Open — Setup in 15 Minutes</span>
             </motion.div>
 
             <motion.div
@@ -158,11 +158,11 @@ export function HeroSection() {
               <LampEffect>
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-aggressive leading-[1.05]">
                   <span className="text-white">
-                    <TextGenerateEffect words="Trade Gold" filter={false} />
+                    <TextGenerateEffect words="Gold Trading," filter={false} />
                   </span>
                   <br />
-                  <span className="text-gradient-emerald">
-                    <FlipWords words={["with AI Agents", "You Stay in Control", "24/5 Without Emotions"]} duration={3000} />
+                  <span className="text-gradient-gold">
+                    <FlipWords words={["Simplified.", "On Telegram.", "In Your Control."]} duration={3000} />
                   </span>
                 </h1>
               </LampEffect>
@@ -174,8 +174,8 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-8 text-lg text-slate-400 leading-relaxed"
             >
-              Multi-agent system analyzes XAUUSD 24/5. Signals sent to your Telegram.
-              You approve or reject. <span className="text-white font-medium">No auto-execution without your say.</span>
+              No charts to babysit, no code to write. Connect Telegram, and the AI scans
+              XAUUSD 24/5 for you. <span className="text-white font-medium">Every signal lands in your pocket — you tap Approve or Reject.</span>
             </motion.p>
 
             <motion.div
@@ -185,16 +185,16 @@ export function HeroSection() {
               className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-500"
             >
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-emerald-500" />
-                <span>2% max risk per trade</span>
+                <Zap className="h-4 w-4 text-gold-500" />
+                <span>Live in 15 minutes</span>
               </div>
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-emerald-500" />
+                <Eye className="h-4 w-4 text-gold-500" />
                 <span>Human-in-the-loop</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-emerald-500" />
-                <span>Backtested 6 months</span>
+                <Shield className="h-4 w-4 text-gold-500" />
+                <span>2% max risk per trade</span>
               </div>
             </motion.div>
 
@@ -206,8 +206,8 @@ export function HeroSection() {
             >
               <MagneticButton>
                 <Link href="/register">
-                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
-                    Start Free Trial
+                  <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base shadow-lg shadow-gold-600/25 hover:shadow-gold-500/30 transition-all duration-300 group">
+                    Set Up in 15 Minutes
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>

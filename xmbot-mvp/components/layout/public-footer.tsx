@@ -33,17 +33,17 @@ export function PublicFooter() {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                <Zap className="h-5 w-5 text-emerald-400" />
+              <div className="w-9 h-9 rounded-xl bg-gold-500/10 flex items-center justify-center">
+                <Zap className="h-5 w-5 text-gold-400" />
               </div>
               <span className="text-lg font-bold tracking-aggressive">
                 <span className="text-white">XM</span>
-                <span className="text-emerald-400">Bot</span>
+                <span className="text-gold-400">Bot</span>
               </span>
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-              AI-powered gold trading with human-in-the-loop approval.
-              Multi-agent system. Backtested results. You stay in control.
+              Set up in 15 minutes on Telegram — no code, no charts to babysit.
+              The AI watches XAUUSD and proposes the trade. You always tap Approve or Reject.
             </p>
             <div className="mt-6 flex gap-4">
               <a href="https://x.com/xmbot" target="_blank" rel="noopener noreferrer" aria-label="Follow us on X (Twitter)" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-white/20 transition-colors">
