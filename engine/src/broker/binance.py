@@ -247,9 +247,26 @@ class BinanceBroker(Broker):
             )
 
         try:
+            # Try spot account first
             account = await self._request("GET", "/api/v3/account", signed=True)
             balance = float(account.get("totalWalletBalance", 0))
             equity = float(account.get("totalMarginBalance", 0))
+
+            # If spot balance is near zero, check margin account
+            if balance < 1.0:
+                try:
+                    margin = await self._request("GET", "/sapi/v1/margin/account", signed=True)
+                    for asset in margin.get("userAssets", []):
+                        if asset.get("asset") == "USDT":
+                            margin_balance = float(asset.get("netAsset", 0))
+                            if margin_balance > balance:
+                                balance = margin_balance
+                                equity = margin_balance
+                                log.info(f"Using margin balance: {balance:.2f} USDT")
+                                break
+                except Exception:
+                    pass
+
             return AccountInfo(
                 broker="binance",
                 balance=balance,
