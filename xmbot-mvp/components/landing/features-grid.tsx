@@ -25,7 +25,7 @@ const features = [
     icon: BarChart3,
     title: "Backtested & Validated",
     description: "64% win rate. +84.3% return. 4.3% max drawdown. Walk-forward validated on unseen data. Not just backtest overfitting.",
-    color: "emerald" as const,
+    color: "violet" as const,
   },
   {
     icon: Bell,
@@ -43,30 +43,30 @@ const features = [
     icon: Layers,
     title: "Multi-Broker",
     description: "Paper Trading for testing. Binance for crypto. MetaTrader 5 for forex. Interactive Brokers for stocks. Switch without changing strategy.",
-    color: "violet" as const,
+    color: "emerald" as const,
   },
   {
     icon: Zap,
     title: "24/5 Execution",
     description: "Engine runs around the clock during market hours. No emotions, no FOMO, no revenge trading. Just the system, executing the plan.",
-    color: "violet" as const,
+    color: "emerald" as const,
   },
 ]
 
 export function FeaturesGrid() {
   return (
     <section id="features" className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
             Platform
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
             Built for
             <br />
-            <span className="text-gradient">Serious Traders</span>
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Serious Traders</span>
           </h2>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Everything you need to run a disciplined, automated gold trading operation.
@@ -77,7 +77,7 @@ export function FeaturesGrid() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="relative p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 hover:border-border transition-all duration-300 group hover:shadow-lg hover:shadow-black/20"
+              className="relative p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 group hover:shadow-lg hover:shadow-black/20"
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
                 f.color === "emerald"

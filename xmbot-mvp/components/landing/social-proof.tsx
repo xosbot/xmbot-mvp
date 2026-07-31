@@ -29,17 +29,17 @@ const testimonials = [
 export function SocialProof() {
   return (
     <section className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
             Beta Users
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
             Trusted by
             <br />
-            <span className="text-gradient">Real Traders</span>
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Real Traders</span>
           </h2>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Early beta users are seeing results. Here&apos;s what they say.
@@ -50,7 +50,7 @@ export function SocialProof() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="relative p-6 sm:p-8 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 hover:border-border transition-all duration-300 group"
+              className="relative p-6 sm:p-8 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 group"
             >
               {/* Stars */}
               <div className="flex gap-1 mb-5">

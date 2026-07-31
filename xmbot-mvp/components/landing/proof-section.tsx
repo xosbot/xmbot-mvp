@@ -32,7 +32,7 @@ function AnimatedNumber({ target, suffix = "", prefix = "" }: { target: number; 
   }, [target, hasAnimated])
 
   return (
-    <div ref={ref} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white font-mono tracking-tight">
+    <div ref={ref} className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white font-mono tracking-tight">
       {prefix}{target % 1 === 0 ? Math.round(current) : current.toFixed(1)}{suffix}
     </div>
   )
@@ -43,18 +43,18 @@ export function ProofSection() {
     <section id="results" className="py-24 sm:py-32 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-emerald-500/[0.03] to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-emerald-500/[0.04] to-background" />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
             Backtested Results
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
             Numbers That
             <br />
-            <span className="text-gradient">Speak for Themselves</span>
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Speak for Themselves</span>
           </h2>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Validated on 6 months of XAUUSD M5 data with walk-forward analysis.
@@ -63,11 +63,11 @@ export function ProofSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Win Rate */}
-          <div className="relative p-8 rounded-2xl border border-border/60 bg-card/40 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative p-8 rounded-2xl border border-white/10 bg-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <svg className="h-7 w-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <svg className="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round"/>
                   <polyline points="22 4 12 14.01 9 11.01" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -79,11 +79,11 @@ export function ProofSection() {
           </div>
 
           {/* Return */}
-          <div className="relative p-8 rounded-2xl border border-border/60 bg-card/40 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative p-8 rounded-2xl border border-white/10 bg-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <svg className="h-7 w-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <svg className="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" strokeLinecap="round" strokeLinejoin="round"/>
                   <polyline points="17 6 23 6 23 12" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -95,11 +95,11 @@ export function ProofSection() {
           </div>
 
           {/* Max Drawdown */}
-          <div className="relative p-8 rounded-2xl border border-border/60 bg-card/40 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative p-8 rounded-2xl border border-white/10 bg-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <svg className="h-7 w-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <svg className="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
@@ -110,16 +110,16 @@ export function ProofSection() {
           </div>
 
           {/* Profit Factor */}
-          <div className="relative p-8 rounded-2xl border border-border/60 bg-card/40 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative p-8 rounded-2xl border border-white/10 bg-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <svg className="h-7 w-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                <svg className="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="12" y1="1" x2="12" y2="23" strokeLinecap="round"/>
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <AnimatedNumber target={2.1} prefix="" suffix="x" />
+              <AnimatedNumber target={2.1} suffix="x" />
               <div className="mt-3 text-sm font-medium text-slate-300">Profit Factor</div>
               <div className="mt-1 text-xs text-slate-500">Gross profit / gross loss</div>
             </div>

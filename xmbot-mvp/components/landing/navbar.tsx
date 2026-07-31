@@ -47,7 +47,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-black/20"
+          ? "bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
           : "bg-transparent"
       }`}
     >
@@ -109,7 +109,7 @@ export function Navbar() {
       <div
         ref={menuRef}
         id="mobile-menu"
-        className={`md:hidden bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 overflow-hidden ${
+        className={`md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 overflow-hidden ${
           mobileOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 border-b-0"
         }`}
         role="region"

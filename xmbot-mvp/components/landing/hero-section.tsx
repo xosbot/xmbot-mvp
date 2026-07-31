@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Activity } from "lucide-react"
+import { ArrowRight, Shield, Eye, TrendingUp, Activity, Zap, Bot, Lock } from "lucide-react"
 import { useEffect, useState } from "react"
 
 function TerminalSimulation() {
@@ -10,21 +10,21 @@ function TerminalSimulation() {
   const [currentLine, setCurrentLine] = useState(0)
 
   const terminalLines = [
-    { text: "$ xmbot-engine --mode=live", delay: 0 },
-    { text: "[ENGINE] Starting multi-agent system...", delay: 800 },
-    { text: "[ENGINE] Technical Analysis Agent registered", delay: 1600 },
-    { text: "[ENGINE] AI Validator Agent registered", delay: 2200 },
-    { text: "[ENGINE] Risk Manager Agent registered", delay: 2800 },
+    { text: "$ xmbot-engine --mode=live --broker=binance", delay: 0 },
+    { text: "[ENGINE] Initializing multi-agent system...", delay: 800 },
+    { text: "[ENGINE] Technical Analysis Agent loaded", delay: 1600 },
+    { text: "[ENGINE] AI Validator loaded (Gemini Pro)", delay: 2200 },
+    { text: "[ENGINE] Risk Manager loaded", delay: 2800 },
     { text: "[ENGINE] Scanning XAUUSD M5...", delay: 3500 },
     { text: "[SCAN] RSI: 38.2 | Supertrend: Bullish | ADX: 32.1", delay: 5000 },
-    { text: "[AI] Confidence: 82% — Signal validated", delay: 6200 },
+    { text: "[AI] Confidence: 82% — Signal validated ✓", delay: 6200 },
     { text: "[SIGNAL] BUY PAXGUSDT @ $3,247.80", delay: 7000 },
     { text: "[RISK] SL: $3,239.35 | TP: $3,264.70 | Risk: 2.0%", delay: 7500 },
     { text: "[TELEGRAM] Signal card sent → Awaiting approval...", delay: 8500 },
     { text: "[APPROVAL] ✓ Approved by user in 12s", delay: 10500 },
     { text: "[ORDER] Filled: 0.05 lots @ $3,247.82", delay: 11500 },
     { text: "[MONITOR] Position active — trailing stop engaged", delay: 12500 },
-    { text: "[P&L] +$47.20 (+1.45%)", delay: 14000 },
+    { text: "[P&L] +$47.20 (+1.45%) 🟢", delay: 14000 },
   ]
 
   useEffect(() => {
@@ -46,22 +46,23 @@ function TerminalSimulation() {
 
   const getLineColor = (line: string) => {
     if (line.includes("$")) return "text-emerald-400"
-    if (line.includes("[SIGNAL]") || line.includes("[ORDER]") || line.includes("[P&L]") || line.includes("[APPROVAL]")) return "text-emerald-400 font-medium"
+    if (line.includes("[SIGNAL]") || line.includes("[ORDER]") || line.includes("[APPROVAL]")) return "text-emerald-400 font-medium"
+    if (line.includes("[P&L]")) return "text-emerald-400 font-bold text-sm"
     if (line.includes("[SCAN]")) return "text-slate-300"
     if (line.includes("[TELEGRAM]") || line.includes("[MONITOR]")) return "text-yellow-400"
     return "text-slate-500"
   }
 
   return (
-    <div className="relative rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm overflow-hidden shadow-2xl shadow-black/40">
+    <div className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-emerald-500/10">
       {/* Terminal header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border/60 bg-card/50">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-500/80" />
           <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
           <div className="w-3 h-3 rounded-full bg-green-500/80" />
         </div>
-        <span className="text-xs text-muted-foreground ml-2 font-mono">xmbot-engine</span>
+        <span className="text-xs text-slate-500 ml-2 font-mono">xmbot-engine</span>
         <div className="ml-auto flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs text-emerald-400 font-mono">LIVE</span>
@@ -69,7 +70,7 @@ function TerminalSimulation() {
       </div>
 
       {/* Terminal content */}
-      <div className="p-4 font-mono text-xs space-y-1.5 min-h-[320px]">
+      <div className="p-5 font-mono text-[11px] leading-relaxed space-y-1 min-h-[340px]">
         {lines.map((line, i) => (
           <div
             key={`${i}-${line}`}
@@ -82,6 +83,9 @@ function TerminalSimulation() {
           <div className="w-2 h-4 bg-emerald-400 animate-[blink_1s_step-end_infinite]" />
         )}
       </div>
+
+      {/* Bottom glow */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
     </div>
   )
 }
@@ -94,14 +98,14 @@ function StatsBar() {
   ]
 
   return (
-    <div className="grid grid-cols-3 gap-4 max-w-md">
+    <div className="grid grid-cols-3 gap-6 max-w-lg">
       {stats.map((s) => (
         <div key={s.label} className="text-center">
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <s.icon className="h-3.5 w-3.5 text-emerald-400" />
             <span className="text-xl sm:text-2xl font-bold text-white font-mono">{s.value}</span>
           </div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">{s.label}</div>
+          <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
         </div>
       ))}
     </div>
@@ -114,11 +118,11 @@ export function HeroSection() {
       {/* Background effects */}
       <div className="absolute inset-0 -z-10">
         {/* Gradient mesh */}
-        <div className="absolute left-1/4 top-0 h-[700px] w-[700px] rounded-full bg-emerald-500/[0.07] blur-[150px]" />
-        <div className="absolute right-1/4 top-1/3 h-[500px] w-[500px] rounded-full bg-violet-600/[0.05] blur-[120px]" />
-        <div className="absolute left-1/3 bottom-0 h-[600px] w-[600px] rounded-full bg-emerald-500/[0.03] blur-[100px]" />
+        <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-emerald-500/[0.08] blur-[150px]" />
+        <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-violet-600/[0.06] blur-[120px]" />
+        <div className="absolute left-1/3 bottom-0 h-[600px] w-[600px] rounded-full bg-emerald-500/[0.04] blur-[100px]" />
         {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
         {/* Radial vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_70%)]" />
       </div>
@@ -134,18 +138,18 @@ export function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] animate-[slide-up_0.6s_ease-out_0.1s_both]">
-              <span className="text-white">Trade Gold with</span>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] animate-[slide-up_0.6s_ease-out_0.1s_both]">
+              <span className="text-white">Trade Gold</span>
               <br />
-              <span className="text-gradient">AI Agents</span>
+              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">with AI Agents</span>
               <br />
-              <span className="text-slate-300">You Stay in Control</span>
+              <span className="text-slate-300 text-4xl sm:text-5xl lg:text-6xl">You Stay in Control</span>
             </h1>
 
             {/* Subheadline */}
-            <p className="mt-6 text-lg text-slate-400 leading-relaxed animate-[slide-up_0.6s_ease-out_0.2s_both]">
+            <p className="mt-8 text-lg text-slate-400 leading-relaxed animate-[slide-up_0.6s_ease-out_0.2s_both]">
               Multi-agent system analyzes XAUUSD 24/5. Signals sent to your Telegram.
-              You approve or reject. No auto-execution without your say.
+              You approve or reject. <span className="text-white font-medium">No auto-execution without your say.</span>
             </p>
 
             {/* Trust badges */}
@@ -167,13 +171,13 @@ export function HeroSection() {
             {/* CTAs */}
             <div className="mt-10 flex flex-col sm:flex-row gap-4 animate-[slide-up_0.6s_ease-out_0.4s_both]">
               <Link href="/register">
-                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 h-12 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
+                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="#how-it-works">
-                <Button size="lg" variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800/50 h-12 text-base">
+                <Button size="lg" variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800/50 h-14 text-base">
                   See How It Works
                 </Button>
               </Link>
