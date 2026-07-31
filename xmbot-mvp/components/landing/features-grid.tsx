@@ -1,84 +1,96 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Bot, Users, Shield, BarChart3, Building2, Workflow, Bell, Cpu } from "lucide-react"
+"use client"
+
+import { Brain, Users, Shield, BarChart3, Bell, Bot, Layers, Zap } from "lucide-react"
 
 const features = [
   {
-    title: "Multi-Agent Architecture",
-    description: "Technical Analysis Agent for setups, AI validation via Gemini/Claude, and future agents for sentiment, fundamentals, and risk analysis.",
-    icon: Cpu,
+    icon: Brain,
+    title: "Multi-Agent AI",
+    description: "Technical Analysis Agent scans XAUUSD M5 with RSI + Supertrend + ADX. AI validates via Gemini/Claude. Future agents: sentiment, fundamentals, news.",
+    color: "emerald" as const,
   },
   {
-    title: "Human-in-the-Loop",
-    description: "Every signal goes through you. Approve, reject, or modify on Telegram before execution. You stay in control, the bot does the work.",
     icon: Users,
+    title: "Human-in-the-Loop",
+    description: "Every signal requires your approval. Review on Telegram, approve with one tap. No auto-execution without your explicit say-so.",
+    color: "emerald" as const,
   },
   {
-    title: "Multi-Broker Support",
-    description: "Works with Paper Trading, MetaTrader 5, and Interactive Brokers. Switch brokers without changing your strategy or configuration.",
-    icon: Building2,
-  },
-  {
-    title: "Risk Engine",
-    description: "Built-in position sizing, daily loss limits, max drawdown protection, and per-trade stop-loss enforcement. Your risk rules are non-negotiable.",
     icon: Shield,
+    title: "Risk Engine",
+    description: "2% max risk per trade. Daily loss limits. Max drawdown protection. Position sizing enforced. Your rules are non-negotiable.",
+    color: "emerald" as const,
   },
   {
-    title: "Backtested Strategy",
-    description: "RSI + Supertrend + ADX strategy validated on 6 months of XAUUSD M5 data. 64% win rate, +84.3% return, 4.3% max drawdown.",
     icon: BarChart3,
+    title: "Backtested & Validated",
+    description: "64% win rate. +84.3% return. 4.3% max drawdown. Walk-forward validated on unseen data. Not just backtest overfitting.",
+    color: "emerald" as const,
   },
   {
-    title: "Telegram Integration",
-    description: "Real-time signal cards with Approve/Reject/Modify buttons. Trade alerts, performance summaries, and system status — all in your chat.",
     icon: Bell,
+    title: "Telegram Alerts",
+    description: "Signal cards with Approve/Reject buttons. Trade alerts. P&L summaries. System status. Everything you need, right in your pocket.",
+    color: "violet" as const,
   },
   {
-    title: "Disciplined Execution",
-    description: "No emotions, no revenge trading, no FOMO. The engine follows the system precisely, executing only when all conditions are met.",
-    icon: Workflow,
-  },
-  {
-    title: "Live Dashboard",
-    description: "Web dashboard with live positions, P&L tracking, signal history, and engine status. Monitor your bots from any device.",
     icon: Bot,
+    title: "Live Dashboard",
+    description: "Real-time positions, P&L tracking, signal history, engine status. Monitor from any device, anywhere in the world.",
+    color: "violet" as const,
+  },
+  {
+    icon: Layers,
+    title: "Multi-Broker",
+    description: "Paper Trading for testing. Binance for crypto. MetaTrader 5 for forex. Interactive Brokers for stocks. Switch without changing strategy.",
+    color: "violet" as const,
+  },
+  {
+    icon: Zap,
+    title: "24/5 Execution",
+    description: "Engine runs around the clock during market hours. No emotions, no FOMO, no revenge trading. Just the system, executing the plan.",
+    color: "violet" as const,
   },
 ]
 
 export function FeaturesGrid() {
   return (
-    <section id="features" className="py-20 sm:py-28 border-t border-slate-800/50">
+    <section id="features" className="py-24 sm:py-32 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/50 px-4 py-1.5 text-xs text-slate-400 mb-4 uppercase tracking-wider">
-            <Workflow className="h-3 w-3" />
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
             Platform
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Built for Serious Traders
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+            Built for
+            <br />
+            <span className="text-gradient">Serious Traders</span>
           </h2>
-          <p className="mt-4 text-slate-400">
+          <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Everything you need to run a disciplined, automated gold trading operation.
           </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((feature) => (
-            <Card
-              key={feature.title}
-              className="group bg-slate-900/40 border-slate-800/60 hover:border-emerald-500/20 hover:bg-slate-900/60 transition-all duration-300"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="relative p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 hover:border-border transition-all duration-300 group hover:shadow-lg hover:shadow-black/20"
             >
-              <CardHeader>
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:bg-emerald-500/20 transition-colors">
-                  <feature.icon className="h-4 w-4 text-emerald-400" />
-                </div>
-                <h3 className="text-sm font-semibold text-white">{feature.title}</h3>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-slate-400 leading-relaxed">{feature.description}</p>
-              </CardContent>
-            </Card>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
+                f.color === "emerald"
+                  ? "bg-emerald-500/10 group-hover:bg-emerald-500/20"
+                  : "bg-violet-500/10 group-hover:bg-violet-500/20"
+              } transition-colors duration-300`}>
+                <f.icon className={`h-6 w-6 ${
+                  f.color === "emerald" ? "text-emerald-400" : "text-violet-400"
+                }`} />
+              </div>
+              <h3 className="text-base font-semibold text-white mb-2">{f.title}</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">{f.description}</p>
+            </div>
           ))}
         </div>
       </div>

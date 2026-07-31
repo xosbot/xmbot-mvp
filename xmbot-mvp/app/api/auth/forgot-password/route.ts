@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { randomBytes } from "crypto"
+import { randomBytes, createHash } from "crypto"
 import { rateLimit } from "@/lib/rate-limit"
 import { sendEmail } from "@/lib/email"
 import { passwordResetEmail } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
+
+function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex")
+}
 
 export async function POST(req: Request) {
   try {
@@ -26,11 +30,18 @@ export async function POST(req: Request) {
     }
 
     const token = randomBytes(32).toString("hex")
+    const hashedToken = hashToken(token)
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
-    await db.passwordResetToken.create({
-      data: { email, token, expiresAt },
-    })
+    await db.$transaction([
+      db.passwordResetToken.updateMany({
+        where: { email, usedAt: null },
+        data: { usedAt: new Date() },
+      }),
+      db.passwordResetToken.create({
+        data: { email, token: hashedToken, expiresAt },
+      }),
+    ])
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
     const resetLink = `${appUrl}/reset-password?token=${token}`

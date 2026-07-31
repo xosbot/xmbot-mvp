@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic"
 export default async function PaymentStatusPage({
   searchParams,
 }: {
-  searchParams: { order_id?: string }
+  searchParams: Promise<{ order_id?: string }>
 }) {
-  const orderId = searchParams.order_id
+  const { order_id: orderId } = await searchParams
 
   let status: "success" | "failed" | "pending" | "unknown" = "unknown"
 

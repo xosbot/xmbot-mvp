@@ -14,12 +14,24 @@ export async function GET(req: Request) {
     const url = new URL(req.url)
     const cursor = url.searchParams.get("cursor")
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10), 100)
+    const symbol = url.searchParams.get("symbol")
+    const type = url.searchParams.get("type")
+    const status = url.searchParams.get("status")
+    const sort = url.searchParams.get("sort") || "openTime-desc"
+
+    const [field, direction] = sort.split("-")
+    const orderBy = { [field]: direction as "asc" | "desc" }
+
+    const where = {
+      botInstance: { userId: session.user.id },
+      ...(symbol && { symbol }),
+      ...(type && { type: type as "BUY" | "SELL" }),
+      ...(status && { status: status as "OPEN" | "CLOSED" }),
+    }
 
     const trades = await db.trade.findMany({
-      where: {
-        botInstance: { userId: session.user.id },
-      },
-      orderBy: { openTime: "desc" },
+      where,
+      orderBy,
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     })

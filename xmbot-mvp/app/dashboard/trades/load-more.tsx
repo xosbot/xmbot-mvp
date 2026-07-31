@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Loader2, ChevronDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -19,6 +20,7 @@ interface Trade {
 }
 
 export function LoadMoreTrades() {
+  const searchParams = useSearchParams()
   const [trades, setTrades] = useState<Trade[]>([])
   const [loading, setLoading] = useState(false)
   const [cursor, setCursor] = useState<string | null>(null)
@@ -29,6 +31,15 @@ export function LoadMoreTrades() {
     try {
       const params = new URLSearchParams({ limit: "25" })
       if (cursor) params.set("cursor", cursor)
+
+      const symbol = searchParams.get("symbol")
+      const type = searchParams.get("type")
+      const status = searchParams.get("status")
+      const sort = searchParams.get("sort")
+      if (symbol) params.set("symbol", symbol)
+      if (type) params.set("type", type)
+      if (status) params.set("status", status)
+      if (sort) params.set("sort", sort)
 
       const res = await fetch(`/api/trades?${params}`)
       const data = await res.json()

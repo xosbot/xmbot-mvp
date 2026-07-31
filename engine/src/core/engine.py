@@ -370,7 +370,7 @@ class Engine:
     def _account_balance(self) -> float:
         """Get cached account balance for position sizing."""
         if not hasattr(self, "_cached_balance"):
-            self._cached_balance = 10000.0
+            self._cached_balance = 0.0
         return self._cached_balance
 
     def _resolve_user_id(self) -> str:

@@ -31,8 +31,7 @@ def init_api(engine: Engine) -> FastAPI:
     global engine_ref, _api_key
     engine_ref = engine
     _api_key = engine.config.api_key
-    if _api_key:
-        _add_auth_middleware()
+    _add_auth_middleware()
     return app
 
 
@@ -41,6 +40,8 @@ def _add_auth_middleware() -> None:
     async def auth_middleware(request: Request, call_next):
         if request.url.path in ("/health", "/docs", "/openapi.json"):
             return await call_next(request)
+        if not _api_key:
+            return JSONResponse(status_code=503, content={"detail": "Engine API key not configured"})
         key = request.headers.get("x-api-key", "")
         if key != _api_key:
             return JSONResponse(status_code=403, content={"detail": "Forbidden"})

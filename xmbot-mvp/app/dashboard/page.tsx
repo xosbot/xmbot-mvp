@@ -16,32 +16,50 @@ export default async function DashboardPage() {
 
   const userId = session.user.id
 
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    include: {
-      botInstances: { where: { status: "ACTIVE" } },
-    },
-  })
+  const [user, trades, tradeStats, openTradesCount] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      include: {
+        botInstances: { where: { status: "ACTIVE" } },
+      },
+    }),
+    db.trade.findMany({
+      where: {
+        botInstance: { userId },
+      },
+      orderBy: { openTime: "desc" },
+      take: 10,
+    }),
+    db.trade.aggregate({
+      where: {
+        botInstance: { userId },
+        status: "CLOSED",
+      },
+      _count: { id: true },
+      _sum: { profit: true },
+    }),
+    db.trade.count({
+      where: {
+        botInstance: { userId },
+        status: "OPEN",
+      },
+    }),
+  ])
 
-  const trades = await db.trade.findMany({
-    where: {
-      botInstance: { userId },
-    },
-    orderBy: { openTime: "desc" },
-    take: 10,
-  })
+  const totalTrades = tradeStats._count.id
+  const totalPnL = tradeStats._sum.profit ?? 0
 
-  const allTrades = await db.trade.findMany({
-    where: {
-      botInstance: { userId },
-      status: "CLOSED",
-    },
-  })
+  const winStats = totalTrades > 0
+    ? await db.trade.count({
+        where: {
+          botInstance: { userId },
+          status: "CLOSED",
+          profit: { gt: 0 },
+        },
+      })
+    : 0
 
-  const totalTrades = allTrades.length
-  const winningTrades = allTrades.filter((t) => (t.profit ?? 0) > 0).length
-  const winRate = totalTrades > 0 ? ((winningTrades / totalTrades) * 100).toFixed(1) : "0"
-  const totalPnL = allTrades.reduce((sum, t) => sum + (t.profit ?? 0), 0)
+  const winRate = totalTrades > 0 ? ((winStats / totalTrades) * 100).toFixed(1) : "0"
   const activeBots = user?.botInstances.length ?? 0
 
   return (
@@ -78,7 +96,7 @@ export default async function DashboardPage() {
               title="Win Rate"
               value={`${winRate}%`}
               icon={TrendingUp}
-              description={`${winningTrades} of ${totalTrades} trades`}
+              description={`${winStats} of ${totalTrades} trades`}
             />
             <StatCard
               title="Total P&L"
@@ -94,9 +112,7 @@ export default async function DashboardPage() {
             />
             <StatCard
               title="Open Trades"
-              value={String(
-                trades.filter((t) => t.status === "OPEN").length
-              )}
+              value={String(openTradesCount)}
               icon={TrendingUp}
               description="Currently running"
             />

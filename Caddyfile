@@ -14,8 +14,32 @@ xmbot.online {
         Permissions-Policy "camera=(), microphone=(), geolocation=()"
     }
 
-    reverse_proxy /api/engine/* web:3006
-    reverse_proxy /api/* web:3006
-    reverse_proxy /_next/* web:3006
-    reverse_proxy /* web:3006
+    reverse_proxy /api/* web:3000
+    reverse_proxy /_next/* web:3000
+    reverse_proxy /* web:3000
+}
+
+www.xmbot.online {
+    redir https://xmbot.online{uri} permanent
+}
+
+xm1.space {
+    log {
+        output file /data/caddy/xm1_access.log
+    }
+
+    encode gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    reverse_proxy 172.22.0.1:5000
+}
+
+www.xm1.space {
+    redir https://xm1.space{uri} permanent
 }

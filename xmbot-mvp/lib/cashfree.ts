@@ -1,5 +1,8 @@
 import { Cashfree, CFEnvironment, type CreateOrderRequest } from "cashfree-pg"
 
+export { PLANS, getExpiryDate } from "./plans"
+export type { PlanKey } from "./plans"
+
 function getCashfreeClient() {
   const env =
     process.env.CASHFREE_ENV === "PRODUCTION"
@@ -14,31 +17,6 @@ function getCashfreeClient() {
 }
 
 export const cashfree = getCashfreeClient()
-
-export const PLANS = {
-  beta: { name: "Beta Access", amount: 9999, currency: "INR", label: "₹9,999", originalLabel: "₹19,999", discountLabel: "50% off", period: "/3 months", popular: false },
-  monthly: { name: "Monthly", amount: 2999, currency: "INR", label: "₹2,999", period: "/month", popular: false },
-  quarterly: { name: "Quarterly", amount: 7999, currency: "INR", label: "₹7,999", period: "/quarter", popular: true },
-  yearly: { name: "Yearly", amount: 24999, currency: "INR", label: "₹24,999", period: "/year", popular: false },
-} as const
-
-export type PlanKey = keyof typeof PLANS
-
-export function getExpiryDate(plan: string): Date {
-  const now = new Date()
-  switch (plan) {
-    case "monthly":
-      return new Date(now.setMonth(now.getMonth() + 1))
-    case "quarterly":
-      return new Date(now.setMonth(now.getMonth() + 3))
-    case "yearly":
-      return new Date(now.setFullYear(now.getFullYear() + 1))
-    case "beta":
-      return new Date(now.setMonth(now.getMonth() + 3))
-    default:
-      return new Date(now.setMonth(now.getMonth() + 1))
-  }
-}
 
 export async function createCashfreeOrder({
   orderId,

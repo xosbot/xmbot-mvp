@@ -81,7 +81,9 @@ class PaperBroker(Broker):
         return OrderResult(success=True, order_id=order.id, filled_price=filled_price, filled_volume=order.volume)
 
     async def cancel_order(self, order_id: str) -> bool:
-        return True
+        before = len(self._positions)
+        self._positions = [p for p in self._positions if p.id != order_id]
+        return len(self._positions) < before
 
     async def modify_position(
         self,
@@ -155,7 +157,7 @@ class PaperBroker(Broker):
             await asyncio.sleep(1)
 
     def _simulate_price_movement(self) -> None:
-        stopped_out: list[str] = []
+        closed: list[str] = []
         for pos in self._positions:
             tick = self._prices.get(pos.symbol, 2650.0)
             change = random.uniform(-2.0, 2.0)
@@ -168,9 +170,25 @@ class PaperBroker(Broker):
             else:
                 pos.unrealized_pnl = (pos.entry_price - new_price) * pos.volume * 100
 
-            if new_price <= pos.stop_loss:
+            # Stop-loss check
+            if pos.direction == SignalAction.BUY and new_price <= pos.stop_loss:
                 pos.unrealized_pnl = 0
-                stopped_out.append(pos.id)
+                closed.append(pos.id)
+                log.info(f"Paper: Position {pos.id} stopped out at {new_price:.2f}")
+            elif pos.direction == SignalAction.SELL and new_price >= pos.stop_loss:
+                pos.unrealized_pnl = 0
+                closed.append(pos.id)
                 log.info(f"Paper: Position {pos.id} stopped out at {new_price:.2f}")
 
-        self._positions = [p for p in self._positions if p.id not in stopped_out]
+            # Take-profit check
+            elif pos.take_profit is not None:
+                if pos.direction == SignalAction.BUY and new_price >= pos.take_profit:
+                    pos.unrealized_pnl = (pos.take_profit - pos.entry_price) * pos.volume * 100
+                    closed.append(pos.id)
+                    log.info(f"Paper: Position {pos.id} take-profit at {new_price:.2f}")
+                elif pos.direction == SignalAction.SELL and new_price <= pos.take_profit:
+                    pos.unrealized_pnl = (pos.entry_price - pos.take_profit) * pos.volume * 100
+                    closed.append(pos.id)
+                    log.info(f"Paper: Position {pos.id} take-profit at {new_price:.2f}")
+
+        self._positions = [p for p in self._positions if p.id not in closed]

@@ -83,13 +83,9 @@ class BinanceBroker(Broker):
             params = {}
         if signed:
             params = self._sign(params)
-            params = self._headers()
 
         url = f"{self._get_base_url()}{path}"
-        if not signed:
-            headers = {}
-        else:
-            headers = self._headers()
+        headers = self._headers() if signed else {}
 
         if self._session is None:
             self._session = aiohttp.ClientSession()

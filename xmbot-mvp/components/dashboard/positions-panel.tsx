@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TrendingUp, TrendingDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react"
 
 interface Position {
   id: string
@@ -70,24 +71,31 @@ function PositionCard({ position }: { position: Position }) {
 export function PositionsPanel() {
   const [positions, setPositions] = useState<Position[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function fetchPositions() {
-      try {
-        const res = await fetch("/api/engine/positions")
-        if (res.ok) {
-          const data = await res.json()
-          setPositions(data.positions || [])
-        }
-      } catch (error) {
-        console.error("Positions fetch error:", error)
+  const fetchPositions = useCallback(async () => {
+    try {
+      const res = await fetch("/api/engine/positions")
+      if (res.ok) {
+        const data = await res.json()
+        setPositions(data.positions || [])
+        setError(null)
+      } else {
+        setError("Failed to load positions")
       }
+    } catch (error) {
+      console.error("Positions fetch error:", error)
+      setError("Network error. Please check your connection.")
+    } finally {
       setLoading(false)
     }
+  }, [])
+
+  useEffect(() => {
     fetchPositions()
     const interval = setInterval(fetchPositions, 15000)
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchPositions])
 
   if (loading && positions.length === 0) {
     return (
@@ -96,7 +104,32 @@ export function PositionsPanel() {
           <CardTitle className="text-white">Open Positions</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-slate-500">Loading...</p>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <RefreshCw className="h-3 w-3 animate-spin" />
+            Loading positions...
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error && positions.length === 0) {
+    return (
+      <Card className="bg-slate-900/50 border-slate-800">
+        <CardHeader>
+          <CardTitle className="text-white">Open Positions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-red-400">{error}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchPositions}
+            className="w-full text-xs"
+          >
+            <RefreshCw className="h-3 w-3 mr-2" />
+            Retry
+          </Button>
         </CardContent>
       </Card>
     )

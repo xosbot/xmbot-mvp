@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Check, Loader2, Shield, Star } from "lucide-react"
-import { PLANS } from "@/lib/cashfree"
+import { PLANS } from "@/lib/plans"
 
 const betaFeatures = [
   "Full bot access for XAUUSD",

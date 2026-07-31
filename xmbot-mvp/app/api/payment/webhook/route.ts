@@ -13,8 +13,8 @@ function verifyWebhookSignature(
   timestamp: string
 ): boolean {
   if (!CASHFREE_SECRET_KEY) {
-    console.warn("CASHFREE_SECRET_KEY not set — skipping signature verification")
-    return true
+    console.error("CASHFREE_SECRET_KEY not set — rejecting webhook")
+    return false
   }
 
   try {

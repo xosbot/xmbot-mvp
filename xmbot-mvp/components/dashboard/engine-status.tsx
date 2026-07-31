@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Cpu, Wifi, Activity } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Cpu, Wifi, Activity, RefreshCw, Play, Square, RotateCw } from "lucide-react"
 
 interface EngineStatus {
   engine: "running" | "stopped" | "error" | "unknown"
@@ -26,49 +27,105 @@ export function EngineStatus() {
   const [status, setStatus] = useState<EngineStatus | null>(null)
   const [account, setAccount] = useState<AccountInfo | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [controlLoading, setControlLoading] = useState<"start" | "stop" | "restart" | null>(null)
+
+  const fetchData = useCallback(async () => {
+    try {
+      setError(null)
+      const [statusRes, accountRes] = await Promise.allSettled([
+        fetch("/api/engine/status"),
+        fetch("/api/engine/account"),
+      ])
+
+      if (statusRes.status === "fulfilled" && statusRes.value.ok) {
+        setStatus(await statusRes.value.json())
+      } else {
+        setError("Could not connect to engine")
+      }
+
+      if (accountRes.status === "fulfilled" && accountRes.value.ok) {
+        setAccount(await accountRes.value.json())
+      }
+
+      setLastUpdate(new Date())
+    } catch (error) {
+      console.error("Engine status fetch error:", error)
+      setError("Network error. Please check your connection.")
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [statusRes, accountRes] = await Promise.allSettled([
-          fetch("/api/engine/status"),
-          fetch("/api/engine/account"),
-        ])
-
-        if (statusRes.status === "fulfilled" && statusRes.value.ok) {
-          setStatus(await statusRes.value.json())
-        }
-
-        if (accountRes.status === "fulfilled" && accountRes.value.ok) {
-          setAccount(await accountRes.value.json())
-        }
-
-        setLastUpdate(new Date())
-      } catch (error) {
-        console.error("Engine status fetch error:", error)
-      }
-    }
-
     fetchData()
     const interval = setInterval(fetchData, 10000)
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchData])
 
-  if (!status) {
+  const handleControl = async (action: "start" | "stop" | "restart") => {
+    setControlLoading(action)
+    try {
+      const res = await fetch("/api/engine/control", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      })
+
+      if (res.ok) {
+        await fetchData()
+      } else {
+        const data = await res.json()
+        setError(data.error || `Failed to ${action} engine`)
+      }
+    } catch (err) {
+      setError(`Network error during ${action}`)
+    } finally {
+      setControlLoading(null)
+    }
+  }
+
+  if (loading && !status) {
     return (
       <Card className="bg-slate-900/50 border-slate-800">
         <CardHeader>
           <CardTitle className="text-white text-sm">Engine Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-slate-500">Connecting to engine...</p>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <RefreshCw className="h-3 w-3 animate-spin" />
+            Connecting to engine...
+          </div>
         </CardContent>
       </Card>
     )
   }
 
-  const isRunning = status.engine === "running"
-  const statusVariant = isRunning ? "default" : status.engine === "error" ? "destructive" : "secondary"
+  if (error && !status) {
+    return (
+      <Card className="bg-slate-900/50 border-slate-800">
+        <CardHeader>
+          <CardTitle className="text-white text-sm">Engine Status</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-red-400">{error}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchData}
+            className="w-full text-xs"
+          >
+            <RefreshCw className="h-3 w-3 mr-2" />
+            Retry
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const isRunning = status?.engine === "running"
+  const statusVariant = isRunning ? "default" : status?.engine === "error" ? "destructive" : "secondary"
 
   return (
     <Card className="bg-slate-900/50 border-slate-800">
@@ -80,22 +137,22 @@ export function EngineStatus() {
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-400">Engine</span>
           <Badge variant={statusVariant} className="text-xs">
-            {status.engine}
+            {status?.engine}
           </Badge>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-400">Broker</span>
           <div className="flex items-center gap-1.5">
-            <Wifi className={`h-3 w-3 ${status.brokerConnected ? "text-emerald-500" : "text-red-400"}`} />
-            <span className="text-xs text-white">{status.broker}</span>
+            <Wifi className={`h-3 w-3 ${status?.brokerConnected ? "text-emerald-500" : "text-red-400"}`} />
+            <span className="text-xs text-white">{status?.broker}</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-400">Agents</span>
           <div className="flex gap-1">
-            {status.agents.map((a) => (
+            {status?.agents.map((a) => (
               <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
             ))}
           </div>
@@ -103,7 +160,7 @@ export function EngineStatus() {
 
         <div className="flex items-center justify-between">
           <span className="text-xs text-slate-400">Pending Signals</span>
-          <span className="text-xs text-white font-medium">{status.pendingSignals}</span>
+          <span className="text-xs text-white font-medium">{status?.pendingSignals}</span>
         </div>
 
         {account && (
@@ -120,10 +177,66 @@ export function EngineStatus() {
           </>
         )}
 
+        <div className="border-t border-slate-800 pt-3">
+          <div className="flex gap-2">
+            {isRunning ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleControl("stop")}
+                  disabled={controlLoading !== null}
+                  className="flex-1 h-7 text-xs border-slate-700 text-red-400 hover:text-red-300"
+                >
+                  {controlLoading === "stop" ? (
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Square className="h-3 w-3 mr-1" />
+                  )}
+                  Stop
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleControl("restart")}
+                  disabled={controlLoading !== null}
+                  className="flex-1 h-7 text-xs border-slate-700 text-slate-400"
+                >
+                  {controlLoading === "restart" ? (
+                    <RefreshCw className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <RotateCw className="h-3 w-3 mr-1" />
+                  )}
+                  Restart
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleControl("start")}
+                disabled={controlLoading !== null}
+                className="w-full h-7 text-xs border-slate-700 text-emerald-400 hover:text-emerald-300"
+              >
+                {controlLoading === "start" ? (
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Play className="h-3 w-3 mr-1" />
+                )}
+                Start Engine
+              </Button>
+            )}
+          </div>
+        </div>
+
         {lastUpdate && (
           <p className="text-[10px] text-slate-600 pt-1">
             Updated {lastUpdate.toLocaleTimeString()}
           </p>
+        )}
+
+        {error && (
+          <p className="text-[10px] text-red-400">{error}</p>
         )}
       </CardContent>
     </Card>

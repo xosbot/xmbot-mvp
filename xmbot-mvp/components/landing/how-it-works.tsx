@@ -1,83 +1,96 @@
-import { Card } from "@/components/ui/card"
-import { Brain, CheckCircle, TrendingUp, CircuitBoard } from "lucide-react"
+"use client"
+
+import { MessageSquare, Brain, CheckCircle, BarChart3 } from "lucide-react"
 
 const steps = [
   {
-    step: "01",
-    title: "AI Agents Analyze",
-    description: "Technical Analysis Agent scans XAUUSD on M5 timeframe. RSI + Supertrend + ADX filter isolates high-probability entries with 64% win rate.",
+    icon: MessageSquare,
+    number: "01",
+    title: "Connect Telegram",
+    description: "Link your Telegram account in 2 minutes. Set your risk preferences — max loss per trade, daily limits, position sizing.",
+    color: "emerald",
+  },
+  {
     icon: Brain,
-    badge: "emerald",
+    number: "02",
+    title: "AI Scans the Market",
+    description: "Multi-agent engine analyzes XAUUSD every 5 minutes. RSI + Supertrend + ADX filters. AI validates every signal before it reaches you.",
+    color: "violet",
   },
   {
-    step: "02",
-    title: "Risk Check & You Approve",
-    description: "Risk engine enforces 2% max risk per trade and daily limits. You receive a signal card on Telegram with Approve / Reject buttons. No auto-execution without your say.",
     icon: CheckCircle,
-    badge: "violet",
+    number: "03",
+    title: "You Approve or Reject",
+    description: "Signal card arrives on Telegram with entry price, stop loss, take profit, and confidence score. Tap Approve or Reject. Your money, your call.",
+    color: "emerald",
   },
   {
-    step: "03",
-    title: "Executed with Risk Controls",
-    description: "Approved signals go through the Risk Engine — max drawdown, daily loss limits, position sizing. Then executed via your broker (Paper, MT5, or IBKR).",
-    icon: TrendingUp,
-    badge: "emerald",
+    icon: BarChart3,
+    number: "04",
+    title: "Track & Optimize",
+    description: "Monitor P&L on your dashboard. Review signal history. Adjust parameters. Get monthly performance reports delivered to Telegram.",
+    color: "violet",
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 sm:py-28 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute right-0 top-1/2 h-[400px] w-[400px] rounded-full bg-emerald-500/5 blur-[100px]" />
-      </div>
+    <section id="how-it-works" className="py-24 sm:py-32 relative">
+      {/* Subtle gradient divider */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/50 px-4 py-1.5 text-xs text-slate-400 mb-4 uppercase tracking-wider">
-            <CircuitBoard className="h-3 w-3" />
-            Pipeline
+        <div className="text-center max-w-2xl mx-auto mb-20">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs text-muted-foreground mb-6 uppercase tracking-wider">
+            How It Works
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            From Signal to Trade in 3 Steps
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+            Four Steps to
+            <br />
+            <span className="text-gradient">Smarter Trading</span>
           </h2>
-          <p className="mt-4 text-slate-400">
-            Every trade goes through the same disciplined pipeline. No shortcuts, no emotions.
+          <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+            From setup to live signals in under 15 minutes. No coding required.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
-          <div className="hidden md:block absolute top-1/2 left-[20%] right-[20%] h-px bg-gradient-to-r from-emerald-500/40 via-slate-700 to-violet-500/40 -translate-y-1/2" />
-
-          {steps.map((s) => (
-            <Card
-              key={s.step}
-              className={`relative bg-slate-900/60 border-slate-800 transition-colors backdrop-blur-sm ${
-                s.badge === "emerald"
-                  ? "hover:border-emerald-500/30"
-                  : "hover:border-violet-500/30"
-              }`}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {steps.map((step, i) => (
+            <div
+              key={step.number}
+              className="relative group"
             >
-              <div className={`absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border ${
-                s.badge === "emerald"
-                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                  : "bg-violet-500/20 text-violet-400 border-violet-500/30"
-              }`}>
-                {s.step}
-              </div>
+              {/* Connector line */}
+              {i < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-10 left-[calc(50%+50px)] right-[calc(-50%+50px)] h-px bg-gradient-to-r from-border to-transparent" />
+              )}
 
-              <div className="p-6">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${
-                  s.badge === "emerald" ? "bg-emerald-500/10" : "bg-violet-500/10"
+              <div className="relative p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/60 hover:border-border transition-all duration-300 group-hover:shadow-lg group-hover:shadow-black/20">
+                {/* Number badge */}
+                <div className={`absolute -top-3 -right-3 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold font-mono ${
+                  step.color === "emerald"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-violet-500/10 text-violet-400 border border-violet-500/20"
                 }`}>
-                  <s.icon className={`h-5 w-5 ${
-                    s.badge === "emerald" ? "text-emerald-400" : "text-violet-400"
+                  {step.number}
+                </div>
+
+                {/* Icon */}
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
+                  step.color === "emerald"
+                    ? "bg-emerald-500/10 group-hover:bg-emerald-500/20"
+                    : "bg-violet-500/10 group-hover:bg-violet-500/20"
+                } transition-colors duration-300`}>
+                  <step.icon className={`h-6 w-6 ${
+                    step.color === "emerald" ? "text-emerald-400" : "text-violet-400"
                   }`} />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{s.description}</p>
+
+                {/* Content */}
+                <h3 className="text-lg font-semibold text-white mb-3">{step.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{step.description}</p>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       </div>
