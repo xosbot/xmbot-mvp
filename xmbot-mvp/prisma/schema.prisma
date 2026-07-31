@@ -25,16 +25,19 @@ enum PaymentStatus {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  name           String?
-  email          String   @unique
-  passwordHash   String
-  role           Role     @default(USER)
-  phone          String?
-  isActive       Boolean  @default(false)
-  telegramChatId String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                          String   @id @default(cuid())
+  name                        String?
+  email                       String   @unique
+  passwordHash                String
+  role                        Role     @default(USER)
+  phone                       String?
+  isActive                    Boolean  @default(false)
+  telegramChatId              String?
+  binanceApiKeyEncrypted      String?
+  binanceApiSecretEncrypted   String?
+  binanceConnectedAt          DateTime?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
 
   botInstances BotInstance[]
   payments     Payment[]

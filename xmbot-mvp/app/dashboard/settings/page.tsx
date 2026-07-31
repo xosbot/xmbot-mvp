@@ -10,7 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectItem } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User } from "lucide-react"
+import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User, Wallet, CreditCard } from "lucide-react"
+import { BinanceForm } from "@/components/dashboard/binance-form"
+import { SubscriptionCard } from "@/components/dashboard/subscription-card"
 import { useToast } from "@/hooks/use-toast"
 import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes"
 
@@ -272,6 +274,14 @@ export default function SettingsPage() {
               <MessageSquare className="h-4 w-4 mr-2" />
               Telegram
             </TabsTrigger>
+            <TabsTrigger value="binance" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+              <Wallet className="h-4 w-4 mr-2" />
+              Binance
+            </TabsTrigger>
+            <TabsTrigger value="subscription" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+              <CreditCard className="h-4 w-4 mr-2" />
+              Subscription
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -495,6 +505,25 @@ export default function SettingsPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="binance">
+            <Card className="bg-slate-900/50 border-slate-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Wallet className="h-5 w-5" />
+                  Binance Connection
+                </CardTitle>
+                <CardDescription>Connect your Binance account to start automated trading</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BinanceForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            <SubscriptionCard />
           </TabsContent>
         </Tabs>
       </main>

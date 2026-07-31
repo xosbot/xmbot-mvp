@@ -1,6 +1,7 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
+import { enforceBotExpiry } from "@/lib/bot-expiry"
 import { Topbar } from "@/components/dashboard/topbar"
 import { StatCard } from "@/components/dashboard/stats-cards"
 import { RecentTrades } from "@/components/dashboard/recent-trades"
@@ -15,6 +16,7 @@ export default async function DashboardPage() {
   if (!session?.user?.id) redirect("/login")
 
   const userId = session.user.id
+  await enforceBotExpiry(userId)
 
   const [user, trades, tradeStats, openTradesCount] = await Promise.all([
     db.user.findUnique({
