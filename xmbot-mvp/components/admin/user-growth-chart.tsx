@@ -17,7 +17,7 @@ export function UserGrowthChart({ data }: UserGrowthChartProps) {
           <Tooltip
             contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: "8px" }}
             labelStyle={{ color: "#94a3b8" }}
-            formatter={(value: number) => [value, "Users"]}
+            formatter={(value) => [Number(value), "Users"]}
           />
           <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
         </BarChart>
