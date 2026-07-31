@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
+import { CardSpotlight } from "@/components/ui/aceternity/card-spotlight"
+import { GlareCard } from "@/components/ui/aceternity/glare-card"
 
 function AnimatedNumber({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
   const [current, setCurrent] = useState(0)
@@ -52,10 +54,10 @@ export function ProofSection() {
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
               Backtested Results
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Numbers That
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Speak for Themselves</span>
+              <span className="text-gradient-emerald">Speak for Themselves</span>
             </h2>
             <p className="mt-6 text-lg text-slate-400 leading-relaxed">
               Validated on 6 months of XAUUSD M5 data with walk-forward analysis.
@@ -69,19 +71,27 @@ export function ProofSection() {
             { icon: "↗", value: 84.3, prefix: "+", suffix: "%", label: "6-Month Return", sub: "On $10,000 initial capital" },
             { icon: "🛡", value: 4.3, suffix: "%", label: "Max Drawdown", sub: "Risk-managed throughout" },
             { icon: "$", value: 2.1, suffix: "x", label: "Profit Factor", sub: "Gross profit / gross loss" },
-          ].map((stat) => (
+          ].map((stat, i) => (
             <StaggerItem key={stat.label}>
-              <div className="relative p-8 rounded-2xl border border-white/10 bg-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors text-2xl">
+              {i === 1 ? (
+                <GlareCard className="p-8 text-center h-full">
+                  <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
                   <div className="mt-3 text-sm font-medium text-slate-300">{stat.label}</div>
                   <div className="mt-1 text-xs text-slate-500">{stat.sub}</div>
-                </div>
-              </div>
+                </GlareCard>
+              ) : (
+                <CardSpotlight className="p-8 text-center h-full">
+                  <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
+                    {stat.icon}
+                  </div>
+                  <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
+                  <div className="mt-3 text-sm font-medium text-slate-300">{stat.label}</div>
+                  <div className="mt-1 text-xs text-slate-500">{stat.sub}</div>
+                </CardSpotlight>
+              )}
             </StaggerItem>
           ))}
         </StaggerChildren>

@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Eye, TrendingUp, Activity } from "lucide-react"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { ParticleBackground } from "./particle-background"
+import { BackgroundBeams } from "@/components/ui/aceternity/background-beams"
+import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
+import { FlipWords } from "@/components/ui/aceternity/flip-words"
+import { MagneticButton } from "@/components/ui/aceternity/magnetic-button"
+import { Spotlight } from "@/components/ui/aceternity/spotlight"
+import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 
 function TerminalSimulation() {
   const [lines, setLines] = useState<string[]>([])
@@ -62,27 +67,30 @@ function TerminalSimulation() {
       transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
       className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-emerald-500/10"
     >
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
-        <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-500/80" />
-          <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-          <div className="w-3 h-3 rounded-full bg-green-500/80" />
-        </div>
-        <span className="text-xs text-slate-500 ml-2 font-mono">xmbot-engine</span>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs text-emerald-400 font-mono">LIVE</span>
-        </div>
-      </div>
-      <div className="p-5 font-mono text-[11px] leading-relaxed space-y-1 min-h-[340px]">
-        {lines.map((line, i) => (
-          <div key={`${i}-${line}`} className={`${getLineColor(line)} animate-[fade-in_0.3s_ease-out]`}>
-            {line}
+      <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent opacity-50 pointer-events-none" />
+      <div className="relative">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500/80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+            <div className="w-3 h-3 rounded-full bg-green-500/80" />
           </div>
-        ))}
-        {currentLine < terminalLines.length && (
-          <div className="w-2 h-4 bg-emerald-400 animate-[blink_1s_step-end_infinite]" />
-        )}
+          <span className="text-xs text-slate-500 ml-2 font-mono">xmbot-engine</span>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs text-emerald-400 font-mono">LIVE</span>
+          </div>
+        </div>
+        <div className="p-5 font-mono text-[11px] leading-relaxed space-y-1 min-h-[340px]">
+          {lines.map((line, i) => (
+            <div key={`${i}-${line}`} className={`${getLineColor(line)} animate-[fade-in_0.3s_ease-out]`}>
+              {line}
+            </div>
+          ))}
+          {currentLine < terminalLines.length && (
+            <div className="w-2 h-4 bg-emerald-400 animate-[blink_1s_step-end_infinite]" />
+          )}
+        </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-emerald-500/5 to-transparent pointer-events-none" />
     </motion.div>
@@ -108,7 +116,7 @@ function StatsBar() {
         >
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <s.icon className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="text-xl sm:text-2xl font-bold text-white font-mono">{s.value}</span>
+            <span className="text-xl sm:text-2xl font-bold text-white font-mono tracking-tight">{s.value}</span>
           </div>
           <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
         </motion.div>
@@ -120,18 +128,13 @@ function StatsBar() {
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-      {/* Background effects */}
+      <BackgroundBeams className="absolute inset-0 -z-10" />
+
       <div className="absolute inset-0 -z-10">
         <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-emerald-500/[0.08] blur-[150px]" />
         <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-violet-600/[0.06] blur-[120px]" />
-        <div className="absolute left-1/3 bottom-0 h-[600px] w-[600px] rounded-full bg-emerald-500/[0.04] blur-[100px]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_70%)]" />
-      </div>
-
-      {/* Particle Network */}
-      <div className="absolute inset-0 -z-5">
-        <ParticleBackground />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
@@ -147,18 +150,23 @@ export function HeroSection() {
               <span>AI-Powered Trading — Beta Open</span>
             </motion.div>
 
-            <motion.h1
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
             >
-              <span className="text-white">Trade Gold</span>
-              <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">with AI Agents</span>
-              <br />
-              <span className="text-slate-300 text-4xl sm:text-5xl lg:text-6xl">You Stay in Control</span>
-            </motion.h1>
+              <LampEffect>
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-aggressive leading-[1.05]">
+                  <span className="text-white">
+                    <TextGenerateEffect words="Trade Gold" filter={false} />
+                  </span>
+                  <br />
+                  <span className="text-gradient-emerald">
+                    <FlipWords words={["with AI Agents", "You Stay in Control", "24/5 Without Emotions"]} duration={3000} />
+                  </span>
+                </h1>
+              </LampEffect>
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -196,12 +204,14 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="mt-10 flex flex-col sm:flex-row gap-4"
             >
-              <Link href="/register">
-                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <MagneticButton>
+                <Link href="/register">
+                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 text-base shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300 group">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </MagneticButton>
               <Link href="#how-it-works">
                 <Button size="lg" variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800/50 h-14 text-base">
                   See How It Works

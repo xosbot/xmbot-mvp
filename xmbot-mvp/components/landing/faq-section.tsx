@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ChevronDown } from "lucide-react"
-import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
+import { ScrollReveal } from "./scroll-reveal"
+import { ExpandableCard } from "@/components/ui/aceternity/expandable-card"
 
 const faqs = [
   { question: "Is my money safe?", answer: "XMBot never has direct access to your funds. We connect via API keys with trading permissions only (no withdrawal). You can revoke access anytime. The 2% risk rule ensures no single trade can cause significant damage." },
@@ -15,35 +14,6 @@ const faqs = [
   { question: "How is this different from other trading bots?", answer: "Most bots trade automatically without your input. XMBot requires human approval for every trade. We also use a multi-agent architecture (not just simple indicators) and AI validation for higher-quality signals." },
 ]
 
-function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
-  const [open, setOpen] = useState(false)
-  const id = `faq-answer-${index}`
-
-  return (
-    <div className="border-b border-white/10 last:border-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full py-5 text-left group"
-        aria-expanded={open}
-        aria-controls={id}
-      >
-        <span className="text-base font-medium text-white group-hover:text-emerald-400 transition-colors pr-4">
-          {question}
-        </span>
-        <ChevronDown className={`h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
-      </button>
-      <div
-        id={id}
-        role="region"
-        aria-labelledby={`faq-question-${index}`}
-        className={`overflow-hidden transition-all duration-300 ${open ? "max-h-96 pb-5" : "max-h-0"}`}
-      >
-        <p className="text-sm text-slate-400 leading-relaxed">{answer}</p>
-      </div>
-    </div>
-  )
-}
-
 export function FAQSection() {
   return (
     <section id="faq" className="py-24 sm:py-32 relative" aria-labelledby="faq-heading">
@@ -55,18 +25,20 @@ export function FAQSection() {
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
               FAQ
             </div>
-            <h2 id="faq-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+            <h2 id="faq-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Frequently Asked
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Questions</span>
+              <span className="text-gradient-emerald">Questions</span>
             </h2>
           </div>
         </ScrollReveal>
 
         <ScrollReveal>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 sm:p-8" role="list">
-            {faqs.map((faq, index) => (
-              <FAQItem key={faq.question} {...faq} index={index} />
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 sm:p-8" role="list">
+            {faqs.map((faq) => (
+              <ExpandableCard key={faq.question} title={faq.question}>
+                {faq.answer}
+              </ExpandableCard>
             ))}
           </div>
         </ScrollReveal>

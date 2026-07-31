@@ -4,6 +4,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check, Star, Zap } from "lucide-react"
 import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
+import { MovingBorder } from "@/components/ui/aceternity/moving-border"
+import { GlareCard } from "@/components/ui/aceternity/glare-card"
+import { CardSpotlight } from "@/components/ui/aceternity/card-spotlight"
 
 export function PricingCards() {
   return (
@@ -16,10 +19,10 @@ export function PricingCards() {
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
               Pricing
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Simple,
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Transparent Pricing</span>
+              <span className="text-gradient-emerald">Transparent Pricing</span>
             </h2>
             <p className="mt-6 text-lg text-slate-400 leading-relaxed">
               Choose the plan that fits your trading style. Upgrade anytime.
@@ -28,11 +31,10 @@ export function PricingCards() {
         </ScrollReveal>
 
         <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto" staggerDelay={0.1}>
-          {/* Beta */}
+          {/* Beta — Moving Border */}
           <StaggerItem>
-            <div className="relative rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.08] to-black/40 backdrop-blur-sm overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent opacity-50" />
-              <div className="relative p-8">
+            <MovingBorder className="h-full">
+              <div className="p-8">
                 <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-400 mb-4">
                   <Star className="h-3 w-3" /> Best Value
                 </div>
@@ -58,40 +60,38 @@ export function PricingCards() {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </MovingBorder>
           </StaggerItem>
 
-          {/* Monthly */}
+          {/* Monthly — CardSpotlight */}
           <StaggerItem>
-            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden group hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-              <div className="p-8">
-                <h3 className="text-lg font-semibold text-white">Monthly</h3>
-                <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹2,999</span>
-                    <span className="text-sm text-slate-400">/month</span>
-                  </div>
+            <CardSpotlight className="p-8 h-full">
+              <h3 className="text-lg font-semibold text-white">Monthly</h3>
+              <div className="mt-4">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-white">₹2,999</span>
+                  <span className="text-sm text-slate-400">/month</span>
                 </div>
-                <ul className="mt-6 space-y-3">
-                  {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Email support"].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
-                      <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className="block mt-8">
-                  <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
-                    Get Started
-                  </Button>
-                </Link>
               </div>
-            </div>
+              <ul className="mt-6 space-y-3">
+                {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Email support"].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                    <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/register" className="block mt-8">
+                <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
+                  Get Started
+                </Button>
+              </Link>
+            </CardSpotlight>
           </StaggerItem>
 
-          {/* Quarterly — Popular */}
+          {/* Quarterly — GlareCard (Most Popular) */}
           <StaggerItem>
-            <div className="relative rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.06] to-black/40 backdrop-blur-sm overflow-hidden group hover:border-emerald-500/40 transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-xs font-bold text-white shadow-lg shadow-emerald-500/30">
+            <GlareCard className="relative h-full">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-xs font-bold text-white shadow-lg shadow-emerald-500/30 z-10">
                 Most Popular
               </div>
               <div className="p-8">
@@ -116,38 +116,36 @@ export function PricingCards() {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </GlareCard>
           </StaggerItem>
 
-          {/* Yearly */}
+          {/* Yearly — CardSpotlight */}
           <StaggerItem>
-            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden group hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
-              <div className="p-8">
-                <div className="inline-flex items-center gap-2 rounded-full bg-violet-500/15 border border-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400 mb-4">
-                  <Zap className="h-3 w-3" /> Best for Pros
-                </div>
-                <h3 className="text-lg font-semibold text-white">Yearly</h3>
-                <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹24,999</span>
-                    <span className="text-sm text-slate-400">/year</span>
-                  </div>
-                  <p className="text-xs text-emerald-400/80 mt-2">Save ₹11,000 vs monthly</p>
-                </div>
-                <ul className="mt-6 space-y-3">
-                  {["Everything in Quarterly", "Dedicated account manager", "Custom strategy requests", "API access", "White-glove onboarding"].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
-                      <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className="block mt-8">
-                  <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
-                    Get Started
-                  </Button>
-                </Link>
+            <CardSpotlight className="p-8 h-full">
+              <div className="inline-flex items-center gap-2 rounded-full bg-violet-500/15 border border-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400 mb-4">
+                <Zap className="h-3 w-3" /> Best for Pros
               </div>
-            </div>
+              <h3 className="text-lg font-semibold text-white">Yearly</h3>
+              <div className="mt-4">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-white">₹24,999</span>
+                  <span className="text-sm text-slate-400">/year</span>
+                </div>
+                <p className="text-xs text-emerald-400/80 mt-2">Save ₹11,000 vs monthly</p>
+              </div>
+              <ul className="mt-6 space-y-3">
+                {["Everything in Quarterly", "Dedicated account manager", "Custom strategy requests", "API access", "White-glove onboarding"].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                    <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/register" className="block mt-8">
+                <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
+                  Get Started
+                </Button>
+              </Link>
+            </CardSpotlight>
           </StaggerItem>
         </StaggerChildren>
       </div>
