@@ -72,8 +72,8 @@ export function FeaturesGrid() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
-              Platform
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // Platform
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Simple to Use.
@@ -90,9 +90,9 @@ export function FeaturesGrid() {
         <StaggerChildren className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6" staggerDelay={0.1}>
           {features.filter(f => f.featured).map((f) => (
             <StaggerItem key={f.title}>
-              <Spotlight className="rounded-2xl" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.08)" : "rgba(212, 175, 55, 0.08)"}>
+              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.08)" : "rgba(212, 175, 55, 0.08)"}>
                 <GlareCard className="p-8 h-full">
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${
+                  <div className={`w-14 h-14 rounded-md flex items-center justify-center mb-6 ${
                     f.color === "emerald" ? "bg-emerald-500/10" : "bg-gold-500/10"
                   }`}>
                     <f.icon className={`h-7 w-7 ${f.color === "emerald" ? "text-emerald-400" : "text-gold-400"}`} />
@@ -109,9 +109,9 @@ export function FeaturesGrid() {
         <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.08}>
           {features.filter(f => !f.featured).map((f) => (
             <StaggerItem key={f.title}>
-              <Spotlight className="rounded-2xl" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.06)" : "rgba(212, 175, 55, 0.06)"}>
-                <div className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 group h-full">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${
+              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.06)" : "rgba(212, 175, 55, 0.06)"}>
+                <div className="p-6 rounded-md border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] hover:border-white/20 transition-colors duration-200 group h-full">
+                  <div className={`w-12 h-12 rounded-md flex items-center justify-center mb-5 ${
                     f.color === "emerald" ? "bg-emerald-500/10 group-hover:bg-emerald-500/20" : "bg-gold-500/10 group-hover:bg-gold-500/20"
                   } transition-colors duration-300`}>
                     <f.icon className={`h-6 w-6 ${f.color === "emerald" ? "text-emerald-400" : "text-gold-400"}`} />

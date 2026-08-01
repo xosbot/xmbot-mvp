@@ -30,8 +30,8 @@ export function SocialProof() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
-              Beta Program
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // Beta Program
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Built to Earn Trust
@@ -49,7 +49,7 @@ export function SocialProof() {
           {commitments.map((c) => (
             <StaggerItem key={c.title}>
               <GlareCard className="p-8 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gold-500/10 flex items-center justify-center mb-6">
+                <div className="w-14 h-14 rounded-md bg-gold-500/10 flex items-center justify-center mb-6">
                   <c.icon className="h-7 w-7 text-gold-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-3">{c.title}</h3>

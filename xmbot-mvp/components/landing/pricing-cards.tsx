@@ -16,8 +16,8 @@ export function PricingCards() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
-              Pricing
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // Pricing
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Simple,
@@ -35,7 +35,7 @@ export function PricingCards() {
           <StaggerItem>
             <MovingBorder className="h-full">
               <div className="p-8">
-                <div className="inline-flex items-center gap-2 rounded-full bg-gold-500/15 border border-gold-500/20 px-3 py-1 text-xs font-medium text-gold-400 mb-4">
+                <div className="inline-flex items-center gap-2 rounded-sm bg-gold-500/10 border border-gold-500/30 px-2.5 py-1 text-xs mono-label text-gold-400 mb-4">
                   <Star className="h-3 w-3" /> Best Value
                 </div>
                 <h3 className="text-lg font-semibold text-white">Beta Access</h3>
@@ -55,7 +55,7 @@ export function PricingCards() {
                   ))}
                 </ul>
                 <Link href="/register" className="block mt-8">
-                  <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold h-11 shadow-lg shadow-gold-600/20 transition-all duration-300">
+                  <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold h-11 transition-colors duration-200">
                     Join Beta Now
                   </Button>
                 </Link>
@@ -91,7 +91,7 @@ export function PricingCards() {
           {/* Quarterly — GlareCard (Most Popular) */}
           <StaggerItem>
             <GlareCard className="relative h-full">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gold-500 text-xs font-bold text-neutral-950 shadow-lg shadow-gold-500/30 z-10">
+              <div className="absolute -top-px left-1/2 -translate-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
                 Most Popular
               </div>
               <div className="p-8">
@@ -111,7 +111,7 @@ export function PricingCards() {
                   ))}
                 </ul>
                 <Link href="/register" className="block mt-8">
-                  <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold h-11 shadow-lg shadow-gold-600/20 transition-all duration-300">
+                  <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold h-11 transition-colors duration-200">
                     Get Started
                   </Button>
                 </Link>
@@ -122,7 +122,7 @@ export function PricingCards() {
           {/* Yearly — CardSpotlight */}
           <StaggerItem>
             <CardSpotlight className="p-8 h-full">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/15 px-3 py-1 text-xs font-medium text-slate-300 mb-4">
+              <div className="inline-flex items-center gap-2 rounded-sm bg-white/5 border border-white/15 px-2.5 py-1 text-xs mono-label text-slate-300 mb-4">
                 <Zap className="h-3 w-3" /> Best for Pros
               </div>
               <h3 className="text-lg font-semibold text-white">Yearly</h3>

@@ -22,8 +22,8 @@ export function FAQSection() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
-              FAQ
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // FAQ
             </div>
             <h2 id="faq-heading" className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Frequently Asked
@@ -34,7 +34,7 @@ export function FAQSection() {
         </ScrollReveal>
 
         <ScrollReveal>
-          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 sm:p-8" role="list">
+          <div className="rounded-md border border-white/10 bg-white/[0.03] p-6 sm:p-8" role="list">
             {faqs.map((faq) => (
               <ExpandableCard key={faq.question} title={faq.question}>
                 {faq.answer}

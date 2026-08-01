@@ -44,8 +44,8 @@ export function HowItWorks() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs text-gold-400 mb-6 uppercase tracking-wider">
-              How It Works
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // How It Works
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
               Four Steps.
@@ -61,7 +61,7 @@ export function HowItWorks() {
         {/* Timeline */}
         <div className="relative max-w-4xl mx-auto">
           {/* Tracing beam line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-gold-500/50 via-gold-500/20 to-gold-500/50" />
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gold-500/25" />
 
           <StaggerChildren className="space-y-12" staggerDelay={0.2}>
             {steps.map((step) => (
@@ -70,7 +70,7 @@ export function HowItWorks() {
                   {/* Step number circle */}
                   <div className="relative z-10 flex-shrink-0">
                     <LampEffect>
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gold-500/10 border border-gold-500/20">
+                      <div className="w-16 h-16 rounded-md flex items-center justify-center bg-gold-500/10 border border-gold-500/20">
                         <step.icon className="h-7 w-7 text-gold-400" />
                       </div>
                     </LampEffect>

@@ -67,6 +67,10 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		fontFamily: {
+  			mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+  			sans: ['var(--font-geist-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif']
   		}
   	}
   },

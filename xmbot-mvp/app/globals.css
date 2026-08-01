@@ -23,7 +23,7 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: 46 65% 52%;
-    --radius: 0.75rem;
+    --radius: 0.375rem;
     /* Brand: gold is the identity/action color (logo, CTAs, chrome).
        Emerald is reserved for positive financial data (P&L, win rate, returns) — never decorative. */
     --gain: 160 84% 39%;
@@ -43,6 +43,11 @@
     font-family: var(--font-geist-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-attachment: fixed;
   }
 }
 
@@ -75,42 +80,21 @@
   color: white;
 }
 
-/* Gradient text utility — brand (gold) */
-.text-gradient {
-  background: linear-gradient(135deg, #d4af37, #e4be55, #f6e6b4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Brand accent text — solid, not glossy. Precision over decoration. */
+.text-gradient,
+.text-gradient-gold {
+  color: #d9af3e;
 }
 
-/* Glow effects */
-.glow-emerald {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2), 0 0 40px rgba(16, 185, 129, 0.1);
-}
-
-.glow-gold {
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.25), 0 0 40px rgba(212, 175, 55, 0.12);
+/* Reserved for positive financial data (win rate, returns, P&L) */
+.text-gradient-emerald {
+  color: #34d399;
 }
 
 /* Animations */
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
-  50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.3); }
 }
 
 @keyframes blink {
@@ -123,48 +107,11 @@
   to { transform: rotateX(0deg); }
 }
 
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
-}
-
-/* Gradient text utility — reserved for positive financial data (win rate, returns, P&L) */
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradient text utility — brand identity accent (headlines, CTAs) */
-.text-gradient-gold {
-  background: linear-gradient(135deg, #d4af37, #e4be55, #f6e6b4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Perspective for 3D transforms */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-/* Surface ladder */
-.surface-0 { background: rgba(255, 255, 255, 0.03); }
-.surface-1 { background: rgba(255, 255, 255, 0.05); }
-.surface-2 { background: rgba(255, 255, 255, 0.08); }
-.surface-3 { background: rgba(255, 255, 255, 0.12); }
-
-/* Glass morphism */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+@keyframes scan-sweep {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
 }
 
 /* Aggressive negative tracking for headings */
@@ -172,33 +119,39 @@
   letter-spacing: -0.04em;
 }
 
-.tracking-tight-xl {
-  letter-spacing: -0.03em;
+/* Monospace eyebrow / section labels — terminal-style tags */
+.mono-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-/* Gradient borders */
-.gradient-border {
+/* Instrument-panel corner brackets */
+.corner-frame {
   position: relative;
 }
 
-.gradient-border::before {
+.corner-frame::before,
+.corner-frame::after {
   content: '';
   position: absolute;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(139, 92, 246, 0.3));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  width: 10px;
+  height: 10px;
   pointer-events: none;
 }
 
-/* Shimmer effect */
-.shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(16, 185, 129, 0.08) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
+.corner-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1.5px solid rgba(212, 175, 55, 0.6);
+  border-left: 1.5px solid rgba(212, 175, 55, 0.6);
+}
+
+.corner-frame::after {
+  top: -1px;
+  right: -1px;
+  border-top: 1.5px solid rgba(212, 175, 55, 0.6);
+  border-right: 1.5px solid rgba(212, 175, 55, 0.6);
 }
 
 /* Reduced motion preference */

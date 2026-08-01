@@ -8,8 +8,6 @@ import { motion } from "framer-motion"
 import { BackgroundBeams } from "@/components/ui/aceternity/background-beams"
 import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
 import { FlipWords } from "@/components/ui/aceternity/flip-words"
-import { MagneticButton } from "@/components/ui/aceternity/magnetic-button"
-import { Spotlight } from "@/components/ui/aceternity/spotlight"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 
 function TerminalSimulation() {
@@ -62,14 +60,13 @@ function TerminalSimulation() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-      className="relative rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl overflow-hidden shadow-2xl shadow-gold-500/10"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="corner-frame relative rounded-md border border-white/10 bg-black/80 overflow-hidden"
     >
-      <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-gold-500/20 via-transparent to-transparent opacity-50 pointer-events-none" />
       <div className="relative">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/[0.03]">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500/80" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
@@ -92,7 +89,6 @@ function TerminalSimulation() {
           )}
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gold-500/5 to-transparent pointer-events-none" />
     </motion.div>
   )
 }
@@ -105,20 +101,20 @@ function StatsBar() {
   ]
 
   return (
-    <div className="grid grid-cols-3 gap-6 max-w-lg">
+    <div className="grid grid-cols-3 divide-x divide-white/10 border border-white/10 rounded-md max-w-lg">
       {stats.map((s, i) => (
         <motion.div
           key={s.label}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
-          className="text-center"
+          transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
+          className="text-center py-3 px-2"
         >
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <s.icon className={`h-3.5 w-3.5 ${s.tone === "gold" ? "text-gold-400" : "text-emerald-400"}`} />
             <span className="text-xl sm:text-2xl font-bold text-white font-mono tracking-tight">{s.value}</span>
           </div>
-          <div className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
+          <div className="text-[10px] sm:text-xs text-slate-500 mono-label">{s.label}</div>
         </motion.div>
       ))}
     </div>
@@ -130,13 +126,6 @@ export function HeroSection() {
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
       <BackgroundBeams className="absolute inset-0 -z-10" />
 
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-0 h-[800px] w-[800px] rounded-full bg-gold-500/[0.08] blur-[150px]" />
-        <div className="absolute right-1/4 top-1/3 h-[600px] w-[600px] rounded-full bg-emerald-600/[0.06] blur-[120px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030712_70%)]" />
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">
@@ -144,10 +133,10 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-8 inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-sm text-gold-400"
+              className="mb-8 inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
-              <span>Beta Open — Setup in 15 Minutes</span>
+              <span>Beta Open // Live in 15 Min</span>
             </motion.div>
 
             <motion.div
@@ -204,16 +193,14 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="mt-10 flex flex-col sm:flex-row gap-4"
             >
-              <MagneticButton>
-                <Link href="/register">
-                  <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base shadow-lg shadow-gold-600/25 hover:shadow-gold-500/30 transition-all duration-300 group">
-                    Set Up in 15 Minutes
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </MagneticButton>
+              <Link href="/register">
+                <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
+                  Set Up in 15 Minutes
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
               <Link href="#how-it-works">
-                <Button size="lg" variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800/50 h-14 text-base">
+                <Button size="lg" variant="outline" className="border-white/15 text-slate-300 hover:bg-white/5 h-14 text-base">
                   See How It Works
                 </Button>
               </Link>

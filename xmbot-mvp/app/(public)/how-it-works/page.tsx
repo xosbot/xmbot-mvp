@@ -19,7 +19,7 @@ const steps = [
       "Configure daily loss limits",
       "Choose your notification preferences",
     ],
-    color: "emerald" as const,
+    color: "gold" as const,
   },
   {
     icon: Brain,
@@ -33,7 +33,7 @@ const steps = [
       "Multi-timeframe analysis",
       "Pattern recognition",
     ],
-    color: "violet" as const,
+    color: "gold" as const,
   },
   {
     icon: CheckCircle,
@@ -47,7 +47,7 @@ const steps = [
       "Confidence score displayed",
       "One-tap approve/reject",
     ],
-    color: "emerald" as const,
+    color: "gold" as const,
   },
   {
     icon: BarChart3,
@@ -61,7 +61,7 @@ const steps = [
       "Performance analytics",
       "Adjustable parameters",
     ],
-    color: "violet" as const,
+    color: "gold" as const,
   },
 ]
 
@@ -71,13 +71,13 @@ export default function HowItWorksPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-            How It Works
+          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            // How It Works
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
             From Setup to Live Signals
             <br />
-            <span className="text-gradient-emerald">in 15 Minutes</span>
+            <span className="text-gradient-gold">in 15 Minutes</span>
           </h1>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             No coding required. Connect your Telegram, configure your risk,
@@ -92,20 +92,12 @@ export default function HowItWorksPage() {
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                 <div className="flex items-center gap-4 mb-6">
                   <LampEffect>
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
-                      step.color === "emerald"
-                        ? "bg-emerald-500/10 border border-emerald-500/20"
-                        : "bg-violet-500/10 border border-violet-500/20"
-                    }`}>
-                      <step.icon className={`h-7 w-7 ${step.color === "emerald" ? "text-emerald-400" : "text-violet-400"}`} />
+                    <div className="w-16 h-16 rounded-md flex items-center justify-center bg-gold-500/10 border border-gold-500/20">
+                      <step.icon className="h-7 w-7 text-gold-400" />
                     </div>
                   </LampEffect>
                   <div>
-                    <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
-                      step.color === "emerald"
-                        ? "bg-emerald-500/10 text-emerald-400"
-                        : "bg-violet-500/10 text-violet-400"
-                    }`}>
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-gold-500/10 text-gold-400">
                       Step {step.number}
                     </span>
                     <div className="text-xs text-slate-500 mt-1">{step.time}</div>
@@ -116,7 +108,7 @@ export default function HowItWorksPage() {
                 <ul className="space-y-3">
                   {step.details.map((detail) => (
                     <li key={detail} className="flex items-center gap-3 text-sm text-slate-300">
-                      <CheckCircle className={`h-4 w-4 flex-shrink-0 ${step.color === "emerald" ? "text-emerald-400" : "text-violet-400"}`} />
+                      <CheckCircle className="h-4 w-4 flex-shrink-0 text-gold-400" />
                       {detail}
                     </li>
                   ))}
@@ -124,8 +116,8 @@ export default function HowItWorksPage() {
               </div>
               <div className={i % 2 === 1 ? "lg:order-1" : ""}>
                 <GlareCard className="p-8">
-                  <div className="aspect-video rounded-lg bg-gradient-to-br from-emerald-500/10 to-violet-500/10 flex items-center justify-center">
-                    <step.icon className="h-20 w-20 text-emerald-400/20" />
+                  <div className="aspect-video rounded-md bg-white/[0.03] border border-white/10 flex items-center justify-center">
+                    <step.icon className="h-20 w-20 text-gold-400/20" />
                   </div>
                 </GlareCard>
               </div>
@@ -142,8 +134,8 @@ export default function HowItWorksPage() {
             Set up in 15 minutes. No coding required. Start with paper trading risk-free.
           </p>
           <Link href="/register">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 shadow-lg shadow-emerald-600/25">
-              Start Free Trial
+            <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 transition-colors duration-200">
+              Set Up in 15 Minutes
             </Button>
           </Link>
         </div>

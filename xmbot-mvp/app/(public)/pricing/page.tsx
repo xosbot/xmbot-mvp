@@ -81,13 +81,13 @@ export default function PricingPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center max-w-2xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-            Pricing
+          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            // Pricing
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
             Simple,
             <br />
-            <span className="text-gradient-emerald">Transparent Pricing</span>
+            <span className="text-gradient-gold">Transparent Pricing</span>
           </h1>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Choose the plan that fits your trading style. Upgrade anytime.
@@ -104,7 +104,7 @@ export default function PricingPage() {
               </MovingBorder>
             ) : plan.popular ? (
               <GlareCard key={plan.name} className="relative h-full">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-xs font-bold text-white shadow-lg shadow-emerald-500/30 z-10">
+                <div className="absolute -top-px left-1/2 -translate-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
                   Most Popular
                 </div>
                 <PlanCard plan={plan} />
@@ -129,7 +129,7 @@ export default function PricingPage() {
               { q: "What payment methods do you accept?", a: "We accept all major credit/debit cards, UPI, net banking, and popular wallets through our secure payment partner Cashfree." },
               { q: "Do I need a Binance account?", a: "No. You can start with Paper Trading to test the system risk-free. When you're ready for live trading, connect your Binance account via API keys." },
             ].map((faq) => (
-              <div key={faq.q} className="p-6 rounded-2xl border border-white/10 bg-white/5">
+              <div key={faq.q} className="p-6 rounded-md border border-white/10 bg-white/[0.03]">
                 <h3 className="text-base font-semibold text-white mb-2">{faq.q}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{faq.a}</p>
               </div>
@@ -141,13 +141,13 @@ export default function PricingPage() {
         <div className="text-center mt-20">
           <p className="text-slate-400 mb-6">
             Still have questions? Contact us at{" "}
-            <a href="mailto:support@xmbot.online" className="text-emerald-400 hover:text-emerald-300">
+            <a href="mailto:support@xmbot.online" className="text-gold-400 hover:text-gold-300">
               support@xmbot.online
             </a>
           </p>
           <Link href="/register">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-500 text-white px-10 h-14 shadow-lg shadow-emerald-600/25">
-              Start Free Trial
+            <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 transition-colors duration-200">
+              Set Up in 15 Minutes
             </Button>
           </Link>
         </div>
@@ -160,7 +160,7 @@ function PlanCard({ plan }: { plan: typeof plans[number] }) {
   return (
     <div className="p-8 h-full flex flex-col">
       {plan.badge && (
-        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-400 mb-4 self-start">
+        <div className="inline-flex items-center gap-2 rounded-sm bg-gold-500/10 border border-gold-500/30 px-2.5 py-1 text-xs mono-label text-gold-400 mb-4 self-start">
           <plan.badge.icon className="h-3 w-3" /> {plan.badge.text}
         </div>
       )}
@@ -179,16 +179,16 @@ function PlanCard({ plan }: { plan: typeof plans[number] }) {
       <ul className="mt-6 space-y-3 flex-1">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
-            <Check className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />{f}
+            <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
           </li>
         ))}
       </ul>
       <Link href="/register" className="block mt-8">
         <Button
-          className={`w-full h-11 transition-all duration-300 ${
+          className={`w-full h-11 transition-colors duration-200 ${
             plan.highlighted
-              ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20"
-              : "border-slate-700 text-white hover:bg-white/5"
+              ? "bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold"
+              : "border-white/15 text-white hover:bg-white/5"
           }`}
           variant={plan.highlighted ? "default" : "outline"}
         >
