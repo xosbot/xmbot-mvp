@@ -23,7 +23,7 @@ export function Topbar({ title }: { title: string }) {
           {session?.user?.email}
         </span>
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-emerald-500/20 text-emerald-500 text-xs">
+          <AvatarFallback className="bg-gold-500/20 text-gold-400 text-xs">
             {initials}
           </AvatarFallback>
         </Avatar>

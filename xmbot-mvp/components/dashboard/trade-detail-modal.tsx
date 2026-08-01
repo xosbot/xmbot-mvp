@@ -46,7 +46,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="bg-slate-900 border-slate-800 max-w-md">
+      <DialogContent className="bg-neutral-950 border-white/10 rounded-md max-w-md">
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
             <span className="text-lg font-bold">{trade.symbol}</span>
@@ -65,7 +65,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-white/[0.05] border-white/10 rounded-md">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                   <TrendingUp className="h-3 w-3" />
@@ -75,7 +75,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-white/[0.05] border-white/10 rounded-md">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                   <TrendingDown className="h-3 w-3" />
@@ -89,7 +89,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-white/[0.05] border-white/10 rounded-md">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                   <Target className="h-3 w-3" />
@@ -99,7 +99,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-white/[0.05] border-white/10 rounded-md">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                   <Shield className="h-3 w-3" />
@@ -115,7 +115,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
           {(trade.stopLoss || trade.takeProfit) && (
             <div className="grid grid-cols-2 gap-4">
               {trade.stopLoss && trade.stopLoss > 0 && (
-                <Card className="bg-slate-800/50 border-slate-700">
+                <Card className="bg-white/[0.05] border-white/10 rounded-md">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                       <Shield className="h-3 w-3 text-red-400" />
@@ -127,7 +127,7 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
               )}
 
               {trade.takeProfit && trade.takeProfit > 0 && (
-                <Card className="bg-slate-800/50 border-slate-700">
+                <Card className="bg-white/[0.05] border-white/10 rounded-md">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
                       <Target className="h-3 w-3 text-emerald-500" />

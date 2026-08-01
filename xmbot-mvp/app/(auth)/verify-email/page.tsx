@@ -41,18 +41,18 @@ function VerifyEmailInner() {
 
   if (verified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-        <Card className="w-full max-w-md bg-slate-900/50 border-slate-800">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Card className="w-full max-w-md rounded-md bg-white/[0.03] border-white/10">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-              <CheckCircle className="h-6 w-6 text-emerald-500" />
+            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-gold-500/10 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-gold-400" />
             </div>
             <CardTitle className="text-white">Email Verified!</CardTitle>
             <CardDescription>Your email has been verified. You can now sign in.</CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/login">
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-500">Sign In</Button>
+              <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold">Sign In</Button>
             </Link>
           </CardContent>
         </Card>
@@ -61,11 +61,11 @@ function VerifyEmailInner() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-      <Card className="w-full max-w-md bg-slate-900/50 border-slate-800">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <Card className="w-full max-w-md rounded-md bg-white/[0.03] border-white/10">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <Mail className="h-6 w-6 text-emerald-500" />
+          <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-gold-500/10 flex items-center justify-center">
+            <Mail className="h-6 w-6 text-gold-400" />
           </div>
           <CardTitle className="text-white">Verify Your Email</CardTitle>
           <CardDescription>
@@ -116,8 +116,8 @@ export default function VerifyEmailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gold-400" />
         </div>
       }
     >

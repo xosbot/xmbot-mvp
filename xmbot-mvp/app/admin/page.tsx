@@ -58,7 +58,7 @@ export default async function AdminOverviewPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Registrations */}
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white/[0.03] border-white/10 rounded-md">
             <CardHeader>
               <CardTitle className="text-white text-base">Recent Registrations</CardTitle>
             </CardHeader>
@@ -89,7 +89,7 @@ export default async function AdminOverviewPage() {
           </Card>
 
           {/* Recent Payments */}
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-white/[0.03] border-white/10 rounded-md">
             <CardHeader>
               <CardTitle className="text-white text-base">Recent Payments</CardTitle>
             </CardHeader>

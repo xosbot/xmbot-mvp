@@ -22,7 +22,7 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md rounded-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Invalid Link</CardTitle>
           <CardDescription>This reset link is invalid or missing a token.</CardDescription>
@@ -76,15 +76,15 @@ function ResetPasswordForm() {
 
   if (done) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md rounded-md">
         <CardHeader className="text-center">
-          <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+          <CheckCircle className="h-12 w-12 text-gold-400 mx-auto mb-4" />
           <CardTitle className="text-2xl font-bold">Password Reset</CardTitle>
           <CardDescription>Your password has been updated successfully.</CardDescription>
         </CardHeader>
         <CardFooter>
           <Link href="/login" className="w-full">
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Sign In</Button>
+            <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold">Sign In</Button>
           </Link>
         </CardFooter>
       </Card>
@@ -92,7 +92,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Set New Password</CardTitle>
         <CardDescription>Enter your new password below</CardDescription>
@@ -142,7 +142,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md rounded-md">
         <CardHeader className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
         </CardHeader>

@@ -59,7 +59,7 @@ function TradeCard({ trade }: { trade: Trade }) {
 
 export function RecentTrades({ trades }: { trades: Trade[] }) {
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader>
         <CardTitle className="text-white">Recent Trades</CardTitle>
       </CardHeader>

@@ -40,7 +40,7 @@ export default function AdminAnalyticsPage() {
       <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            <Loader2 className="h-8 w-8 animate-spin text-gold-400" />
           </div>
         ) : data ? (
           <>
@@ -52,7 +52,7 @@ export default function AdminAnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card className="bg-slate-900/50 border-slate-800">
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
                 <CardHeader>
                   <CardTitle className="text-white text-base">Revenue Trend</CardTitle>
                 </CardHeader>
@@ -61,7 +61,7 @@ export default function AdminAnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-900/50 border-slate-800">
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
                 <CardHeader>
                   <CardTitle className="text-white text-base">User Growth</CardTitle>
                 </CardHeader>

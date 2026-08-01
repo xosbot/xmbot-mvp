@@ -9,7 +9,7 @@ export function LivePnL() {
   const { health, account, metrics, connected } = useEngineStream()
 
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader>
         <CardTitle className="text-white flex items-center justify-between">
           <span className="flex items-center gap-2">
