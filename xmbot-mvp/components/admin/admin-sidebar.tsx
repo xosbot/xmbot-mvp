@@ -31,8 +31,10 @@ function AdminSidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-slate-900 border-r border-slate-800">
-      <div className="flex h-16 items-center gap-2 px-6 border-b border-slate-800">
-        <Shield className="h-6 w-6 text-amber-500" />
+      <div className="flex h-16 items-center gap-2.5 px-6 border-b border-slate-800">
+        <div className="corner-frame w-8 h-8 rounded-md border border-white/15 bg-white/[0.03] flex items-center justify-center">
+          <Shield className="h-4 w-4 text-gold-400" />
+        </div>
         <span className="text-lg font-bold text-white">Admin Panel</span>
       </div>
 
@@ -45,7 +47,7 @@ function AdminSidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
               pathname === item.href
-                ? "bg-amber-500/10 text-amber-500"
+                ? "bg-gold-500/10 text-gold-400"
                 : "text-slate-400 hover:text-white hover:bg-slate-800"
             )}
           >

@@ -10,7 +10,7 @@ export default function AdminLoading() {
       <div className="flex-1 p-4 lg:p-6 space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="bg-slate-900/50 border-slate-800">
+            <Card key={i} className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-24 bg-slate-800" />
               </CardHeader>
@@ -20,7 +20,7 @@ export default function AdminLoading() {
             </Card>
           ))}
         </div>
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white/[0.03] border-white/10 rounded-md">
           <CardContent className="pt-6 space-y-3">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full bg-slate-800" />

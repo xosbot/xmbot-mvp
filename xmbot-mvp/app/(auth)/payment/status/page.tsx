@@ -26,7 +26,7 @@ export default async function PaymentStatusPage({
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-md">
       <CardHeader className="text-center">
         {status === "success" ? (
           <>
@@ -64,7 +64,7 @@ export default async function PaymentStatusPage({
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <Link href="/dashboard" className="w-full">
-          <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+          <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold">
             Go to Dashboard
           </Button>
         </Link>

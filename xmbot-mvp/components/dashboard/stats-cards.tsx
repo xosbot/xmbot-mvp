@@ -12,7 +12,7 @@ interface StatCardProps {
 
 export function StatCard({ title, value, description, icon: Icon, badge }: StatCardProps) {
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-slate-400">{title}</CardTitle>
         <Icon className="h-4 w-4 text-slate-500" />

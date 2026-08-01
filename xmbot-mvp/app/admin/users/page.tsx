@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white/[0.03] border-white/10 rounded-md">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-white">All Users</CardTitle>
             <Button variant="outline" size="sm" onClick={fetchUsers} className="border-slate-700 text-slate-300">
@@ -64,7 +64,7 @@ export default function AdminUsersPage() {
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-gold-400" />
               </div>
             ) : (
               <div className="overflow-x-auto">

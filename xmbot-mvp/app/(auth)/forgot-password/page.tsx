@@ -43,9 +43,9 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md rounded-md">
         <CardHeader className="text-center">
-          <Mail className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
+          <Mail className="h-12 w-12 text-gold-400 mx-auto mb-4" />
           <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
           <CardDescription>
             If an account exists for {email}, you will receive a password reset link shortly.
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
         <CardDescription>Enter your email and we&apos;ll send you a reset link</CardDescription>

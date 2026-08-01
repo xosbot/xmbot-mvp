@@ -18,7 +18,7 @@ export default function SubscriptionPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Star className="h-5 w-5" />
@@ -30,9 +30,9 @@ export default function SubscriptionPage() {
                 {Object.entries(PLANS).map(([key, plan]) => (
                   <div
                     key={key}
-                    className={`p-4 rounded-lg border ${
+                    className={`p-4 rounded-md border ${
                       plan.popular
-                        ? "border-emerald-500/30 bg-emerald-500/5"
+                        ? "border-gold-500/30 bg-gold-500/5"
                         : "border-slate-700 bg-slate-800/30"
                     }`}
                   >
@@ -40,7 +40,7 @@ export default function SubscriptionPage() {
                       <div className="flex items-center gap-2">
                         <h4 className="text-sm font-medium text-white">{plan.name}</h4>
                         {plan.popular && (
-                          <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
+                          <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30 text-xs rounded-sm">
                             Popular
                           </Badge>
                         )}
@@ -51,7 +51,7 @@ export default function SubscriptionPage() {
                       </div>
                     </div>
 {"discountLabel" in plan && plan.discountLabel && (
-                      <p className="text-xs text-emerald-400">{plan.discountLabel}</p>
+                      <p className="text-xs text-gold-400">{plan.discountLabel}</p>
                     )}
                   </div>
                 ))}
@@ -59,7 +59,7 @@ export default function SubscriptionPage() {
                 <div className="pt-4">
                   <a
                     href="/pricing"
-                    className="text-sm text-emerald-500 hover:underline"
+                    className="text-sm text-gold-400 hover:underline"
                   >
                     Compare all features →
                   </a>
@@ -67,7 +67,7 @@ export default function SubscriptionPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white">Need Help?</CardTitle>
               </CardHeader>
@@ -77,7 +77,7 @@ export default function SubscriptionPage() {
                 </p>
                 <a
                   href="/contact"
-                  className="inline-flex items-center text-sm text-emerald-500 hover:underline"
+                  className="inline-flex items-center text-sm text-gold-400 hover:underline"
                 >
                   Contact Support →
                 </a>

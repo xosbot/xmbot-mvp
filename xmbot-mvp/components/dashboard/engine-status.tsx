@@ -88,7 +88,7 @@ export function EngineStatus() {
 
   if (loading && !status) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white text-sm">Engine Status</CardTitle>
         </CardHeader>
@@ -104,7 +104,7 @@ export function EngineStatus() {
 
   if (error && !status) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white text-sm">Engine Status</CardTitle>
         </CardHeader>
@@ -128,7 +128,7 @@ export function EngineStatus() {
   const statusVariant = isRunning ? "default" : status?.engine === "error" ? "destructive" : "secondary"
 
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-slate-400">Engine Status</CardTitle>
         <Activity className={`h-4 w-4 ${isRunning ? "text-emerald-500" : "text-slate-500"}`} />

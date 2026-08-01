@@ -37,7 +37,7 @@ export function TradeSort({ currentSort }: TradeSortProps) {
       <select
         value={currentSort || "openTime-desc"}
         onChange={(e) => handleSort(e.target.value)}
-        className="flex h-7 w-[140px] rounded-md border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-600"
+        className="flex h-7 w-[140px] rounded-md border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-gold-500"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
