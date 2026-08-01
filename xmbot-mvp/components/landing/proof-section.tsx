@@ -44,23 +44,19 @@ function AnimatedNumber({ target, suffix = "", prefix = "" }: { target: number; 
 export function ProofSection() {
   return (
     <section id="results" className="py-24 sm:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-emerald-500/[0.04] to-background" />
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-              Backtested Results
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // Backtested Results
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
-              Numbers That
+              Simple Doesn&apos;t Mean
               <br />
-              <span className="text-gradient-emerald">Speak for Themselves</span>
+              <span className="text-gradient-emerald">Unproven</span>
             </h2>
             <p className="mt-6 text-lg text-slate-400 leading-relaxed">
-              Validated on 6 months of XAUUSD M5 data with walk-forward analysis.
+              Validated on 6 months of XAUUSD M5 data with walk-forward analysis — before it ever touched real money.
             </p>
           </div>
         </ScrollReveal>
@@ -75,7 +71,7 @@ export function ProofSection() {
             <StaggerItem key={stat.label}>
               {i === 1 ? (
                 <GlareCard className="p-8 text-center h-full">
-                  <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
+                  <div className="w-16 h-16 rounded-md mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
@@ -84,7 +80,7 @@ export function ProofSection() {
                 </GlareCard>
               ) : (
                 <CardSpotlight className="p-8 text-center h-full">
-                  <div className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
+                  <div className="w-16 h-16 rounded-md mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />

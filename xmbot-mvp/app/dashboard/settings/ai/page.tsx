@@ -73,7 +73,7 @@ export default function AISettingsPage() {
     <>
       <Topbar title="AI Settings" />
       <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white/[0.03] border-white/10 rounded-md">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Brain className="h-5 w-5" />
@@ -139,7 +139,7 @@ export default function AISettingsPage() {
 
               <div className="flex items-center justify-between p-3 rounded-lg border border-slate-700">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="h-5 w-5 text-emerald-500" />
+                  <TrendingUp className="h-5 w-5 text-gold-400" />
                   <div>
                     <Label>Market Regime Detection</Label>
                     <p className="text-xs text-slate-500">AI classifies market as trending/ranging (hourly)</p>
@@ -188,7 +188,7 @@ export default function AISettingsPage() {
                 <p>• Regime Detection: ~1K tokens/hour = ~$0.01/day</p>
                 <p>• Trade Validation: ~500 tokens/trade (disabled)</p>
                 <p>• Daily Reports: ~2K tokens/day (disabled)</p>
-                <p className="text-emerald-500 font-medium">Estimated monthly cost: ~$0.30</p>
+                <p className="text-slate-300 font-medium">Estimated monthly cost: ~$0.30</p>
               </div>
             </div>
 

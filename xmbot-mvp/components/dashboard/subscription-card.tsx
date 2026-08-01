@@ -63,7 +63,7 @@ export function SubscriptionCard() {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-white">Current Plan</h3>
@@ -131,7 +131,7 @@ export function SubscriptionCard() {
         </CardContent>
       </Card>
 
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardContent className="p-6">
           <h3 className="text-lg font-medium text-white mb-4">Payment History</h3>
           {data.payments.length === 0 ? (

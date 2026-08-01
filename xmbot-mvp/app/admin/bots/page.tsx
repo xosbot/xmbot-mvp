@@ -32,7 +32,7 @@ export default async function AdminBotsPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white/[0.03] border-white/10 rounded-md">
           <CardHeader>
             <CardTitle className="text-white">All Bot Instances</CardTitle>
           </CardHeader>

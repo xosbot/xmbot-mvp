@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-slate-950 py-16 px-4">
+    <div className="min-h-screen py-16 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-8">Privacy Policy</h1>
         <p className="text-slate-400 text-sm mb-8">Last updated: July 31, 2026</p>
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-white mb-4">9. Contact</h2>
             <p>
               For questions about this Privacy Policy, contact us at{" "}
-              <a href="mailto:privacy@xmbot.online" className="text-emerald-400 hover:underline">
+              <a href="mailto:privacy@xmbot.online" className="text-gold-400 hover:underline">
                 privacy@xmbot.online
               </a>
             </p>
@@ -111,7 +111,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-800">
-          <Link href="/" className="text-emerald-400 hover:underline text-sm">
+          <Link href="/" className="text-gold-400 hover:underline text-sm">
             ← Back to Home
           </Link>
         </div>

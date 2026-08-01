@@ -49,12 +49,28 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			gold: {
+  				50: '#FBF3DC',
+  				100: '#F6E6B4',
+  				200: '#EED37E',
+  				300: '#E4BE55',
+  				400: '#D9AF3E',
+  				500: '#D4AF37',
+  				600: '#B08B23',
+  				700: '#8A6B1B',
+  				800: '#644D14',
+  				900: '#3D2F0C'
   			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		fontFamily: {
+  			mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+  			sans: ['var(--font-geist-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif']
   		}
   	}
   },

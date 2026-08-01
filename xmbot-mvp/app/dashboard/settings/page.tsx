@@ -290,7 +290,7 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="profile">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white">Profile</CardTitle>
                 <CardDescription>Update your personal information</CardDescription>
@@ -319,7 +319,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="security">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white">Change Password</CardTitle>
                 <CardDescription>Update your account password</CardDescription>
@@ -367,7 +367,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="bot">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Bot className="h-5 w-5" />
@@ -454,7 +454,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="telegram">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <MessageSquare className="h-5 w-5" />
@@ -513,7 +513,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="binance">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Wallet className="h-5 w-5" />
@@ -532,7 +532,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="sessions">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Monitor className="h-5 w-5" />

@@ -1,59 +1,63 @@
 "use client"
 
-import { ScrollReveal } from "./scroll-reveal"
-import { AnimatedTestimonials } from "@/components/ui/aceternity/animated-testimonials"
+import { ShieldCheck, Eye, Undo2 } from "lucide-react"
+import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
+import { GlareCard } from "@/components/ui/aceternity/glare-card"
 
-const testimonials = [
+const commitments = [
   {
-    name: "Rahul M.",
-    role: "Full-time Trader, Mumbai",
-    content: "I was skeptical about automated trading, but the human-in-the-loop approach sold me. I still make the final call, but the AI does the heavy analysis. Win rate has been solid — better than my manual trades.",
-    rating: 5,
-    highlight: "Better than my manual trades",
+    icon: ShieldCheck,
+    title: "No Withdrawal Access",
+    description: "Your Binance API keys are connected with trade-only permissions. XMBot can never move funds out of your account — and you can revoke access in one tap, anytime.",
   },
   {
-    name: "Priya K.",
-    role: "Part-time Investor, Bangalore",
-    content: "Set it up in 15 minutes. The Telegram alerts are clean — I just approve or reject. No more staring at charts all day. The risk management is tight, which is exactly what I needed.",
-    rating: 5,
-    highlight: "Set it up in 15 minutes",
+    icon: Eye,
+    title: "You Approve Every Trade",
+    description: "This isn't a line in the terms — it's the architecture. No signal executes until you tap Approve on Telegram. There is no auto-execution mode to accidentally enable.",
   },
   {
-    name: "Arjun S.",
-    role: "Portfolio Manager, Delhi",
-    content: "Backtested results matched live performance within 5%. The multi-agent architecture is real — not just a simple indicator bot. Worth the beta price for the risk management alone.",
-    rating: 5,
-    highlight: "Multi-agent architecture is real",
+    icon: Undo2,
+    title: "7-Day Refund, No Questions",
+    description: "Not convinced after a week in beta? Full refund, no forms to fill out. We'd rather lose a sale than a customer's trust.",
   },
 ]
 
 export function SocialProof() {
   return (
     <section className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-              Beta Users
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+              // Beta Program
             </div>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
-              Trusted by
+              Built to Earn Trust
               <br />
-              <span className="text-gradient-emerald">Real Traders</span>
+              <span className="text-gradient-gold">Not Buy It</span>
             </h2>
             <p className="mt-6 text-lg text-slate-400 leading-relaxed">
-              Early beta users are seeing results. Here&apos;s what they say.
+              We&apos;re early, and we&apos;d rather show you exactly how you&apos;re protected than
+              paste in reviews. Here&apos;s what that looks like in practice.
             </p>
           </div>
         </ScrollReveal>
 
-        <ScrollReveal>
-          <div className="max-w-3xl mx-auto">
-            <AnimatedTestimonials testimonials={testimonials} />
-          </div>
-        </ScrollReveal>
+        <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto" staggerDelay={0.1}>
+          {commitments.map((c) => (
+            <StaggerItem key={c.title}>
+              <GlareCard className="p-8 h-full">
+                <div className="w-14 h-14 rounded-md bg-gold-500/10 flex items-center justify-center mb-6">
+                  <c.icon className="h-7 w-7 text-gold-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-3">{c.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{c.description}</p>
+              </GlareCard>
+            </StaggerItem>
+          ))}
+        </StaggerChildren>
       </div>
     </section>
   )

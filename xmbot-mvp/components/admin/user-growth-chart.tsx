@@ -19,7 +19,7 @@ export function UserGrowthChart({ data }: UserGrowthChartProps) {
             labelStyle={{ color: "#94a3b8" }}
             formatter={(value) => [Number(value), "Users"]}
           />
-          <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="count" fill="#D9AF3E" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

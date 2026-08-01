@@ -89,7 +89,7 @@ export default async function TradesPage({ searchParams }: TradesPageProps) {
           </div>
         </div>
 
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-white/[0.03] border-white/10 rounded-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="text-white">All Trades</CardTitle>
             <div className="flex items-center gap-3 flex-wrap">

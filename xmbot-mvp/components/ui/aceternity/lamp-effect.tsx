@@ -1,5 +1,3 @@
-"use client"
-
 import { cn } from "@/lib/cn"
 
 export function LampEffect({
@@ -11,7 +9,7 @@ export function LampEffect({
 }) {
   return (
     <div className={cn("relative", className)}>
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-px bg-gold-500/50 pointer-events-none" />
       <div className="relative z-10">{children}</div>
     </div>
   )

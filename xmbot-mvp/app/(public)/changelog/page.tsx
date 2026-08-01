@@ -49,8 +49,8 @@ export default function ChangelogPage() {
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-            Changelog
+          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            // Changelog
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-aggressive">
             Product Updates
@@ -64,12 +64,12 @@ export default function ChangelogPage() {
           {changelog.map((release) => (
             <StaggerItem key={release.version}>
               <div className="relative pl-8 before:absolute before:left-[11px] before:top-10 before:bottom-0 before:w-px before:bg-white/10 last:before:hidden">
-                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Tag className="h-3 w-3 text-emerald-400" />
+                <div className="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center">
+                  <Tag className="h-3 w-3 text-gold-400" />
                 </div>
-                <div className="p-6 rounded-2xl border border-white/10 bg-white/5">
+                <div className="p-6 rounded-md border border-white/10 bg-white/[0.03]">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-bold">
+                    <span className="px-2 py-0.5 rounded bg-gold-500/10 text-gold-400 text-xs font-mono font-bold">
                       v{release.version}
                     </span>
                     <span className="text-xs text-slate-500">
@@ -80,7 +80,7 @@ export default function ChangelogPage() {
                   <ul className="space-y-2">
                     {release.changes.map((change, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-slate-400">
-                        <span className="text-emerald-400 mt-1">+</span>
+                        <span className="text-gold-400 mt-1">+</span>
                         {change}
                       </li>
                     ))}

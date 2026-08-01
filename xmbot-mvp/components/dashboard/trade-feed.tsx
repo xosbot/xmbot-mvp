@@ -10,7 +10,7 @@ export function TradeFeed() {
 
   if (!connected) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white text-sm">Open Positions</CardTitle>
         </CardHeader>
@@ -25,7 +25,7 @@ export function TradeFeed() {
 
   if (positions.length === 0) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white text-sm">Open Positions</CardTitle>
         </CardHeader>
@@ -39,7 +39,7 @@ export function TradeFeed() {
   }
 
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader>
         <CardTitle className="text-white text-sm">Open Positions ({positions.length})</CardTitle>
       </CardHeader>
@@ -48,7 +48,7 @@ export function TradeFeed() {
           {positions.map((pos) => (
             <div
               key={pos.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50"
+              className="flex items-center justify-between p-3 rounded-md bg-white/[0.05] border border-white/10"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${

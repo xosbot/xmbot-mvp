@@ -24,7 +24,7 @@ function PositionCard({ position }: { position: Position }) {
   const pnlPositive = position.profit >= 0
 
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3 space-y-2">
+    <div className="rounded-md border border-white/10 bg-white/[0.03] p-3 space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-white font-medium text-sm">{position.symbol}</span>
@@ -99,7 +99,7 @@ export function PositionsPanel() {
 
   if (loading && positions.length === 0) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white">Open Positions</CardTitle>
         </CardHeader>
@@ -115,7 +115,7 @@ export function PositionsPanel() {
 
   if (error && positions.length === 0) {
     return (
-      <Card className="bg-slate-900/50 border-slate-800">
+      <Card className="bg-white/[0.03] border-white/10 rounded-md">
         <CardHeader>
           <CardTitle className="text-white">Open Positions</CardTitle>
         </CardHeader>
@@ -136,7 +136,7 @@ export function PositionsPanel() {
   }
 
   return (
-    <Card className="bg-slate-900/50 border-slate-800">
+    <Card className="bg-white/[0.03] border-white/10 rounded-md">
       <CardHeader>
         <CardTitle className="text-white">Open Positions</CardTitle>
       </CardHeader>

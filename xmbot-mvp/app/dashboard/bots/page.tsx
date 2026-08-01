@@ -104,7 +104,7 @@ export default function BotsPage() {
       <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Bot className="h-5 w-5" />
@@ -115,7 +115,7 @@ export default function BotsPage() {
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor(status?.engine || "unknown")}`}>
+                    <div className={`px-3 py-1 rounded-sm border text-sm font-medium ${getStatusColor(status?.engine || "unknown")}`}>
                       {status?.engine === "running" && <CheckCircle className="h-4 w-4 mr-1 inline" />}
                       {status?.engine === "error" && <AlertCircle className="h-4 w-4 mr-1 inline" />}
                       {status?.engine === "running" ? "Running" : status?.engine === "stopped" ? "Stopped" : status?.engine === "error" ? "Error" : "Unknown"}
@@ -168,7 +168,7 @@ export default function BotsPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Settings className="h-5 w-5" />
@@ -180,7 +180,7 @@ export default function BotsPage() {
                 <div className="p-4 rounded-lg bg-slate-800/50 text-center">
                   <p className="text-sm text-slate-400">
                     Configure broker, risk limits, and AI settings in{" "}
-                    <a href="/dashboard/settings" className="text-emerald-500 hover:underline">
+                    <a href="/dashboard/settings" className="text-gold-400 hover:underline">
                       Settings
                     </a>
                   </p>
@@ -190,7 +190,7 @@ export default function BotsPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Wallet className="h-5 w-5" />

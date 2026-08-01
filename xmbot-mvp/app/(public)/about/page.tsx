@@ -12,13 +12,13 @@ export default function AboutPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-            About XMBot
+          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            // About XMBot
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
             Trading Meets
             <br />
-            <span className="text-gradient-emerald">Artificial Intelligence</span>
+            <span className="text-gradient-gold">Artificial Intelligence</span>
           </h1>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             XMBot was built with a simple thesis: AI can analyze markets better than humans,
@@ -50,13 +50,13 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: Shield, title: "Risk First", desc: "2% max risk per trade. Always." },
-              { icon: Eye, title: "Transparent", desc: "See every signal, every decision." },
-              { icon: TrendingUp, title: "Backtested", desc: "64% win rate over 6 months." },
-              { icon: Users, title: "Human-Centered", desc: "You approve every trade." },
+              { icon: Shield, title: "Risk First", desc: "2% max risk per trade. Always.", data: false },
+              { icon: Eye, title: "Transparent", desc: "See every signal, every decision.", data: false },
+              { icon: TrendingUp, title: "Backtested", desc: "64% win rate over 6 months.", data: true },
+              { icon: Users, title: "Human-Centered", desc: "You approve every trade.", data: false },
             ].map((item) => (
-              <div key={item.title} className="p-5 rounded-2xl border border-white/10 bg-white/5">
-                <item.icon className="h-6 w-6 text-emerald-400 mb-3" />
+              <div key={item.title} className="p-5 rounded-md border border-white/10 bg-white/[0.03]">
+                <item.icon className={`h-6 w-6 mb-3 ${item.data ? "text-emerald-400" : "text-gold-400"}`} />
                 <h3 className="text-sm font-semibold text-white mb-1">{item.title}</h3>
                 <p className="text-xs text-slate-400">{item.desc}</p>
               </div>
@@ -87,9 +87,9 @@ export default function AboutPage() {
                 description: "We show you every signal, every analysis, every decision. No black boxes. No hidden logic. Full visibility.",
               },
             ].map((value) => (
-              <div key={value.title} className="p-8 rounded-2xl border border-white/10 bg-white/5 text-center">
-                <div className="w-14 h-14 rounded-2xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10">
-                  <value.icon className="h-7 w-7 text-emerald-400" />
+              <div key={value.title} className="p-8 rounded-md border border-white/10 bg-white/[0.03] text-center">
+                <div className="w-14 h-14 rounded-md mx-auto mb-6 flex items-center justify-center bg-gold-500/10">
+                  <value.icon className="h-7 w-7 text-gold-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-3">{value.title}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{value.description}</p>
@@ -107,8 +107,8 @@ export default function AboutPage() {
             Join the beta and experience AI-powered trading with full control.
           </p>
           <a href="/register">
-            <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg font-medium shadow-lg shadow-emerald-600/25 transition-all duration-300">
-              Start Free Trial
+            <button className="bg-gold-500 hover:bg-gold-400 text-neutral-950 px-8 py-3 rounded-md font-semibold transition-colors duration-200">
+              Set Up in 15 Minutes
             </button>
           </a>
         </div>

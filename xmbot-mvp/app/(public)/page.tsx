@@ -11,8 +11,8 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <ProofSection />
       <HowItWorks />
+      <ProofSection />
       <FeaturesGrid />
       <SocialProof />
       <PricingCards />

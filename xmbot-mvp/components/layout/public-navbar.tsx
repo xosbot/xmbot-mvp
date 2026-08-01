@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X, Terminal } from "lucide-react"
 
 const navLinks = [
   { label: "Features", href: "/features" },
@@ -57,13 +57,12 @@ export function Navbar() {
         }`}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors duration-300">
-              <Zap className="h-5 w-5 text-emerald-400" />
-              <div className="absolute inset-0 rounded-xl bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="corner-frame w-9 h-9 rounded-md border border-white/15 bg-white/[0.03] flex items-center justify-center group-hover:border-gold-500/50 transition-colors duration-200">
+              <Terminal className="h-4 w-4 text-gold-400" />
             </div>
             <span className="text-lg font-bold tracking-aggressive">
               <span className="text-white">XM</span>
-              <span className="text-emerald-400">Bot</span>
+              <span className="text-gold-400">Bot</span>
             </span>
           </Link>
 
@@ -88,8 +87,8 @@ export function Navbar() {
               </Button>
             </Link>
             <Link href="/register">
-              <Button className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/30 transition-all duration-300">
-                Start Free Trial
+              <Button className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold transition-colors duration-200">
+                Live in 15 Minutes
               </Button>
             </Link>
           </div>
@@ -135,8 +134,8 @@ export function Navbar() {
               </Button>
             </Link>
             <Link href="/register" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-500">
-                Start Free Trial
+              <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold">
+                Live in 15 Minutes
               </Button>
             </Link>
           </div>

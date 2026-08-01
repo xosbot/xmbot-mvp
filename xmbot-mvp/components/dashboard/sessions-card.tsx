@@ -102,7 +102,7 @@ export function SessionsCard() {
 
       <div className="space-y-3">
         {sessions.map((s) => (
-          <Card key={s.id} className="bg-slate-900/50 border-slate-800">
+          <Card key={s.id} className="bg-white/[0.03] border-white/10 rounded-md">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Monitor className="h-5 w-5 text-slate-400" />

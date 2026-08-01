@@ -27,11 +27,11 @@ export default function RefundsPage() {
             <h2 className="text-2xl font-semibold text-white tracking-tight">How to Request a Refund</h2>
             <p className="text-slate-400 leading-relaxed">
               To request a refund, contact us at{" "}
-              <a href="mailto:support@xmbot.online" className="text-emerald-400 hover:text-emerald-300">
+              <a href="mailto:support@xmbot.online" className="text-gold-400 hover:text-gold-300">
                 support@xmbot.online
               </a>{" "}
               or via Telegram at{" "}
-              <a href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300">
+              <a href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300">
                 @xmbot
               </a>{" "}
               within 7 days of your purchase. Include your registered email address and we&apos;ll
@@ -61,7 +61,7 @@ export default function RefundsPage() {
             <h2 className="text-2xl font-semibold text-white tracking-tight">Contact</h2>
             <p className="text-slate-400 leading-relaxed">
               If you have any questions about our refund policy, please contact us at{" "}
-              <a href="mailto:support@xmbot.online" className="text-emerald-400 hover:text-emerald-300">
+              <a href="mailto:support@xmbot.online" className="text-gold-400 hover:text-gold-300">
                 support@xmbot.online
               </a>.
             </p>
