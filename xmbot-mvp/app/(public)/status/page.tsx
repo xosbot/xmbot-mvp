@@ -50,8 +50,8 @@ export default function StatusPage() {
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs text-emerald-400 mb-6 uppercase tracking-wider">
-            System Status
+          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            // System Status
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-aggressive">
             All Systems Operational
@@ -62,7 +62,7 @@ export default function StatusPage() {
         </div>
 
         {/* Services */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden mb-12">
+        <div className="rounded-md border border-white/10 bg-white/[0.03] overflow-hidden mb-12">
           <div className="px-6 py-4 border-b border-white/10">
             <h2 className="text-sm font-semibold text-white">Services</h2>
           </div>
@@ -84,7 +84,7 @@ export default function StatusPage() {
           ) : (
             <div className="space-y-4">
               {incidents.map((incident, i) => (
-                <div key={i} className="p-6 rounded-2xl border border-white/10 bg-white/5">
+                <div key={i} className="p-6 rounded-md border border-white/10 bg-white/[0.03]">
                   <div className="flex items-center gap-2 text-emerald-400 mb-2">
                     <CheckCircle className="h-4 w-4" />
                     <span className="text-xs font-medium uppercase">Resolved</span>

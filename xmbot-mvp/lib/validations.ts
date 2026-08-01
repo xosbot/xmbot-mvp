@@ -37,7 +37,15 @@ export const changePasswordSchema = z.object({
   path: ["confirmPassword"],
 })
 
+export const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.email("Please enter a valid email"),
+  subject: z.string().min(3, "Subject must be at least 3 characters").max(200),
+  message: z.string().min(10, "Message must be at least 10 characters").max(5000),
+})
+
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
 export type SettingsInput = z.infer<typeof settingsSchema>
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
+export type ContactInput = z.infer<typeof contactSchema>

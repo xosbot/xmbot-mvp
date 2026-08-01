@@ -35,7 +35,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
             <Calendar className="h-3 w-3" />
             {new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-medium">
+            <span className="px-2 py-0.5 rounded-sm bg-gold-500/10 text-gold-400 text-[10px] font-medium">
               {post.category}
             </span>
           </div>

@@ -63,8 +63,8 @@ export default function QuickstartPage() {
           ].map((item) => (
             <div key={item.step} className="flex gap-6">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <span className="text-sm font-bold text-emerald-400 font-mono">{item.step}</span>
+                <div className="w-10 h-10 rounded-md bg-gold-500/10 border border-gold-500/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-gold-400 font-mono">{item.step}</span>
                 </div>
               </div>
               <div>
@@ -75,15 +75,15 @@ export default function QuickstartPage() {
           ))}
         </div>
 
-        <div className="mt-16 p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+        <div className="mt-16 p-6 rounded-md border border-gold-500/20 bg-gold-500/5">
           <div className="flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-emerald-400 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="h-5 w-5 text-gold-400 mt-0.5 flex-shrink-0" />
             <div>
               <h3 className="text-sm font-semibold text-white mb-1">You&apos;re all set!</h3>
               <p className="text-sm text-slate-400">
                 The engine will start scanning the market immediately. You&apos;ll receive your first
                 signal within the next market session. Join our{" "}
-                <a href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300">
+                <a href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300">
                   Telegram group
                 </a>{" "}
                 for support.

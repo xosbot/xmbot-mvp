@@ -24,12 +24,12 @@ export default function ApiDocsPage() {
           {/* Authentication */}
           <section>
             <h2 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
-              <Lock className="h-6 w-6 text-emerald-400" />
+              <Lock className="h-6 w-6 text-gold-400" />
               Authentication
             </h2>
             <p className="text-slate-400 leading-relaxed">
               All API requests require authentication via an API key. Include your key in the
-              <code className="mx-1 px-2 py-0.5 rounded bg-white/10 text-emerald-400 text-sm">Authorization</code>
+              <code className="mx-1 px-2 py-0.5 rounded bg-white/10 text-gold-400 text-sm">Authorization</code>
               header:
             </p>
             <div className="p-4 rounded-lg bg-black/50 border border-white/10 font-mono text-sm text-slate-300 mt-4">
@@ -40,7 +40,7 @@ export default function ApiDocsPage() {
           {/* Endpoints */}
           <section>
             <h2 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
-              <Zap className="h-6 w-6 text-emerald-400" />
+              <Zap className="h-6 w-6 text-gold-400" />
               Engine Endpoints
             </h2>
             <div className="space-y-4">
@@ -53,7 +53,7 @@ export default function ApiDocsPage() {
                 <div key={endpoint.path} className="p-4 rounded-lg border border-white/10 bg-white/5">
                   <div className="flex items-center gap-3 mb-2">
                     <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                      endpoint.method === "GET" ? "bg-emerald-500/20 text-emerald-400" : "bg-violet-500/20 text-violet-400"
+                      endpoint.method === "GET" ? "bg-emerald-500/20 text-emerald-400" : "bg-gold-500/20 text-gold-400"
                     }`}>
                       {endpoint.method}
                     </span>
@@ -68,7 +68,7 @@ export default function ApiDocsPage() {
           {/* Bot Management */}
           <section>
             <h2 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
-              <Bot className="h-6 w-6 text-emerald-400" />
+              <Bot className="h-6 w-6 text-gold-400" />
               Bot Management
             </h2>
             <div className="space-y-4">
@@ -82,7 +82,7 @@ export default function ApiDocsPage() {
                   <div className="flex items-center gap-3 mb-2">
                     <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                       endpoint.method === "GET" ? "bg-emerald-500/20 text-emerald-400" :
-                      endpoint.method === "POST" ? "bg-violet-500/20 text-violet-400" :
+                      endpoint.method === "POST" ? "bg-gold-500/20 text-gold-400" :
                       endpoint.method === "PATCH" ? "bg-yellow-500/20 text-yellow-400" :
                       "bg-red-500/20 text-red-400"
                     }`}>
@@ -99,7 +99,7 @@ export default function ApiDocsPage() {
           {/* Trade Data */}
           <section>
             <h2 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
-              <BarChart3 className="h-6 w-6 text-emerald-400" />
+              <BarChart3 className="h-6 w-6 text-gold-400" />
               Trade Data
             </h2>
             <div className="space-y-4">
@@ -123,7 +123,7 @@ export default function ApiDocsPage() {
           {/* Rate Limits */}
           <section>
             <h2 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
-              <Shield className="h-6 w-6 text-emerald-400" />
+              <Shield className="h-6 w-6 text-gold-400" />
               Rate Limits
             </h2>
             <p className="text-slate-400 leading-relaxed">

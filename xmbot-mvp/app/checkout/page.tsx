@@ -27,8 +27,8 @@ export default function CheckoutPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
       </div>
     )
   }
@@ -69,11 +69,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
-      <Card className="w-full max-w-md bg-gradient-to-b from-emerald-500/10 to-slate-900 border-emerald-500/30">
-        <div className="h-1 bg-emerald-500" />
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md rounded-md bg-white/[0.03] border-white/10 overflow-hidden">
+        <div className="h-[3px] bg-gold-500" />
         <CardHeader className="text-center">
-          <Badge className="mx-auto mb-2 bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+          <Badge className="mx-auto mb-2 rounded-sm bg-gold-500/10 text-gold-400 border-gold-500/30">
             <Star className="h-3 w-3 mr-1" />
             Beta Access
           </Badge>
@@ -86,14 +86,14 @@ export default function CheckoutPage() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 mb-4">
+            <div className="rounded-md border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-400 mb-4">
               {error}
             </div>
           )}
           <ul className="space-y-3">
             {betaFeatures.map((feature) => (
               <li key={feature} className="flex items-center gap-3 text-sm text-slate-300">
-                <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                <Check className="h-4 w-4 text-gold-500 flex-shrink-0" />
                 {feature}
               </li>
             ))}
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
             onClick={handlePayment}
             disabled={loading}
             size="lg"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold transition-colors duration-200"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

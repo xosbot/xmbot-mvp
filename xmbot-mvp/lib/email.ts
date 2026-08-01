@@ -6,9 +6,10 @@ type SendEmailParams = {
   to: string
   subject: string
   html: string
+  replyTo?: string
 }
 
-export async function sendEmail({ to, subject, html }: SendEmailParams) {
+export async function sendEmail({ to, subject, html, replyTo }: SendEmailParams) {
   if (!process.env.RESEND_API_KEY) {
     console.log(`[EMAIL] Would send email to ${to}: ${subject}`)
     return { id: "dry-run" }
@@ -19,6 +20,7 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
     to,
     subject,
     html,
+    ...(replyTo ? { replyTo } : {}),
   })
 
   if (error) {
