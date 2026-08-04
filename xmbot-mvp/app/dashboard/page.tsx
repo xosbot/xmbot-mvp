@@ -9,6 +9,7 @@ import { EngineStatus } from "@/components/dashboard/engine-status"
 import { PositionsPanel } from "@/components/dashboard/positions-panel"
 import { LivePnL } from "@/components/dashboard/live-pnl"
 import { TradeFeed } from "@/components/dashboard/trade-feed"
+import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist"
 import { TrendingUp, Bot, DollarSign, BarChart } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -77,6 +78,8 @@ export default async function DashboardPage() {
             to activate your trading bot.
           </div>
         )}
+
+        <OnboardingChecklist />
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <LivePnL />

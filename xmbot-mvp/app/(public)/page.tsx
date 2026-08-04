@@ -1,11 +1,12 @@
 import { HeroSection } from "@/components/landing/hero-section"
 import { HowItWorks } from "@/components/landing/how-it-works"
 import { ProofSection } from "@/components/landing/proof-section"
-import { SocialProof } from "@/components/landing/social-proof"
+import { LivePreviewSection } from "@/components/landing/live-preview-section"
+import { TestimonialsSection } from "@/components/landing/testimonials-section"
 import { FeaturesGrid } from "@/components/landing/features-grid"
 import { PricingCards } from "@/components/landing/pricing-cards"
-import { CTASection } from "@/components/landing/cta-section"
 import { FAQSection } from "@/components/landing/faq-section"
+import { CTASection } from "@/components/landing/cta-section"
 
 export default function HomePage() {
   return (
@@ -13,8 +14,9 @@ export default function HomePage() {
       <HeroSection />
       <HowItWorks />
       <ProofSection />
+      <LivePreviewSection />
       <FeaturesGrid />
-      <SocialProof />
+      <TestimonialsSection />
       <PricingCards />
       <FAQSection />
       <CTASection />

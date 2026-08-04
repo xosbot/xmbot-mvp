@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
+import { ArrowRight, Shield, Eye, TrendingUp, Zap, CheckCircle2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
 import { FlipWords } from "@/components/ui/aceternity/flip-words"
@@ -11,9 +11,9 @@ import { ProductMockupStack } from "./product-mockup-stack"
 
 function StatsBar() {
   const stats = [
-    { label: "Setup Time", value: "15 min", icon: Zap, tone: "gold" as const },
-    { label: "Win Rate", value: "64%", icon: TrendingUp, tone: "emerald" as const },
-    { label: "Max Drawdown", value: "4.3%", icon: Shield, tone: "emerald" as const },
+    { label: "Win Rate", value: "64%", icon: TrendingUp, tone: "emerald" },
+    { label: "Return", value: "+84%", icon: TrendingUp, tone: "emerald" },
+    { label: "Max Drawdown", value: "4.3%", icon: Shield, tone: "emerald" },
   ]
 
   return (
@@ -27,13 +27,37 @@ function StatsBar() {
           className="text-center py-3 px-2"
         >
           <div className="flex items-center justify-center gap-1.5 mb-1">
-            <s.icon className={`h-3.5 w-3.5 ${s.tone === "gold" ? "text-gold-400" : "text-emerald-400"}`} />
+            <s.icon className="h-3.5 w-3.5 text-emerald-400" />
             <span className="text-xl sm:text-2xl font-bold text-foreground font-mono tracking-tight">{s.value}</span>
           </div>
           <div className="text-[10px] sm:text-xs text-stone-500 mono-label">{s.label}</div>
         </motion.div>
       ))}
     </div>
+  )
+}
+
+function TrustBadges() {
+  const badges = [
+    "No withdrawal access — ever",
+    "API keys only",
+    "Cancel anytime",
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.8, duration: 0.6 }}
+      className="mt-6 flex flex-wrap gap-x-4 gap-y-2"
+    >
+      {badges.map((badge) => (
+        <div key={badge} className="flex items-center gap-1.5 text-xs text-stone-500">
+          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+          <span>{badge}</span>
+        </div>
+      ))}
+    </motion.div>
   )
 }
 
@@ -50,7 +74,7 @@ export function HeroSection() {
               className="mb-8 inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
-              <span>Beta Open // Live in 15 Min</span>
+              <span>Beta Open // 7-Day Free Trial</span>
             </motion.div>
 
             <motion.div
@@ -61,11 +85,11 @@ export function HeroSection() {
               <LampEffect>
                 <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl font-medium tracking-tight leading-[1.02]">
                   <span className="text-foreground">
-                    <TextGenerateEffect words="Gold Trading," filter={false} />
+                    <TextGenerateEffect words="Stop Guessing." filter={false} />
                   </span>
                   <br />
                   <span className="text-gradient-gold">
-                    <FlipWords words={["Simplified.", "On Telegram.", "In Your Control."]} duration={3000} />
+                    <FlipWords words={["Start Trading.", "Let AI Decide.", "Trade Smarter."]} duration={3000} />
                   </span>
                 </h1>
               </LampEffect>
@@ -77,8 +101,9 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-8 text-lg text-stone-400 leading-relaxed"
             >
-              No charts to babysit, no code to write. Connect Telegram, and the AI scans
-              XAUUSD 24/5 for you. <span className="text-foreground font-medium">Every signal lands in your pocket — you tap Approve or Reject.</span>
+              The AI finds high-probability gold trades while you sleep.
+              You approve on Telegram in 12 seconds. No charts. No code. No stress.
+              <span className="text-foreground font-medium"> Just disciplined profits.</span>
             </motion.p>
 
             <motion.div
@@ -93,7 +118,7 @@ export function HeroSection() {
               </div>
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4 text-gold-500" />
-                <span>Human-in-the-loop</span>
+                <span>You approve every trade</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-gold-500" />
@@ -109,7 +134,7 @@ export function HeroSection() {
             >
               <Link href="/register">
                 <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
-                  Set Up in 15 Minutes
+                  Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
@@ -124,9 +149,11 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-14"
+              className="mt-10"
             >
               <StatsBar />
+              <p className="text-[10px] text-stone-600 mt-2">* Backtested results. Past performance does not guarantee future returns.</p>
+              <TrustBadges />
             </motion.div>
           </div>
 

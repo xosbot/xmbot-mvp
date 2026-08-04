@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
+import { ArrowRight, Shield, Eye, TrendingUp, Zap, CheckCircle2 } from "lucide-react"
 import { ScrollReveal } from "./scroll-reveal"
 import { MovingBorder } from "@/components/ui/aceternity/moving-border"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
@@ -19,39 +19,39 @@ export function CTASection() {
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-8">
                   <Zap className="h-3.5 w-3.5" />
-                  <span>Limited Beta // First 10 Customers</span>
+                  <span>7-Day Free Trial // No Credit Card Required</span>
                 </div>
 
                 <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
-                  Your First Signal Is
+                  Your First AI Trade Is
                   <br />
                   <span className="text-gradient-gold">15 Minutes Away</span>
                 </h2>
 
                 <p className="mt-6 text-lg text-stone-400 max-w-xl mx-auto leading-relaxed">
-                  Connect Telegram, set your risk limits, and let the multi-agent system
-                  handle the analysis. You stay the one who taps Approve.
+                  Connect Telegram, set your risk limits, and let the AI find your next trade.
+                  You approve. You profit. No strings attached.
                 </p>
 
                 <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-stone-500">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-gold-500" />
-                    <span>2% max risk</span>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <span>Free 7-day trial</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4 text-gold-500" />
-                    <span>You approve every trade</span>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <span>No credit card needed</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    <span>64% win rate</span>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <span>Cancel anytime</span>
                   </div>
                 </div>
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link href="/register">
                     <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
-                      Set Up in 15 Minutes
+                      Start Free Trial
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
@@ -62,9 +62,20 @@ export function CTASection() {
                   </Link>
                 </div>
 
-                <p className="mt-8 text-xs text-stone-400">
-                  No hidden fees. Cancel anytime. Trading involves risk.
-                </p>
+                <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3 text-xs text-stone-500">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="h-3.5 w-3.5 text-gold-500" />
+                    <span>2% max risk per trade</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Eye className="h-3.5 w-3.5 text-gold-500" />
+                    <span>You approve every trade</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>64% backtested win rate</span>
+                  </div>
+                </div>
               </div>
             </LampEffect>
           </MovingBorder>

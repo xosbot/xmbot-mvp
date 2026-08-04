@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectItem } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User, Wallet, CreditCard, Monitor } from "lucide-react"
+import { Loader2, Save, Bot, Shield, Brain, MessageSquare, LinkIcon, Unlink, User, Wallet, CreditCard, Monitor, ArrowRight, CheckCircle2 } from "lucide-react"
 import { BinanceForm } from "@/components/dashboard/binance-form"
 import { SubscriptionCard } from "@/components/dashboard/subscription-card"
 import { SessionsCard } from "@/components/dashboard/sessions-card"
@@ -257,38 +257,152 @@ export default function SettingsPage() {
     <>
       <Topbar title="Settings" />
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-        <Tabs defaultValue="profile" className="space-y-6">
+        {/* Quick setup progress */}
+        <div className="mb-6 p-4 rounded-lg border border-white/10 bg-white/[0.02]">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-white">Setup Progress</h3>
+            <span className="text-xs text-slate-500">
+              {[linkedTelegram, broker !== "paper", enableAI].filter(Boolean).length}/3 complete
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${linkedTelegram ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+              {linkedTelegram ? <CheckCircle2 className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />}
+              Telegram
+            </div>
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${broker !== "paper" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+              {broker !== "paper" ? <CheckCircle2 className="h-3 w-3" /> : <Wallet className="h-3 w-3" />}
+              Binance
+            </div>
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${enableAI ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+              {enableAI ? <CheckCircle2 className="h-3 w-3" /> : <Brain className="h-3 w-3" />}
+              AI Enabled
+            </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="quickstart" className="space-y-6">
           <TabsList className="bg-slate-900 border border-slate-800 p-1">
+            <TabsTrigger value="quickstart" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+              <ArrowRight className="h-4 w-4 mr-2" />
+              Quick Start
+            </TabsTrigger>
             <TabsTrigger value="profile" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
               <User className="h-4 w-4 mr-2" />
               Profile
-            </TabsTrigger>
-            <TabsTrigger value="security" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
-              <Shield className="h-4 w-4 mr-2" />
-              Security
             </TabsTrigger>
             <TabsTrigger value="bot" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
               <Bot className="h-4 w-4 mr-2" />
               Bot Config
             </TabsTrigger>
-            <TabsTrigger value="telegram" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Telegram
-            </TabsTrigger>
-            <TabsTrigger value="binance" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
-              <Wallet className="h-4 w-4 mr-2" />
-              Binance
-            </TabsTrigger>
-            <TabsTrigger value="subscription" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
-              <CreditCard className="h-4 w-4 mr-2" />
-              Subscription
-            </TabsTrigger>
-            <TabsTrigger value="sessions" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
-              <Monitor className="h-4 w-4 mr-2" />
-              Sessions
+            <TabsTrigger value="account" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+              <Shield className="h-4 w-4 mr-2" />
+              Account
             </TabsTrigger>
           </TabsList>
 
+          {/* Quick Start - for new users */}
+          <TabsContent value="quickstart">
+            <div className="space-y-4">
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-gold-400" />
+                    1. Connect Telegram
+                  </CardTitle>
+                  <CardDescription>Link your Telegram to receive trade signals</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 max-w-lg">
+                    {linkedTelegram ? (
+                      <div className="flex items-center gap-2 p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        <span className="text-sm text-emerald-300">Connected to Chat ID: {linkedTelegram}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="rounded-lg border border-slate-700 p-4 space-y-3">
+                          <ol className="text-xs text-slate-400 space-y-2 list-decimal list-inside">
+                            <li>Open Telegram and search for <span className="text-white font-medium">@XM1_Gold_Bot</span></li>
+                            <li>Start a chat and send <span className="text-white font-medium">/start</span></li>
+                            <li>The bot will reply with your Chat ID</li>
+                            <li>Copy and paste the Chat ID below</li>
+                          </ol>
+                        </div>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Enter your Telegram Chat ID"
+                            value={telegramChatId}
+                            onChange={(e) => setTelegramChatId(e.target.value)}
+                          />
+                          <Button onClick={handleSaveTelegram} disabled={savingTelegram}>
+                            {savingTelegram ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-gold-400" />
+                    2. Connect Binance
+                  </CardTitle>
+                  <CardDescription>Add your Binance API keys for live trading</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BinanceForm />
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-gold-400" />
+                    3. Configure Risk & AI
+                  </CardTitle>
+                  <CardDescription>Set your risk limits and enable AI analysis</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingConfig ? (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Loading config...
+                    </div>
+                  ) : (
+                    <div className="space-y-4 max-w-lg">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="maxDailyLoss">Max Daily Loss ($)</Label>
+                          <Input id="maxDailyLoss" type="number" value={maxDailyLoss} onChange={(e) => setMaxDailyLoss(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="maxPositionSize">Max Position Size</Label>
+                          <Input id="maxPositionSize" type="number" step="0.01" value={maxPositionSize} onChange={(e) => setMaxPositionSize(e.target.value)} />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="enableAI">AI-Powered Trade Analysis</Label>
+                          <p className="text-xs text-slate-500">Use AI to validate trade signals before execution</p>
+                        </div>
+                        <Switch checked={enableAI} onCheckedChange={setEnableAI} />
+                      </div>
+                      <Button onClick={handleSaveConfig} disabled={savingConfig}>
+                        {savingConfig ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                        Save Settings
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Profile */}
           <TabsContent value="profile">
             <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
@@ -318,54 +432,7 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="security">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
-              <CardHeader>
-                <CardTitle className="text-white">Change Password</CardTitle>
-                <CardDescription>Update your account password</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" disabled={savingPassword}>
-                    {savingPassword ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                    Change Password
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
+          {/* Bot Config (advanced) */}
           <TabsContent value="bot">
             <Card className="bg-white/[0.03] border-white/10 rounded-md">
               <CardHeader>
@@ -453,97 +520,70 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="telegram">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Telegram Integration
-                </CardTitle>
-                <CardDescription>Link your Telegram account for trade alerts and manual approval</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 max-w-lg">
-                  {linkedTelegram ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
-                        <div className="flex items-center gap-2">
-                          <LinkIcon className="h-4 w-4 text-emerald-500" />
-                          <span className="text-sm text-emerald-300">Linked to Chat ID: {linkedTelegram}</span>
-                        </div>
-                        <Button variant="ghost" size="sm" onClick={handleUnlinkTelegram}>
-                          <Unlink className="h-4 w-4 mr-1" />
-                          Unlink
-                        </Button>
-                      </div>
-                      <p className="text-xs text-slate-500">
-                        You will receive trade signals and alerts in your linked Telegram chat.
-                        Use the bot commands to approve or reject trades.
-                      </p>
+          {/* Account (security + subscription + sessions) */}
+          <TabsContent value="account">
+            <div className="space-y-4">
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white">Change Password</CardTitle>
+                  <CardDescription>Update your account password</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">Current Password</Label>
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        required
+                      />
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="rounded-lg border border-slate-700 p-4 space-y-3">
-                        <p className="text-sm text-slate-300">To link your Telegram:</p>
-                        <ol className="text-xs text-slate-400 space-y-2 list-decimal list-inside">
-                          <li>Open Telegram and search for <span className="text-white font-medium">@XMBotTradingBot</span></li>
-                          <li>Start a chat and send <span className="text-white font-medium">/start</span></li>
-                          <li>The bot will reply with your Chat ID</li>
-                          <li>Copy and paste the Chat ID below</li>
-                        </ol>
-                      </div>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Enter your Telegram Chat ID"
-                          value={telegramChatId}
-                          onChange={(e) => setTelegramChatId(e.target.value)}
-                        />
-                        <Button onClick={handleSaveTelegram} disabled={savingTelegram}>
-                          {savingTelegram ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-slate-500">
-                        Your Chat ID is used to send trade alerts and receive manual approval requests.
-                      </p>
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">New Password</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        minLength={6}
+                      />
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" disabled={savingPassword}>
+                      {savingPassword ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                      Change Password
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
 
-          <TabsContent value="binance">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Wallet className="h-5 w-5" />
-                  Binance Connection
-                </CardTitle>
-                <CardDescription>Connect your Binance account to start automated trading</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <BinanceForm />
-              </CardContent>
-            </Card>
-          </TabsContent>
+              <SubscriptionCard />
 
-          <TabsContent value="subscription">
-            <SubscriptionCard />
-          </TabsContent>
-
-          <TabsContent value="sessions">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Monitor className="h-5 w-5" />
-                  Active Sessions
-                </CardTitle>
-                <CardDescription>Manage your active login sessions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SessionsCard />
-              </CardContent>
-            </Card>
+              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Monitor className="h-5 w-5" />
+                    Active Sessions
+                  </CardTitle>
+                  <CardDescription>Manage your active login sessions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SessionsCard />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>

@@ -30,8 +30,12 @@ export function TradeFeed() {
           <CardTitle className="text-white text-sm">Open Positions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-slate-500 text-sm">
-            No open positions
+          <div className="text-center py-8">
+            <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center mx-auto mb-3">
+              <Minus className="h-5 w-5 text-slate-500" />
+            </div>
+            <p className="text-sm text-slate-400">No open positions</p>
+            <p className="text-xs text-slate-600 mt-1">Positions will appear here when trades are active</p>
           </div>
         </CardContent>
       </Card>

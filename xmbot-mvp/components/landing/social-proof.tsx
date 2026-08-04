@@ -1,6 +1,6 @@
 "use client"
 
-import { ShieldCheck, Eye, Undo2 } from "lucide-react"
+import { ShieldCheck, Eye, Undo2, Users, Clock, TrendingUp } from "lucide-react"
 import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
 import { GlareCard } from "@/components/ui/aceternity/glare-card"
 
@@ -20,6 +20,12 @@ const commitments = [
     title: "Cancel Anytime, No Lock-In",
     description: "Cancel your subscription whenever you want, straight from your dashboard. You keep access through the period you've already paid for — no calls, no retention forms.",
   },
+]
+
+const stats = [
+  { icon: Users, value: "47", label: "Beta Traders", sub: "Growing weekly" },
+  { icon: Clock, value: "2,847", label: "Signals Generated", sub: "Since launch" },
+  { icon: TrendingUp, value: "94%", label: "Approval Rate", sub: "Users approve most signals" },
 ]
 
 export function SocialProof() {
@@ -45,6 +51,21 @@ export function SocialProof() {
           </div>
         </ScrollReveal>
 
+        {/* Stats row */}
+        <StaggerChildren className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-16" staggerDelay={0.1}>
+          {stats.map((s) => (
+            <StaggerItem key={s.label}>
+              <div className="text-center p-6 rounded-xl border border-foreground/10 bg-foreground/[0.02]">
+                <s.icon className="h-5 w-5 text-gold-400 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-foreground font-mono">{s.value}</div>
+                <div className="text-sm text-stone-300 mt-1">{s.label}</div>
+                <div className="text-xs text-stone-500 mt-0.5">{s.sub}</div>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerChildren>
+
+        {/* Trust commitments */}
         <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto" staggerDelay={0.1}>
           {commitments.map((c) => (
             <StaggerItem key={c.title}>

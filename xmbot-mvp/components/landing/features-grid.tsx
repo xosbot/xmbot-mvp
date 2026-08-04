@@ -8,57 +8,57 @@ import { Spotlight } from "@/components/ui/aceternity/spotlight"
 const features = [
   {
     icon: Brain,
-    title: "Multi-Agent AI",
-    description: "Technical Analysis Agent scans XAUUSD M5 with RSI + Supertrend + ADX. AI validates via Gemini/Claude.",
+    title: "AI Does the Analysis",
+    description: "Multi-agent system scans gold 24/5 with RSI, Supertrend, and ADX. Gemini and Claude validate every signal. You get only high-probability setups.",
     color: "gold" as const,
     featured: true,
   },
   {
     icon: Users,
-    title: "Human-in-the-Loop",
-    description: "Every signal requires your approval. Review on Telegram, approve with one tap. No auto-execution.",
+    title: "You Stay in Control",
+    description: "Every trade requires your approval. Signal lands on Telegram, you tap Approve or Reject. No auto-execution. Ever.",
     color: "neutral" as const,
     featured: true,
   },
   {
     icon: Shield,
-    title: "Risk Engine",
-    description: "2% max risk per trade. Daily loss limits. Max drawdown protection. Position sizing enforced.",
+    title: "Risk is Baked In",
+    description: "2% max risk per trade. Daily loss limits. Max drawdown protection. Position sizing enforced automatically.",
     color: "neutral" as const,
     featured: false,
   },
   {
     icon: BarChart3,
-    title: "Backtested",
-    description: "64% win rate. +84.3% return. 4.3% max drawdown. Walk-forward validated on unseen data.",
+    title: "Proven Results",
+    description: "64% win rate. +84.3% return. 4.3% max drawdown. Validated on 6 months of real market data.",
     color: "emerald" as const,
     featured: false,
   },
   {
     icon: Bell,
-    title: "Telegram Alerts",
-    description: "Signal cards with Approve/Reject buttons. Trade alerts. P&L summaries. Everything in your pocket.",
+    title: "Instant Alerts",
+    description: "Signal cards with entry, SL, TP, and AI analysis land in your pocket. Review in 12 seconds, approve with one tap.",
     color: "neutral" as const,
     featured: false,
   },
   {
     icon: Bot,
-    title: "Live Dashboard",
-    description: "Real-time positions, P&L tracking, signal history, engine status. Monitor from any device.",
+    title: "Real-Time Dashboard",
+    description: "Watch positions, P&L, and signal history live. Monitor from any device. Monthly reports keep you honest.",
     color: "neutral" as const,
     featured: false,
   },
   {
     icon: Layers,
-    title: "Multi-Broker",
-    description: "Paper Trading for testing. Binance for live crypto trading. MetaTrader 5 and Interactive Brokers coming soon.",
+    title: "Works With Your Broker",
+    description: "Paper trading for testing. Binance for crypto. MetaTrader 5 and Interactive Brokers coming soon.",
     color: "neutral" as const,
     featured: false,
   },
   {
     icon: Zap,
-    title: "24/5 Execution",
-    description: "Engine runs around the clock during market hours. No emotions, no FOMO. Just the system.",
+    title: "Runs While You Sleep",
+    description: "Engine runs 24/5 during market hours. No emotions, no FOMO, no revenge trading. Just the system.",
     color: "neutral" as const,
     featured: false,
   },
@@ -101,15 +101,16 @@ export function FeaturesGrid() {
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
-              // Platform
+              // Why XMBot
             </div>
             <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
-              Simple to Use.
+              Trading Shouldn&apos;t Be
               <br />
-              <span className="text-gradient-gold">Serious Underneath.</span>
+              <span className="text-gradient-gold">A Full-Time Job.</span>
             </h2>
             <p className="mt-6 text-lg text-stone-400 leading-relaxed">
-              Everything you need to run a disciplined, automated gold trading operation — without ever opening a terminal yourself.
+              XMBot handles the analysis. You handle the decisions.
+              That&apos;s how disciplined trading works.
             </p>
           </div>
         </ScrollReveal>
