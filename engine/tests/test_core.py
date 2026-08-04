@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 from src.core.types import (
-    Signal, SignalAction, Order, OrderStatus, RiskVerdict,
+    Signal, SignalAction, SignalDecision, Order, OrderStatus, RiskVerdict,
     UserConfig, AgentConfig, Position, AccountInfo, Market,
 )
 from src.risk.engine import RiskEngine
@@ -15,6 +15,7 @@ from src.agents.technical import TechnicalAnalysisAgent
 from src.core.engine import Engine
 from src.core.config import EngineConfig
 from src.gate.human_gate import HumanGate
+from src.telegram.bot import TelegramBot
 
 
 class TestRiskEngine:
@@ -300,6 +301,95 @@ class TestEnginePauseResume:
     def test_signal_message_omits_ai_verdict_when_absent(self, engine):
         message = engine._format_signal_message(self._make_signal())
         assert "AI:" not in message
+
+    def test_signal_message_includes_take_profit_when_present(self, engine):
+        signal = self._make_signal()
+        signal.take_profit = 3020.0
+        message = engine._format_signal_message(signal)
+        assert "TP: $3020.00" in message
+
+
+class TestSignalNotification:
+    """Covers the human_gate -> telegram wiring: the formatted message (with
+    AI verdict) must actually reach the outgoing Telegram call unmodified."""
+
+    @pytest.mark.asyncio
+    async def test_gate_notify_receives_formatted_message_unmodified(self):
+        received = {}
+
+        async def notify(signal, message):
+            received["message"] = message
+
+        gate = HumanGate(signal_timeout=1, notify_callback=notify)
+        signal = Signal(
+            id="sig-notify",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+        formatted = "📊 formatted message\nReason: RSI oversold bounce\n🤖 AI: SAFE — looks fine"
+
+        task = asyncio.create_task(gate.submit(signal, user_message=formatted))
+        await asyncio.sleep(0.01)
+        await gate.resolve(signal.id, SignalDecision.APPROVED)
+        await task
+
+        assert received["message"] == formatted
+
+    @pytest.mark.asyncio
+    async def test_send_signal_sends_formatted_user_message(self, monkeypatch):
+        bot = TelegramBot(token="fake-token", chat_id="fake-chat")
+        sent = {}
+
+        async def fake_send_message(text, buttons=None, parse_mode="Markdown"):
+            sent["text"] = text
+            return True
+
+        monkeypatch.setattr(bot, "send_message", fake_send_message)
+
+        signal = Signal(
+            id="sig-1",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+        formatted = "📊 formatted message\n🤖 AI: SAFE — looks fine"
+        await bot.send_signal(signal, user_message=formatted)
+
+        assert sent["text"] == formatted
+
+    @pytest.mark.asyncio
+    async def test_send_signal_falls_back_when_no_user_message(self, monkeypatch):
+        bot = TelegramBot(token="fake-token", chat_id="fake-chat")
+        sent = {}
+
+        async def fake_send_message(text, buttons=None, parse_mode="Markdown"):
+            sent["text"] = text
+            return True
+
+        monkeypatch.setattr(bot, "send_message", fake_send_message)
+
+        signal = Signal(
+            id="sig-2",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+        await bot.send_signal(signal)
+
+        assert "Trade Signal" in sent["text"]
 
 
 class TestSessionFilter:

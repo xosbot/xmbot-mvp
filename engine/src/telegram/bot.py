@@ -80,19 +80,16 @@ class TelegramBot:
             ],
         ]
 
-        message = (
+        message = user_message or (
             f"📊 *{signal.agent} Trade Signal*\n"
             f"────────────────\n"
             f"*Action:* {signal.action.value} {signal.market}\n"
             f"*Entry:* ${signal.entry_price:.2f}\n"
             f"*SL:* ${signal.stop_loss:.2f} (${signal.risk_amount:.2f} risk)\n"
-        )
-        if signal.take_profit:
-            message += f"*TP:* ${signal.take_profit:.2f}\n"
-        message += (
-            f"*Confidence:* {signal.confidence:.0%}\n"
-            f"*Reason:* {signal.reason}\n"
-            f"────────────────"
+            + (f"*TP:* ${signal.take_profit:.2f}\n" if signal.take_profit else "")
+            + f"*Confidence:* {signal.confidence:.0%}\n"
+              f"*Reason:* {signal.reason}\n"
+              f"────────────────"
         )
 
         await self.send_message(message, buttons)

@@ -50,7 +50,7 @@ class HumanGate:
         self._pending[signal.id] = future
 
         if self._notify:
-            await self._notify(signal, f"{user_message}\n\n{signal.reason}" if signal.reason else user_message)
+            await self._notify(signal, user_message)
 
         try:
             result = await asyncio.wait_for(future, timeout=self._signal_timeout)
