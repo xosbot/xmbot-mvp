@@ -48,6 +48,8 @@ class Engine:
         self._agents: dict[str, Agent] = {}
         self._user_configs: dict[str, UserConfig] = {}
         self._running = False
+        self._paused = False
+        self._control_lock = asyncio.Lock()
         self._tasks: list[asyncio.Task] = []
         self._position_atr: dict[str, float] = {}  # position_id -> ATR at entry
         self._regime_cache: dict[str, dict] = {}  # symbol -> regime info
@@ -61,6 +63,10 @@ class Engine:
     def running(self) -> bool:
         return self._running
 
+    @property
+    def paused(self) -> bool:
+        return self._paused
+
     def register_agent(self, agent: Agent) -> None:
         self._agents[agent.name] = agent
         log.info(f"Registered agent: {agent.name}")
@@ -69,45 +75,95 @@ class Engine:
         self._user_configs[config.user_id] = config
         log.info(f"Registered user: {config.user_id}")
 
+    def update_agent_params(self, agent_name: str, params: dict) -> dict:
+        """Push live strategy-parameter overrides to a registered agent.
+
+        Raises KeyError if no such agent is registered, or TypeError if the
+        agent doesn't support live parameter updates.
+        """
+        agent = self._agents.get(agent_name)
+        if agent is None:
+            raise KeyError(f"No such agent: {agent_name}")
+        if not hasattr(agent, "update_params"):
+            raise TypeError(f"Agent {agent_name!r} does not support live parameter updates")
+        return agent.update_params(**params)
+
     async def start(self) -> None:
-        log.info("Engine starting...")
+        async with self._control_lock:
+            if self._running:
+                log.warning("start() called while already running — ignoring")
+                return
 
-        connected = await self.broker.connect()
-        if not connected:
-            log.error("Broker connection failed")
-            return
+            log.info("Engine starting...")
 
-        for agent in self._agents.values():
-            await agent.on_start()
+            connected = await self.broker.connect()
+            if not connected:
+                log.error("Broker connection failed")
+                return
 
-        self._running = True
+            for agent in self._agents.values():
+                await agent.on_start()
 
-        for agent in self._agents.values():
-            task = asyncio.create_task(self._agent_loop(agent))
-            self._tasks.append(task)
+            self._running = True
+            self._paused = False
 
-        self._tasks.append(asyncio.create_task(self._sync_loop()))
+            for agent in self._agents.values():
+                task = asyncio.create_task(self._agent_loop(agent))
+                self._tasks.append(task)
 
-        if self.config.trailing_stop_enabled:
-            self._tasks.append(asyncio.create_task(self._monitor_positions()))
+            self._tasks.append(asyncio.create_task(self._sync_loop()))
 
-        log.info(f"Engine running with {len(self._agents)} agent(s)")
+            if self.config.trailing_stop_enabled:
+                self._tasks.append(asyncio.create_task(self._monitor_positions()))
+
+            log.info(f"Engine running with {len(self._agents)} agent(s)")
 
     async def stop(self) -> None:
-        log.info("Engine stopping...")
-        self._running = False
+        async with self._control_lock:
+            if not self._running:
+                log.warning("stop() called while already stopped — ignoring")
+                return
 
-        for task in self._tasks:
-            task.cancel()
-        await asyncio.gather(*self._tasks, return_exceptions=True)
+            log.info("Engine stopping...")
+            self._running = False
+            self._paused = False
 
-        await self.gate.cancel_all()
+            for task in self._tasks:
+                task.cancel()
+            await asyncio.gather(*self._tasks, return_exceptions=True)
+            self._tasks = []
 
-        for agent in self._agents.values():
-            await agent.on_stop()
+            await self.gate.cancel_all()
 
-        await self.broker.disconnect()
-        log.info("Engine stopped")
+            for agent in self._agents.values():
+                await agent.on_stop()
+
+            await self.broker.disconnect()
+            log.info("Engine stopped")
+
+    async def restart(self) -> None:
+        await self.stop()
+        await self.start()
+
+    def pause(self) -> None:
+        """Idle the agent loops without disconnecting the broker or dropping tasks."""
+        self._paused = True
+        log.info("Engine paused")
+
+    def resume(self) -> None:
+        self._paused = False
+        log.info("Engine resumed")
+
+    def switch_broker(self, broker_type: str) -> None:
+        """Swap the active broker. Only permitted while the engine is stopped."""
+        if self._running:
+            raise RuntimeError("Stop the engine before switching brokers")
+
+        from .broker_factory import create_broker
+
+        self.broker = create_broker(self.config, broker_type)
+        self.config.default_broker = broker_type
+        log.info(f"Broker switched to {broker_type}")
 
     async def _sync_loop(self) -> None:
         """Periodically push trade data to the sync API store."""
@@ -214,6 +270,10 @@ class Engine:
     async def _agent_loop(self, agent: Agent) -> None:
         while self._running:
             try:
+                if self._paused:
+                    await asyncio.sleep(self.config.tick_interval_seconds)
+                    continue
+
                 if agent.config.confirmation_timeframe:
                     m5_data, h1_data = await self._fetch_markets_multi_tf(agent)
                 else:

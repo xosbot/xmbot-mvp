@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/auth"
+import { requireAdmin, forbiddenResponse } from "@/lib/auth-helpers"
 import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
@@ -9,14 +9,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const role = (session.user as { role?: string }).role
-    if (role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    const auth = await requireAdmin()
+    if (!auth.ok) {
+      return forbiddenResponse(auth)
     }
 
     const { id } = await params

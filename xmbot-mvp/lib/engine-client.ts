@@ -1,4 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 const ENGINE_BASE = process.env.ENGINE_API_URL || "http://localhost:8080";
+const API_KEY = process.env.XMBOT_API_KEY || "";
 
 interface EngineStatus {
   engine: string;
@@ -75,9 +78,65 @@ export function getTrades(since?: string) {
   return fetchEngine<TradeData[]>(`/api/sync/trades${params}`);
 }
 
-export function controlEngine(action: "start" | "stop" | "status") {
+export function controlEngine(action: "start" | "stop" | "restart" | "pause" | "resume" | "status") {
   return fetchEngine<{ status: string }>("/control", {
     method: "POST",
     body: JSON.stringify({ action }),
   });
+}
+
+/**
+ * Forward a request from a Next.js API route to the engine, attaching the
+ * shared X-User-Id / x-api-key headers. Single implementation used by both
+ * the user-facing `/api/engine/*` routes and the admin-facing
+ * `/api/admin/engine/*` routes — do not hand-roll another fetch-to-engine
+ * helper next to this one.
+ */
+export async function proxyEngineRequest(
+  req: NextRequest,
+  method: string,
+  path: string,
+  userId: string
+): Promise<NextResponse> {
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "X-User-Id": userId,
+    };
+    if (API_KEY) {
+      headers["x-api-key"] = API_KEY;
+    }
+
+    const init: RequestInit = { method, headers };
+
+    if (method !== "GET" && method !== "HEAD") {
+      try {
+        const body = await req.json();
+        init.body = JSON.stringify(body);
+      } catch {
+        // No body
+      }
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    init.signal = controller.signal;
+
+    const res = await fetch(`${ENGINE_BASE}${path}`, init);
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "Engine error");
+      console.error(`Engine ${method} ${path} failed:`, res.status, text);
+      return NextResponse.json({ error: "Engine error", detail: text }, { status: res.status });
+    }
+
+    return NextResponse.json(await res.json());
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return NextResponse.json({ error: "Engine timeout" }, { status: 504 });
+    }
+    console.error("Engine proxy error:", error);
+    return NextResponse.json({ error: "Engine unreachable" }, { status: 503 });
+  }
 }

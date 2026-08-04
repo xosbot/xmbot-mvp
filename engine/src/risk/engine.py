@@ -22,7 +22,7 @@ class RiskEngine:
         self._daily_pnl: dict[str, float] = {}
         self._daily_trades: dict[str, int] = {}
         self._peak_balance: dict[str, float] = {}
-        self._last_reset: Optional[datetime] = None
+        self._last_reset: Optional[datetime] = datetime.now(timezone.utc)
 
     async def check_signal(self, signal: Signal, user_config: UserConfig) -> RiskVerdict:
         self._maybe_reset_daily()
@@ -48,7 +48,7 @@ class RiskEngine:
     async def check_drawdown(self, user_id: str, current_balance: float, max_drawdown_percent: float = 15.0) -> bool:
         """Check if max drawdown is exceeded. Returns True if limit breached."""
         peak = self._peak_balance.get(user_id, current_balance)
-        if current_balance > peak:
+        if current_balance >= peak:
             self._peak_balance[user_id] = current_balance
             peak = current_balance
 
@@ -60,6 +60,18 @@ class RiskEngine:
             log.warning(f"Drawdown limit breached for {user_id}: {drawdown_pct:.1f}% >= {max_drawdown_percent}%")
             return True
         return False
+
+    def update_global_limits(
+        self, max_daily_loss: Optional[float] = None, max_positions: Optional[int] = None
+    ) -> None:
+        if max_daily_loss is not None:
+            self._global_max_daily_loss = max_daily_loss
+        if max_positions is not None:
+            self._global_max_positions = max_positions
+        log.info(
+            f"Risk: global limits updated — max_daily_loss={self._global_max_daily_loss}, "
+            f"max_positions={self._global_max_positions}"
+        )
 
     def get_daily_stats(self, user_id: str) -> dict:
         return {

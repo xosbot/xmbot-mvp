@@ -27,6 +27,18 @@ class TechnicalAnalysisAgent(Agent):
     3. OR enter on RSI continuation (RSI crossing 50 in trend direction)
     """
 
+    _PARAM_TYPES = {
+        "rsi_period": int,
+        "adx_period": int,
+        "adx_threshold": float,
+        "atr_period": int,
+        "atr_multiplier": float,
+        "atr_sl_multiplier": float,
+        "tp_ratio": float,
+        "min_sl_distance": float,
+        "risk_per_trade_pct": float,
+    }
+
     def __init__(
         self,
         config: AgentConfig,
@@ -52,6 +64,28 @@ class TechnicalAnalysisAgent(Agent):
         self.risk_per_trade_pct = risk_per_trade_pct
         self._last_signal_time: Optional[datetime] = None
         self._min_candle_gap = 5  # minutes between signals
+
+    def update_params(self, **kwargs) -> dict:
+        """Apply live strategy-parameter overrides to this running agent.
+
+        Returns the params actually applied. Raises ValueError on an unknown
+        key or a value that can't be coerced to the expected type — callers
+        (the config API) turn that into a 400 rather than silently ignoring it.
+        """
+        applied: dict = {}
+        for key, value in kwargs.items():
+            expected_type = self._PARAM_TYPES.get(key)
+            if expected_type is None:
+                raise ValueError(f"Unknown strategy parameter: {key}")
+            try:
+                coerced = expected_type(value)
+            except (TypeError, ValueError):
+                raise ValueError(f"Invalid value for {key}: {value!r}")
+            setattr(self, key, coerced)
+            applied[key] = coerced
+        if applied:
+            log.info(f"[{self.name}] Strategy params updated: {applied}")
+        return applied
 
     async def analyze(self, market_data: list[Market]) -> Optional[Signal]:
         """Analyze market data for trading signals.

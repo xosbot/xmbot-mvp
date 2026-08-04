@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/auth"
+import { requireSuperAdmin, forbiddenResponse } from "@/lib/auth-helpers"
 import { proxyEngineRequest } from "@/lib/engine-client"
 
 async function handle(
@@ -8,13 +8,13 @@ async function handle(
   path: string[] | undefined,
   fallback: string
 ): Promise<NextResponse> {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await requireSuperAdmin()
+  if (!auth.ok) {
+    return forbiddenResponse(auth)
   }
 
   const pathStr = "/" + (path?.join("/") || fallback)
-  return proxyEngineRequest(req, method, pathStr, session.user.id)
+  return proxyEngineRequest(req, method, pathStr, auth.user.id)
 }
 
 export async function GET(

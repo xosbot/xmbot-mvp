@@ -67,8 +67,22 @@ class UserConfigUpdate(BaseModel):
     enable_ai_analysis: Optional[bool] = None
 
 
+def _live_params(engine_ref, agent_name: str) -> Optional[dict]:
+    """Read a running agent's actual live parameter values, if it exposes any."""
+    if engine_ref is None:
+        return None
+    live_agent = engine_ref.agents.get(agent_name)
+    param_types = getattr(live_agent, "_PARAM_TYPES", None)
+    if not param_types:
+        return None
+    return {k: getattr(live_agent, k) for k in param_types if hasattr(live_agent, k)}
+
+
 def _to_out(user_id: str) -> UserConfigOut:
     cfg = _get_or_create(user_id)
+
+    from ..server import engine_ref
+
     agents = []
     for name, ac in cfg.agent_configs.items():
         agents.append(AgentConfigModel(
@@ -77,12 +91,33 @@ def _to_out(user_id: str) -> UserConfigOut:
             market=ac.markets[0] if ac.markets else "XAUUSD",
             timeframe=ac.timeframe,
             confidence_threshold=ac.confidence_threshold,
-            params=ac.metadata,
+            params=_live_params(engine_ref, name) or ac.metadata,
         ))
+
+    # Surface agents that are running but have never been PUT through this
+    # config API yet, so a tuning UI has real values to show on first load.
+    if engine_ref is not None:
+        for name, live_agent in engine_ref.agents.items():
+            if name in cfg.agent_configs:
+                continue
+            params = _live_params(engine_ref, name)
+            if params is None:
+                continue
+            agents.append(AgentConfigModel(
+                agent_type=name,
+                enabled=True,
+                market=live_agent.config.markets[0] if live_agent.config.markets else "XAUUSD",
+                timeframe=live_agent.config.timeframe,
+                confidence_threshold=live_agent.config.confidence_threshold,
+                params=params,
+            ))
+
+    current_broker = engine_ref.config.default_broker if engine_ref else "paper"
+
     return UserConfigOut(
         user_id=user_id,
         telegram_chat_id=cfg.telegram_chat_id,
-        broker=BrokerConfig(broker="paper"),
+        broker=BrokerConfig(broker=current_broker),
         risk=RiskConfig(
             max_daily_loss=cfg.max_daily_loss,
             max_drawdown_percent=cfg.max_drawdown_percent,
@@ -132,6 +167,34 @@ async def get_config(user_id: str):
 @router.put("/{user_id}", response_model=UserConfigOut)
 async def update_config(user_id: str, body: UserConfigUpdate):
     _apply_update(user_id, body)
+
+    if body.agents:
+        from ..server import engine_ref
+
+        for a in body.agents:
+            if not a.params:
+                continue
+            if engine_ref is None:
+                raise HTTPException(status_code=503, detail="Engine not ready")
+            try:
+                engine_ref.update_agent_params(a.agent_type, a.params)
+            except KeyError as e:
+                raise HTTPException(status_code=404, detail=str(e))
+            except (TypeError, ValueError) as e:
+                raise HTTPException(status_code=400, detail=str(e))
+
+    if body.broker is not None:
+        from ..server import engine_ref
+
+        if engine_ref is None:
+            raise HTTPException(status_code=503, detail="Engine not ready")
+        try:
+            engine_ref.switch_broker(body.broker.broker)
+        except RuntimeError as e:
+            raise HTTPException(status_code=409, detail=str(e))
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
     log.info(f"Config updated for {user_id}")
     return _to_out(user_id)
 

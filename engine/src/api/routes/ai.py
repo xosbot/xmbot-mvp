@@ -40,6 +40,13 @@ async def get_ai_config():
 @router.put("/config")
 async def update_ai_config(body: AIConfigUpdate):
     if body.provider is not None:
+        from ..server import engine_ref
+
+        if engine_ref and engine_ref.ai_registry:
+            try:
+                engine_ref.ai_registry.set_preferred(body.provider)
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
         _ai_config["provider"] = body.provider
     if body.model is not None:
         _ai_config["model"] = body.model
@@ -69,6 +76,7 @@ async def get_ai_status():
 
     if engine_ref and engine_ref.ai_registry:
         status["available_providers"] = engine_ref.ai_registry.available
+        status["preferred_provider"] = engine_ref.ai_registry.preferred
 
     return status
 

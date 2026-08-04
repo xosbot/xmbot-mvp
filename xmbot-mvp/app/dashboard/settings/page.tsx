@@ -66,7 +66,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!session?.user?.id) return
-    fetch("/api/engine?path=/api/config/" + session.user.id)
+    fetch("/api/engine/api/config/" + session.user.id)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!data) return
@@ -158,7 +158,7 @@ export default function SettingsPage() {
     if (!session?.user?.id) return
     setSavingConfig(true)
     try {
-      const res = await fetch("/api/engine?path=/api/config/" + session.user.id, {
+      const res = await fetch("/api/engine/api/config/" + session.user.id, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

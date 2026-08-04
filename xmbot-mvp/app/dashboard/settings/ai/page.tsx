@@ -33,7 +33,7 @@ export default function AISettingsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/engine?path=/api/ai/config")
+    fetch("/api/engine/api/ai/config")
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (data) setConfig(data)
@@ -44,7 +44,7 @@ export default function AISettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const res = await fetch("/api/engine?path=/api/ai/config", {
+      const res = await fetch("/api/engine/api/ai/config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config),

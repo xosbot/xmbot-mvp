@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -15,6 +15,11 @@ import {
   Shield,
   Menu,
   BarChart3,
+  Cpu,
+  SlidersHorizontal,
+  Brain,
+  ShieldAlert,
+  Activity,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -26,8 +31,19 @@ const adminNavItems = [
   { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
 ]
 
+const engineNavItems = [
+  { title: "Status & Control", href: "/admin/engine", icon: Cpu },
+  { title: "Strategy Tuning", href: "/admin/engine/strategy", icon: SlidersHorizontal },
+  { title: "AI Config", href: "/admin/engine/ai", icon: Brain },
+  { title: "Risk Limits", href: "/admin/engine/risk", icon: ShieldAlert },
+  { title: "Positions/Account", href: "/admin/engine/positions", icon: Activity },
+]
+
 function AdminSidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const role = (session?.user as { role?: string } | undefined)?.role
+  const isSuperAdmin = role === "SUPERADMIN"
 
   return (
     <div className="flex h-full flex-col bg-slate-900 border-r border-slate-800">
@@ -55,6 +71,30 @@ function AdminSidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             {item.title}
           </Link>
         ))}
+
+        {isSuperAdmin && (
+          <>
+            <div className="pt-4 pb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+              Engine
+            </div>
+            {engineNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onNavigate}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                  pathname === item.href
+                    ? "bg-gold-500/10 text-gold-400"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.title}
+              </Link>
+            ))}
+          </>
+        )}
       </nav>
 
       <div className="border-t border-slate-800 p-3 space-y-1">

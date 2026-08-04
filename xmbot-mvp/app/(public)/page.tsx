@@ -6,10 +6,12 @@ import { FeaturesGrid } from "@/components/landing/features-grid"
 import { PricingCards } from "@/components/landing/pricing-cards"
 import { CTASection } from "@/components/landing/cta-section"
 import { FAQSection } from "@/components/landing/faq-section"
+import { CursorGlow } from "@/components/landing/cursor-glow"
 
 export default function HomePage() {
   return (
     <>
+      <CursorGlow />
       <HeroSection />
       <HowItWorks />
       <ProofSection />

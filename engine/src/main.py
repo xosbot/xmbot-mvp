@@ -27,9 +27,7 @@ from src.ai.providers import ClaudeProvider, GeminiProvider
 from src.ai.registry import AIRegistry
 from src.api.server import app, init_api
 from src.api.routes.trading import init_trading_api
-from src.broker.binance import BinanceBroker
-from src.broker.mt5 import MT5Broker
-from src.broker.paper import PaperBroker
+from src.core.broker_factory import create_broker
 from src.core.config import EngineConfig, load_config
 from src.core.engine import Engine
 from src.core.persistence import Persistence
@@ -49,22 +47,6 @@ def setup_logging(level: str = "INFO") -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     logging.getLogger("xmbot").setLevel(getattr(logging, level.upper(), logging.INFO))
-
-
-def create_broker(config: EngineConfig, broker_type: str):
-    if broker_type == "binance":
-        return BinanceBroker(
-            api_key=config.binance_api_key,
-            api_secret=config.binance_api_secret,
-        )
-    if broker_type == "mt5":
-        return MT5Broker(
-            path=config.mt5_path,
-            login=config.mt5_login,
-            password=config.mt5_password,
-            server=config.mt5_server,
-        )
-    return PaperBroker()
 
 
 def setup_ai(config: EngineConfig) -> AIRegistry:
@@ -124,6 +106,7 @@ async def main() -> None:
 
     log.info(f"XMBot Engine v0.1.0 starting (env={config.env}, broker={args.broker})")
 
+    config.default_broker = args.broker
     broker = create_broker(config, args.broker)
 
     telegram = TelegramBot(config.telegram_token, config.telegram_chat_id)

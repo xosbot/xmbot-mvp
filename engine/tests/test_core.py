@@ -10,6 +10,9 @@ from src.core.types import (
 from src.risk.engine import RiskEngine
 from src.broker.paper import PaperBroker
 from src.agents.technical import TechnicalAnalysisAgent
+from src.core.engine import Engine
+from src.core.config import EngineConfig
+from src.gate.human_gate import HumanGate
 
 
 class TestRiskEngine:
@@ -62,7 +65,8 @@ class TestRiskEngine:
         breached = await risk.check_drawdown("user1", 8500.0, 15.0)
         assert not breached
 
-        breached = await risk.check_drawdown("user1", 8400.0, 15.0)
+        # 7000 is a ~17.6% drop from the 8500 peak — breaches the 15% limit.
+        breached = await risk.check_drawdown("user1", 7000.0, 15.0)
         assert breached
 
     @pytest.mark.asyncio
@@ -73,6 +77,16 @@ class TestRiskEngine:
         risk._last_reset = None
         risk._maybe_reset_daily()
         assert risk._daily_pnl.get("test_user", 0) == 0.0
+
+    def test_update_global_limits(self, risk):
+        risk.update_global_limits(max_daily_loss=2000.0, max_positions=5)
+        assert risk._global_max_daily_loss == 2000.0
+        assert risk._global_max_positions == 5
+
+    def test_update_global_limits_partial(self, risk):
+        risk.update_global_limits(max_positions=7)
+        assert risk._global_max_positions == 7
+        assert risk._global_max_daily_loss == 1000.0  # unchanged (fixture default)
 
 
 class TestPaperBroker:
@@ -150,6 +164,72 @@ class TestTechnicalAgent:
         assert "ADX" in result.columns
         assert "trend" in result.columns
         assert len(result) == n
+
+    def test_update_params_applies_valid(self, agent):
+        applied = agent.update_params(adx_threshold=25.0, rsi_period=21)
+        assert applied == {"adx_threshold": 25.0, "rsi_period": 21}
+        assert agent.adx_threshold == 25.0
+        assert agent.rsi_period == 21
+
+    def test_update_params_rejects_unknown_key(self, agent):
+        with pytest.raises(ValueError):
+            agent.update_params(not_a_real_param=1)
+
+    def test_update_params_rejects_bad_value(self, agent):
+        with pytest.raises(ValueError):
+            agent.update_params(adx_threshold="not-a-number")
+
+
+class TestEnginePauseResume:
+    @pytest.fixture
+    def engine(self):
+        config = EngineConfig(tick_interval_seconds=0.01, candle_interval_seconds=0.01)
+        return Engine(
+            config=config,
+            broker=PaperBroker(),
+            gate=HumanGate(),
+            risk=RiskEngine(),
+        )
+
+    def test_pause_resume_flags_are_independent(self, engine):
+        engine._running = True
+        assert not engine.paused
+
+        engine.pause()
+        assert engine.paused
+        assert engine.running  # pausing must not stop the engine
+
+        engine.resume()
+        assert not engine.paused
+        assert engine.running
+
+    @pytest.mark.asyncio
+    async def test_agent_loop_skips_analysis_while_paused(self, engine):
+        fake_agent = MagicMock()
+        fake_agent.name = "fake"
+        fake_agent.config.confirmation_timeframe = None
+        fake_agent.analyze = AsyncMock(return_value=None)
+
+        engine._running = True
+        engine._paused = True
+
+        task = asyncio.create_task(engine._agent_loop(fake_agent))
+        await asyncio.sleep(0.05)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+        fake_agent.analyze.assert_not_called()
+
+    def test_switch_broker_requires_stopped_engine(self, engine):
+        engine._running = True
+        with pytest.raises(RuntimeError):
+            engine.switch_broker("paper")
+
+    def test_switch_broker_while_stopped(self, engine):
+        engine._running = False
+        engine.switch_broker("paper")
+        assert engine.config.default_broker == "paper"
+        assert isinstance(engine.broker, PaperBroker)
 
 
 class TestSessionFilter:

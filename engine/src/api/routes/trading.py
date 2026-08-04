@@ -37,7 +37,7 @@ class TradeSignalRequest(BaseModel):
 
 
 class EngineControlRequest(BaseModel):
-    action: str  # start, stop, pause, resume
+    action: str  # start, stop, restart, pause, resume
 
 
 class RiskConfigRequest(BaseModel):
@@ -54,6 +54,7 @@ async def trading_status(engine: Engine = Depends(get_engine)):
 
     return {
         "engine": "running" if engine.running else "stopped",
+        "paused": engine.paused,
         "broker": engine.config.default_broker,
         "broker_connected": connected,
         "agents": list(engine.agents.keys()),
@@ -100,11 +101,14 @@ async def control_engine(req: EngineControlRequest, engine: Engine = Depends(get
     elif req.action == "stop":
         await engine.stop()
         return {"status": "stopped"}
+    elif req.action == "restart":
+        await engine.restart()
+        return {"status": "restarted"}
     elif req.action == "pause":
-        engine._running = False
+        engine.pause()
         return {"status": "paused"}
     elif req.action == "resume":
-        engine._running = True
+        engine.resume()
         return {"status": "resumed"}
     raise HTTPException(status_code=400, detail=f"Unknown action: {req.action}")
 
@@ -151,8 +155,8 @@ async def get_risk_stats(engine: Engine = Depends(get_engine)):
 
 @router.post("/risk")
 async def update_risk_config(req: RiskConfigRequest, engine: Engine = Depends(get_engine)):
-    if req.max_daily_loss is not None:
-        engine.risk._global_max_daily_loss = req.max_daily_loss
-    if req.max_positions is not None:
-        engine.risk._global_max_positions = req.max_positions
+    engine.risk.update_global_limits(
+        max_daily_loss=req.max_daily_loss,
+        max_positions=req.max_positions,
+    )
     return {"status": "updated"}

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/auth"
+import { requireSuperAdmin, forbiddenResponse } from "@/lib/auth-helpers"
 import { proxyEngineRequest } from "@/lib/engine-client"
 
 const VALID_ACTIONS = ["start", "stop", "restart", "pause", "resume"]
 
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const auth = await requireSuperAdmin()
+  if (!auth.ok) {
+    return forbiddenResponse(auth)
   }
 
   let action: string | undefined
@@ -25,5 +25,5 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  return proxyEngineRequest(req, "POST", "/api/trading/control", session.user.id)
+  return proxyEngineRequest(req, "POST", "/api/trading/control", auth.user.id)
 }

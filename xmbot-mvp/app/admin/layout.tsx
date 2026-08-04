@@ -13,9 +13,9 @@ export default async function AdminLayout({
     redirect("/login")
   }
 
-  // Role check
+  // Role check — SUPERADMIN is a superset of ADMIN
   const role = (session.user as { role?: string }).role
-  if (role !== "ADMIN") {
+  if (role !== "ADMIN" && role !== "SUPERADMIN") {
     redirect("/dashboard")
   }
 
