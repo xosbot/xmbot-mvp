@@ -37,6 +37,7 @@ class EngineConfig:
     claude_api_key: str = ""
     gemini_api_key: str = ""
     openai_api_key: str = ""
+    ai_validation_enabled: bool = True
 
     # Engine
     tick_interval_seconds: float = 1.0
@@ -79,6 +80,7 @@ class EngineConfig:
             claude_api_key=os.getenv("CLAUDE_API_KEY", ""),
             gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
             openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+            ai_validation_enabled=os.getenv("AI_VALIDATION_ENABLED", "true").lower() == "true",
             tick_interval_seconds=float(os.getenv("TICK_INTERVAL", "1.0")),
             candle_interval_seconds=float(os.getenv("CANDLE_INTERVAL", "300.0")),
             max_concurrent_agents=int(os.getenv("MAX_AGENTS", "10")),

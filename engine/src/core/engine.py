@@ -301,12 +301,16 @@ class Engine:
                 signal.user_id = self._resolve_user_id()
 
                 user_config = self._user_configs.get(signal.user_id, UserConfig(user_id=signal.user_id))
-                risk_verdict = await self.risk.check_signal(signal, user_config)
+                open_positions = await self.broker.get_positions()
+                risk_verdict = await self.risk.check_signal(signal, user_config, len(open_positions))
 
                 if risk_verdict == RiskVerdict.BLOCK:
                     log.warning(f"Risk blocked signal: {signal.action} {signal.market}")
                     agent.status = AgentStatus.ANALYZING
                     continue
+
+                if self.config.ai_validation_enabled:
+                    signal.metadata["ai_verdict"] = await self.analyze_trade_with_ai(signal, m5_data)
 
                 await self.signal_bus.emit_signal(signal)
 
@@ -397,7 +401,7 @@ class Engine:
             log.error(f"Execution failed: {result.error}")
 
     def _format_signal_message(self, signal: Signal) -> str:
-        return (
+        message = (
             f"📊 *{signal.agent} Signal*\n"
             f"Action: {signal.action.value} {signal.market}\n"
             f"Entry: ${signal.entry_price:.2f}\n"
@@ -405,6 +409,13 @@ class Engine:
             f"Confidence: {signal.confidence:.0%}\n"
             f"Reason: {signal.reason}"
         )
+
+        ai_verdict = signal.metadata.get("ai_verdict")
+        if ai_verdict and ai_verdict["verdict"] in ("SAFE", "RISKY"):
+            icon = "🤖" if ai_verdict["verdict"] == "SAFE" else "⚠️"
+            message += f"\n{icon} AI: {ai_verdict['verdict']} — {ai_verdict['reason']}"
+
+        return message
 
     def _calculate_volume(self, signal: Signal, config: UserConfig) -> float:
         """Risk-based position sizing: risk X% of account per trade."""

@@ -36,6 +36,24 @@ export function contactFormEmail({
   }
 }
 
+export function verificationEmail({ verifyLink }: { verifyLink: string }) {
+  return {
+    subject: "Verify your XMBot email",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h1 style="color: #D4AF37;">XMBot</h1>
+        <p>Confirm your email address to finish setting up your account:</p>
+        <a href="${verifyLink}" style="display: inline-block; background: #D4AF37; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">
+          Verify Email
+        </a>
+        <p style="margin-top: 24px; color: #666; font-size: 14px;">
+          This link expires in 24 hours. If you didn't create an XMBot account, ignore this email.
+        </p>
+      </div>
+    `,
+  }
+}
+
 export function passwordResetEmail({ resetLink }: { resetLink: string }) {
   return {
     subject: "Reset your XMBot password",

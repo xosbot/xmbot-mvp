@@ -88,6 +88,27 @@ class TestRiskEngine:
         assert risk._global_max_positions == 7
         assert risk._global_max_daily_loss == 1000.0  # unchanged (fixture default)
 
+    @pytest.mark.asyncio
+    async def test_check_signal_blocks_on_open_position_count(self, risk, user_config):
+        """Global limit must reflect actual open positions, not today's trade count."""
+        signal = Signal(
+            id="test-3",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        # Fixture's global_max_positions=10 — well under the trade counter (0 trades
+        # recorded today) but at/above the actual open-position count.
+        verdict = await risk.check_signal(signal, user_config, open_position_count=10)
+        assert verdict == RiskVerdict.BLOCK
+
+        verdict = await risk.check_signal(signal, user_config, open_position_count=3)
+        assert verdict == RiskVerdict.PASS
+
 
 class TestPaperBroker:
     @pytest.fixture
@@ -230,6 +251,35 @@ class TestEnginePauseResume:
         engine.switch_broker("paper")
         assert engine.config.default_broker == "paper"
         assert isinstance(engine.broker, PaperBroker)
+
+    def _make_signal(self):
+        return Signal(
+            id="sig-1",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+
+    def test_signal_message_includes_ai_verdict_when_present(self, engine):
+        signal = self._make_signal()
+        signal.metadata["ai_verdict"] = {"verdict": "RISKY", "reason": "Low liquidity window"}
+        message = engine._format_signal_message(signal)
+        assert "RISKY" in message
+        assert "Low liquidity window" in message
+
+    def test_signal_message_omits_ai_verdict_when_skipped(self, engine):
+        signal = self._make_signal()
+        signal.metadata["ai_verdict"] = {"verdict": "SKIP", "reason": "No AI available"}
+        message = engine._format_signal_message(signal)
+        assert "AI:" not in message
+
+    def test_signal_message_omits_ai_verdict_when_absent(self, engine):
+        message = engine._format_signal_message(self._make_signal())
+        assert "AI:" not in message
 
 
 class TestSessionFilter:

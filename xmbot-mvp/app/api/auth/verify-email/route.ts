@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import crypto from "crypto"
+import { sendEmail } from "@/lib/email"
+import { verificationEmail } from "@/lib/email-templates"
 
 export const dynamic = "force-dynamic"
 
@@ -37,10 +39,11 @@ export async function POST(req: Request) {
       },
     })
 
-    // TODO: Send verification email via Resend
-    // For now, log the token for testing
-    console.log(`[EMAIL VERIFICATION] Token for ${email}: ${token}`)
-    console.log(`[EMAIL VERIFICATION] Verify URL: ${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const verifyLink = `${appUrl}/api/auth/verify-email/confirm?token=${token}`
+
+    const template = verificationEmail({ verifyLink })
+    await sendEmail({ to: email, ...template })
 
     return NextResponse.json({ success: true })
   } catch (error) {

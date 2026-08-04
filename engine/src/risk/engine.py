@@ -24,10 +24,12 @@ class RiskEngine:
         self._peak_balance: dict[str, float] = {}
         self._last_reset: Optional[datetime] = datetime.now(timezone.utc)
 
-    async def check_signal(self, signal: Signal, user_config: UserConfig) -> RiskVerdict:
+    async def check_signal(
+        self, signal: Signal, user_config: UserConfig, open_position_count: int = 0
+    ) -> RiskVerdict:
         self._maybe_reset_daily()
 
-        if not await self._check_global_limits():
+        if not await self._check_global_limits(open_position_count):
             return RiskVerdict.BLOCK
 
         if not await self._check_user_limits(signal, user_config):
@@ -88,10 +90,9 @@ class RiskEngine:
             self._daily_trades.clear()
             self._last_reset = now
 
-    async def _check_global_limits(self) -> bool:
-        total_positions = sum(self._daily_trades.values())
-        if total_positions >= self._global_max_positions:
-            log.warning(f"Global position limit reached: {total_positions}")
+    async def _check_global_limits(self, open_position_count: int) -> bool:
+        if open_position_count >= self._global_max_positions:
+            log.warning(f"Global position limit reached: {open_position_count}")
             return False
         return True
 
