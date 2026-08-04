@@ -17,8 +17,8 @@ const commitments = [
   },
   {
     icon: Undo2,
-    title: "7-Day Refund, No Questions",
-    description: "Not convinced after a week in beta? Full refund, no forms to fill out. We'd rather lose a sale than a customer's trust.",
+    title: "Cancel Anytime, No Lock-In",
+    description: "Cancel your subscription whenever you want, straight from your dashboard. You keep access through the period you've already paid for — no calls, no retention forms.",
   },
 ]
 

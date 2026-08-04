@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Book, Code, Zap, ArrowRight } from "lucide-react"
+import { Code, Zap, ArrowRight } from "lucide-react"
 import { ScrollReveal, StaggerChildren, StaggerItem } from "@/components/landing/scroll-reveal"
 
 const sections = [
@@ -16,12 +16,6 @@ const sections = [
     title: "API Reference",
     description: "Integrate with XMBot via our REST API. Access trading signals, account data, and bot management endpoints.",
     href: "/docs/api",
-  },
-  {
-    icon: Book,
-    title: "Trading Strategy",
-    description: "Understand the RSI Sniper + ADX Filter strategy, backtest methodology, and risk management framework.",
-    href: "/docs/strategy",
   },
 ]
 

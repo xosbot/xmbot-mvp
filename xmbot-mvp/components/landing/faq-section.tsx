@@ -5,7 +5,7 @@ import { ExpandableCard } from "@/components/ui/aceternity/expandable-card"
 
 const faqs = [
   { question: "Is my money safe?", answer: "XMBot never has direct access to your funds. We connect via API keys with trading permissions only (no withdrawal). You can revoke access anytime. The 2% risk rule ensures no single trade can cause significant damage." },
-  { question: "What if I'm not satisfied?", answer: "We offer a full refund within 7 days of purchase if you're not satisfied. No questions asked. We want you to be confident in your decision." },
+  { question: "What if I'm not satisfied?", answer: "You can cancel your subscription anytime — you'll keep access through the end of the billing period you've already paid for. Subscriptions are non-refundable, so we'd recommend starting with a shorter plan to try XMBot before committing to a longer one." },
   { question: "What is XMBot?", answer: "XMBot is an AI-powered trading platform for gold (XAUUSD). It uses a multi-agent system to analyze the market 24/5 and sends trading signals to your Telegram. You approve or reject each trade — no auto-execution without your say." },
   { question: "How does the human-in-the-loop work?", answer: "When the AI identifies a trading opportunity, it sends a signal card to your Telegram with entry price, stop loss, take profit, and confidence score. You tap Approve or Reject. Only after your approval does the system execute the trade." },
   { question: "Do I need to keep my computer running?", answer: "No. The engine runs on our servers 24/5 during market hours. You just need Telegram on your phone to receive signals and approve trades. No computer required." },

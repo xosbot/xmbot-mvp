@@ -90,8 +90,8 @@ export default function PricingPage() {
             <span className="text-gradient-gold">Transparent Pricing</span>
           </h1>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
-            Choose the plan that fits your trading style. Upgrade anytime.
-            7-day money-back guarantee on all plans.
+            Choose the plan that fits your trading style. Upgrade anytime,
+            cancel anytime — no lock-in.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function PricingPage() {
           </h2>
           <div className="space-y-6">
             {[
-              { q: "Is there a free trial?", a: "We don't offer a free trial, but we offer a 7-day money-back guarantee. Try XMBot risk-free — if you're not satisfied, we'll refund your full purchase amount." },
+              { q: "Is there a free trial?", a: "We don't offer a free trial or refunds, but you can start with Paper Trading to test the system risk-free before connecting a live broker, and cancel anytime — you'll keep access through the billing period you've already paid for." },
               { q: "Can I switch plans?", a: "Yes! You can upgrade or downgrade your plan at any time. When upgrading, you'll be charged the prorated difference. When downgrading, the change takes effect at your next billing cycle." },
               { q: "What payment methods do you accept?", a: "We accept all major credit/debit cards, UPI, net banking, and popular wallets through our secure payment partner Cashfree." },
               { q: "Do I need a Binance account?", a: "No. You can start with Paper Trading to test the system risk-free. When you're ready for live trading, connect your Binance account via API keys." },

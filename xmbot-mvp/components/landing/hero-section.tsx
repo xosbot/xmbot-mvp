@@ -18,7 +18,7 @@ function TerminalSimulation() {
     { text: "$ xmbot-engine --mode=live --broker=binance", delay: 0 },
     { text: "[ENGINE] Initializing multi-agent system...", delay: 800 },
     { text: "[ENGINE] Technical Analysis Agent loaded", delay: 1600 },
-    { text: "[ENGINE] AI Validator loaded (Gemini Pro)", delay: 2200 },
+    { text: "[ENGINE] AI Validator loaded (Gemini/Claude)", delay: 2200 },
     { text: "[ENGINE] Risk Manager loaded", delay: 2800 },
     { text: "[ENGINE] Scanning XAUUSD M5...", delay: 3500 },
     { text: "[SCAN] RSI: 38.2 | Supertrend: Bullish | ADX: 32.1", delay: 5000 },

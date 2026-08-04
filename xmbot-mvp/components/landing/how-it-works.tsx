@@ -23,7 +23,7 @@ const steps = [
   {
     icon: CheckCircle,
     number: "03",
-    time: "~10 sec",
+    time: "~12s",
     title: "You Approve or Reject",
     description: "A signal card lands on Telegram with entry price, stop loss, and take profit already worked out. Tap Approve or Reject — nothing fires without you.",
   },

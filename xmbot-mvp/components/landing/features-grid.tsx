@@ -51,7 +51,7 @@ const features = [
   {
     icon: Layers,
     title: "Multi-Broker",
-    description: "Paper Trading for testing. Binance for crypto. MetaTrader 5 for forex. Switch without changing strategy.",
+    description: "Paper Trading for testing. Binance for live crypto trading. MetaTrader 5 and Interactive Brokers coming soon.",
     color: "gold" as const,
     featured: false,
   },
