@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from datetime import datetime
 
 from ..agents.base import Agent, AgentStatus
@@ -527,10 +528,16 @@ class Engine:
             if response.error:
                 return {"verdict": "SKIP", "reason": response.error, "source": "error"}
 
-            verdict = "SAFE" if "SAFE" in response.content.upper() else "RISKY"
+            content = response.content.strip()
+            verdict = "SAFE" if "SAFE" in content.upper() else "RISKY"
+            # Providers are instructed to lead with "VERDICT: SAFE/RISKY" followed by
+            # a "Reason: ..." line — strip both labels so the Telegram card doesn't
+            # show the verdict twice.
+            reason = re.sub(r"(?i)^verdict:\s*(safe|risky)\s*", "", content).strip()
+            reason = re.sub(r"(?i)^reason:\s*", "", reason).strip()
             return {
                 "verdict": verdict,
-                "reason": response.content[:200],
+                "reason": reason[:200],
                 "source": "ai",
                 "model": response.model,
                 "tokens": response.tokens_used,

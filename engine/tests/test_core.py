@@ -16,6 +16,8 @@ from src.core.engine import Engine
 from src.core.config import EngineConfig
 from src.gate.human_gate import HumanGate
 from src.telegram.bot import TelegramBot
+from src.ai.base import AIProvider, AIResponse
+from src.ai.registry import AIRegistry
 
 
 class TestRiskEngine:
@@ -390,6 +392,68 @@ class TestSignalNotification:
         await bot.send_signal(signal)
 
         assert "Trade Signal" in sent["text"]
+
+
+class _FakeAIProvider(AIProvider):
+    def __init__(self, content: str) -> None:
+        super().__init__(model="fake-model", api_key="fake-key")
+        self._content = content
+
+    async def generate(self, prompt: str, system: str | None = None) -> AIResponse:
+        return AIResponse(content=self._content, model=self.model)
+
+    async def chat(self, messages: list[dict]) -> AIResponse:
+        return AIResponse(content=self._content, model=self.model)
+
+
+class TestAITradeValidation:
+    """Covers analyze_trade_with_ai's parsing of the provider's raw response —
+    discovered live that the 'VERDICT: SAFE/RISKY' + 'Reason:' labels the
+    providers are instructed to lead with were leaking into the Telegram
+    card's reason text, duplicating the verdict."""
+
+    @pytest.fixture
+    def engine(self):
+        return Engine(
+            config=EngineConfig(),
+            broker=PaperBroker(),
+            gate=HumanGate(),
+            risk=RiskEngine(),
+        )
+
+    def _make_signal(self):
+        return Signal(
+            id="sig-ai",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+
+    @pytest.mark.asyncio
+    async def test_strips_verdict_and_reason_labels(self, engine):
+        registry = AIRegistry()
+        registry.register(
+            "fake",
+            _FakeAIProvider("VERDICT: RISKY\nReason: Low liquidity window observed"),
+        )
+        engine.ai_registry = registry
+
+        verdict = await engine.analyze_trade_with_ai(self._make_signal(), [])
+
+        assert verdict["verdict"] == "RISKY"
+        assert verdict["reason"] == "Low liquidity window observed"
+
+    @pytest.mark.asyncio
+    async def test_skips_when_no_provider_registered(self, engine):
+        engine.ai_registry = AIRegistry()
+
+        verdict = await engine.analyze_trade_with_ai(self._make_signal(), [])
+
+        assert verdict["verdict"] == "SKIP"
 
 
 class TestSessionFilter:
