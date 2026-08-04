@@ -92,7 +92,7 @@ export function ProofSection() {
           ))}
         </StaggerChildren>
 
-        <p className="text-center text-xs text-slate-600 mt-10 max-w-lg mx-auto">
+        <p className="text-center text-xs text-slate-400 mt-10 max-w-lg mx-auto">
           * Past performance does not guarantee future results. Trading involves significant risk of loss.
           Results based on backtested data from Jul–Dec 2025.
         </p>

@@ -230,7 +230,7 @@ function LatticeField({ count, bounds }: LatticeConfig) {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#D9AF3E" transparent opacity={0.12} depthWrite={false} />
+        <lineBasicMaterial color="#D9AF3E" transparent opacity={0.25} depthWrite={false} />
       </lineSegments>
       <points ref={pointsRef}>
         <bufferGeometry>
@@ -310,6 +310,13 @@ export function SignalLattice({ className }: { className?: string }) {
           gl={{ alpha: true, antialias: false }}
           style={{ background: "transparent" }}
           frameloop={reducedMotion ? "demand" : "always"}
+          // The container above is pointer-events-none so this full-bleed
+          // background never blocks clicks on real page content — but that
+          // also means the canvas itself never receives pointer events, so
+          // the cursor-reactive effect below needs its own event source:
+          // listen on the page body instead (which does receive events).
+          eventSource={typeof document !== "undefined" ? document.body : undefined}
+          eventPrefix="client"
         >
           <Scene mobile={mobile} />
         </Canvas>

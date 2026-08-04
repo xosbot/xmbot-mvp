@@ -84,7 +84,7 @@ export function PublicFooter() {
             <p className="text-xs text-slate-500">
               &copy; 2026 XMBot. All rights reserved.
             </p>
-            <p className="text-xs text-slate-600 max-w-md text-center sm:text-right">
+            <p className="text-xs text-slate-400 max-w-md text-center sm:text-right">
               Trading involves substantial risk of loss and is not suitable for all investors.
               Past performance is not indicative of future results.
             </p>

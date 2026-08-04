@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { BackgroundBeams } from "@/components/ui/aceternity/background-beams"
 import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
 import { FlipWords } from "@/components/ui/aceternity/flip-words"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
@@ -124,8 +123,6 @@ function StatsBar() {
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-      <BackgroundBeams className="absolute inset-0 -z-10" />
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">

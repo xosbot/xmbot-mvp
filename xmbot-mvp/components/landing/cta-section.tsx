@@ -4,7 +4,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
 import { ScrollReveal } from "./scroll-reveal"
-import { BackgroundBeams } from "@/components/ui/aceternity/background-beams"
 import { MovingBorder } from "@/components/ui/aceternity/moving-border"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 
@@ -12,8 +11,6 @@ export function CTASection() {
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
-
-      <BackgroundBeams className="absolute inset-0 -z-10" />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -65,7 +62,7 @@ export function CTASection() {
                   </Link>
                 </div>
 
-                <p className="mt-8 text-xs text-slate-600">
+                <p className="mt-8 text-xs text-slate-400">
                   No hidden fees. Cancel anytime. Trading involves risk.
                 </p>
               </div>

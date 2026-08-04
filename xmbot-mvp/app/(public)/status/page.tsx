@@ -1,26 +1,35 @@
-"use client"
+import { CheckCircle, AlertCircle, HelpCircle, Clock } from "lucide-react"
+import { db } from "@/lib/db"
 
-import { CheckCircle, AlertCircle, Clock } from "lucide-react"
+export const dynamic = "force-dynamic"
 
-const services = [
-  { name: "Trading Engine", status: "operational" as const },
-  { name: "Web Dashboard", status: "operational" as const },
-  { name: "Telegram Alerts", status: "operational" as const },
-  { name: "Binance Integration", status: "operational" as const },
-  { name: "Payment Gateway", status: "operational" as const },
-  { name: "API", status: "operational" as const },
-]
+const ENGINE_URL = process.env.ENGINE_API_URL || "http://localhost:8080"
 
-const incidents: { date: string; title: string; status: string; resolution: string }[] = [
-  {
-    date: "2026-01-15",
-    title: "Scheduled Maintenance",
-    status: "resolved",
-    resolution: "Database migration completed. All systems operational.",
-  },
-]
+type ServiceState = "operational" | "outage" | "not_monitored"
 
-function StatusBadge({ status }: { status: "operational" | "degraded" | "outage" }) {
+async function checkEngine(): Promise<ServiceState> {
+  try {
+    const res = await fetch(`${ENGINE_URL}/health`, { signal: AbortSignal.timeout(5000), cache: "no-store" })
+    if (!res.ok) return "outage"
+    const data = await res.json()
+    return data.status === "running" ? "operational" : "outage"
+  } catch {
+    return "outage"
+  }
+}
+
+async function checkDatabase(): Promise<ServiceState> {
+  try {
+    await db.$queryRaw`SELECT 1`
+    return "operational"
+  } catch {
+    return "outage"
+  }
+}
+
+const incidents: { date: string; title: string; status: string; resolution: string }[] = []
+
+function StatusBadge({ status }: { status: ServiceState }) {
   if (status === "operational") {
     return (
       <div className="flex items-center gap-2 text-emerald-400">
@@ -29,11 +38,11 @@ function StatusBadge({ status }: { status: "operational" | "degraded" | "outage"
       </div>
     )
   }
-  if (status === "degraded") {
+  if (status === "not_monitored") {
     return (
-      <div className="flex items-center gap-2 text-yellow-400">
-        <AlertCircle className="h-4 w-4" />
-        <span className="text-sm font-medium">Degraded</span>
+      <div className="flex items-center gap-2 text-slate-500">
+        <HelpCircle className="h-4 w-4" />
+        <span className="text-sm font-medium">Not Monitored</span>
       </div>
     )
   }
@@ -45,7 +54,23 @@ function StatusBadge({ status }: { status: "operational" | "degraded" | "outage"
   )
 }
 
-export default function StatusPage() {
+export default async function StatusPage() {
+  const [engineStatus, dbStatus] = await Promise.all([checkEngine(), checkDatabase()])
+  const checkedAt = new Date()
+
+  // Only services with a real check behind them are reported as operational/
+  // outage — everything else is honestly labeled "Not Monitored" rather than
+  // shown as a false-positive green check.
+  const services: { name: string; status: ServiceState }[] = [
+    { name: "Trading Engine", status: engineStatus },
+    { name: "Web Dashboard & Database", status: dbStatus },
+    { name: "Telegram Alerts", status: "not_monitored" },
+    { name: "Binance Integration", status: "not_monitored" },
+    { name: "Payment Gateway", status: "not_monitored" },
+  ]
+
+  const allOperational = services.every((s) => s.status !== "outage")
+
   return (
     <div className="py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
@@ -54,10 +79,10 @@ export default function StatusPage() {
             // System Status
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-aggressive">
-            All Systems Operational
+            {allOperational ? "All Monitored Systems Operational" : "Experiencing Issues"}
           </h1>
           <p className="mt-4 text-slate-400">
-            Last checked: {new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
+            Last checked: {checkedAt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
           </p>
         </div>
 

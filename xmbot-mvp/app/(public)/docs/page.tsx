@@ -14,7 +14,7 @@ const sections = [
   {
     icon: Code,
     title: "API Reference",
-    description: "Integrate with XMBot via our REST API. Access trading signals, account data, and bot management endpoints.",
+    description: "Where XMBot's API access stands today, and how to request early access to a public API.",
     href: "/docs/api",
   },
 ]
