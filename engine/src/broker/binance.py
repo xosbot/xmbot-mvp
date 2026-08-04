@@ -159,7 +159,7 @@ class BinanceBroker(Broker):
             filled_price = self._price_cache.get(order.market, {}).get("price", 3000.0)
             order.status = OrderStatus.FILLED
             order.filled_price = filled_price
-            order.filled_at = datetime.utcnow()
+            order.filled_at = datetime.now(UTC)
             self._orders[order.id] = order
 
             if order.action in (SignalAction.BUY, SignalAction.SELL):
@@ -190,7 +190,7 @@ class BinanceBroker(Broker):
 
             order.status = OrderStatus.FILLED
             order.filled_price = filled_price
-            order.filled_at = datetime.utcnow()
+            order.filled_at = datetime.now(UTC)
             order.broker_order_id = broker_order_id
             self._orders[order.id] = order
 

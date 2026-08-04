@@ -3,94 +3,11 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Shield, Eye, TrendingUp, Zap } from "lucide-react"
-import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
 import { FlipWords } from "@/components/ui/aceternity/flip-words"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
-
-function TerminalSimulation() {
-  const [lines, setLines] = useState<string[]>([])
-  const [currentLine, setCurrentLine] = useState(0)
-
-  const terminalLines = [
-    { text: "$ xmbot-engine --mode=live --broker=binance", delay: 0 },
-    { text: "[ENGINE] Initializing multi-agent system...", delay: 800 },
-    { text: "[ENGINE] Technical Analysis Agent loaded", delay: 1600 },
-    { text: "[ENGINE] AI Validator loaded (Gemini/Claude)", delay: 2200 },
-    { text: "[ENGINE] Risk Manager loaded", delay: 2800 },
-    { text: "[ENGINE] Scanning XAUUSD M5...", delay: 3500 },
-    { text: "[SCAN] RSI: 38.2 | Supertrend: Bullish | ADX: 32.1", delay: 5000 },
-    { text: "[AI] Confidence: 82% — Signal validated ✓", delay: 6200 },
-    { text: "[SIGNAL] BUY PAXGUSDT @ $3,247.80", delay: 7000 },
-    { text: "[RISK] SL: $3,239.35 | TP: $3,264.70 | Risk: 2.0%", delay: 7500 },
-    { text: "[TELEGRAM] Signal card sent → Awaiting approval...", delay: 8500 },
-    { text: "[APPROVAL] ✓ Approved by user in 12s", delay: 10500 },
-    { text: "[ORDER] Filled: 0.05 lots @ $3,247.82", delay: 11500 },
-    { text: "[MONITOR] Position active — trailing stop engaged", delay: 12500 },
-    { text: "[P&L] +$47.20 (+1.45%)", delay: 14000 },
-  ]
-
-  useEffect(() => {
-    if (currentLine >= terminalLines.length) {
-      const timer = setTimeout(() => {
-        setLines([])
-        setCurrentLine(0)
-      }, 4000)
-      return () => clearTimeout(timer)
-    }
-
-    const timer = setTimeout(() => {
-      setLines((prev) => [...prev, terminalLines[currentLine].text])
-      setCurrentLine((prev) => prev + 1)
-    }, terminalLines[currentLine].delay - (currentLine > 0 ? terminalLines[currentLine - 1].delay : 0))
-
-    return () => clearTimeout(timer)
-  }, [currentLine])
-
-  const getLineColor = (line: string) => {
-    if (line.includes("$")) return "text-gold-400"
-    if (line.includes("[SIGNAL]") || line.includes("[ORDER]") || line.includes("[APPROVAL]")) return "text-emerald-400 font-medium"
-    if (line.includes("[P&L]")) return "text-emerald-400 font-bold text-sm"
-    if (line.includes("[SCAN]")) return "text-stone-300"
-    if (line.includes("[TELEGRAM]") || line.includes("[MONITOR]")) return "text-yellow-400"
-    return "text-stone-500"
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      className="corner-frame relative rounded-md border border-foreground/10 bg-background/80 overflow-hidden"
-    >
-      <div className="relative">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-foreground/10 bg-foreground/[0.03]">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-            <div className="w-3 h-3 rounded-full bg-green-500/80" />
-          </div>
-          <span className="text-xs text-stone-500 ml-2 font-mono">xmbot-engine</span>
-          <div className="ml-auto flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs text-emerald-400 font-mono">LIVE</span>
-          </div>
-        </div>
-        <div className="p-5 font-mono text-[11px] leading-relaxed space-y-1 min-h-[340px]">
-          {lines.map((line, i) => (
-            <div key={`${i}-${line}`} className={`${getLineColor(line)} animate-[fade-in_0.3s_ease-out]`}>
-              {line}
-            </div>
-          ))}
-          {currentLine < terminalLines.length && (
-            <div className="w-2 h-4 bg-gold-400 animate-[blink_1s_step-end_infinite]" />
-          )}
-        </div>
-      </div>
-    </motion.div>
-  )
-}
+import { ProductMockupStack } from "./product-mockup-stack"
 
 function StatsBar() {
   const stats = [
@@ -100,7 +17,7 @@ function StatsBar() {
   ]
 
   return (
-    <div className="grid grid-cols-3 divide-x divide-foreground/10 border border-foreground/10 rounded-md max-w-lg">
+    <div className="grid grid-cols-3 divide-x divide-foreground/10 border border-foreground/10 rounded-xl max-w-lg">
       {stats.map((s, i) => (
         <motion.div
           key={s.label}
@@ -142,7 +59,7 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               <LampEffect>
-                <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.02]">
+                <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl font-medium tracking-tight leading-[1.02]">
                   <span className="text-foreground">
                     <TextGenerateEffect words="Gold Trading," filter={false} />
                   </span>
@@ -193,7 +110,7 @@ export function HeroSection() {
               <Link href="/register">
                 <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
                   Set Up in 15 Minutes
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:transtone-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="#how-it-works">
@@ -214,7 +131,7 @@ export function HeroSection() {
           </div>
 
           <div className="hidden lg:block">
-            <TerminalSimulation />
+            <ProductMockupStack />
           </div>
         </div>
       </div>

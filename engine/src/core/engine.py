@@ -4,7 +4,7 @@ import asyncio
 import logging
 import re
 from collections.abc import Awaitable, Callable
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ..agents.base import Agent, AgentStatus
 from ..ai.registry import AIRegistry
@@ -92,7 +92,7 @@ class Engine:
         """Like _alert, but at most once per `min_interval_seconds` per key —
         for loops that retry every few seconds, so a sustained outage sends
         one notification instead of spamming Telegram."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         last = self._last_alert_at.get(key)
         if last and (now - last).total_seconds() < min_interval_seconds:
             return
@@ -233,7 +233,7 @@ class Engine:
                         "account_equity": account.equity,
                     }
 
-                store["last_sync"] = datetime.utcnow().isoformat()
+                store["last_sync"] = datetime.now(UTC).isoformat()
 
             except Exception as e:
                 log.error(f"Sync error: {e}")
@@ -346,7 +346,8 @@ class Engine:
 
                 user_config = self._user_configs.get(signal.user_id, UserConfig(user_id=signal.user_id))
                 open_positions = await self.broker.get_positions()
-                risk_verdict = await self.risk.check_signal(signal, user_config, len(open_positions))
+                user_position_count = sum(1 for p in open_positions if p.symbol in user_config.agent_configs.get(signal.agent, AgentConfig(name="default")).markets if hasattr(p, 'symbol'))
+                risk_verdict = await self.risk.check_signal(signal, user_config, len(open_positions), user_position_count)
 
                 if risk_verdict == RiskVerdict.BLOCK:
                     log.warning(f"Risk blocked signal: {signal.action} {signal.market}")
@@ -478,6 +479,9 @@ class Engine:
         """
         risk_percent = config.risk_per_trade_pct / 100 if hasattr(config, 'risk_per_trade_pct') else 0.02
 
+        # Validate max_position_size is positive
+        max_pos_size = config.max_position_size if config.max_position_size > 0 else 0.5
+
         # Fetch live balance from broker
         account = await self.broker.get_account()
         if account and account.balance > 0:
@@ -490,16 +494,16 @@ class Engine:
 
         price_risk = abs(signal.entry_price - signal.stop_loss)
         if price_risk <= 0:
-            return min(0.01, config.max_position_size)
+            return min(0.01, max_pos_size)
 
         # Instrument-specific contract size from registry
         contract_size = get_contract_size(signal.market)
         risk_per_lot = price_risk * contract_size
         if risk_per_lot <= 0:
-            return min(0.01, config.max_position_size)
+            return min(0.01, max_pos_size)
 
         volume = risk_amount / risk_per_lot
-        volume = max(0.01, min(round(volume, 2), config.max_position_size))
+        volume = max(0.01, min(round(volume, 2), max_pos_size))
         return volume
 
     @property
@@ -514,7 +518,7 @@ class Engine:
 
     async def get_market_regime(self, symbol: str, market_data: list) -> dict:
         """Get market regime (trend/range/volatile) using AI or cached data."""
-        now = datetime.utcnow().timestamp()
+        now = datetime.now(UTC).timestamp()
 
         if symbol in self._regime_cache:
             cached = self._regime_cache[symbol]

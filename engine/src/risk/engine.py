@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import UTC, datetime
 
@@ -28,6 +29,7 @@ class RiskEngine:
         self._daily_trades: dict[str, int] = {}
         self._peak_balance: dict[str, float] = {}
         self._last_reset: datetime | None = datetime.now(UTC)
+        self._lock = asyncio.Lock()
         self._load_state()
 
     def _load_state(self) -> None:
@@ -64,47 +66,52 @@ class RiskEngine:
         )
 
     async def check_signal(
-        self, signal: Signal, user_config: UserConfig, open_position_count: int = 0
+        self, signal: Signal, user_config: UserConfig, open_position_count: int = 0,
+        user_position_count: int = 0,
     ) -> RiskVerdict:
-        if self._maybe_reset_daily():
-            await self._save_state()
+        async with self._lock:
+            if self._maybe_reset_daily():
+                await self._save_state()
 
-        if not await self._check_global_limits(open_position_count):
-            return RiskVerdict.BLOCK
+            if not await self._check_global_limits(open_position_count):
+                return RiskVerdict.BLOCK
 
-        if not await self._check_user_limits(signal, user_config):
-            return RiskVerdict.BLOCK
+            if not await self._check_user_limits(signal, user_config, user_position_count):
+                return RiskVerdict.BLOCK
 
-        return RiskVerdict.PASS
+            return RiskVerdict.PASS
 
     async def record_trade(self, order: Order) -> None:
-        self._daily_trades.setdefault(order.user_id, 0)
-        self._daily_trades[order.user_id] += 1
-        await self._save_state()
+        async with self._lock:
+            self._daily_trades.setdefault(order.user_id, 0)
+            self._daily_trades[order.user_id] += 1
+            await self._save_state()
 
     async def record_pnl(self, user_id: str, pnl: float) -> None:
         """Called when a position closes to update daily PnL tracking."""
-        self._daily_pnl.setdefault(user_id, 0.0)
-        self._daily_pnl[user_id] += pnl
-        log.info(f"Risk: Recorded PnL for {user_id}: {pnl:+.2f} (daily total: {self._daily_pnl[user_id]:+.2f})")
-        await self._save_state()
+        async with self._lock:
+            self._daily_pnl.setdefault(user_id, 0.0)
+            self._daily_pnl[user_id] += pnl
+            log.info(f"Risk: Recorded PnL for {user_id}: {pnl:+.2f} (daily total: {self._daily_pnl[user_id]:+.2f})")
+            await self._save_state()
 
     async def check_drawdown(self, user_id: str, current_balance: float, max_drawdown_percent: float = 15.0) -> bool:
         """Check if max drawdown is exceeded. Returns True if limit breached."""
-        peak = self._peak_balance.get(user_id, current_balance)
-        if current_balance >= peak:
-            self._peak_balance[user_id] = current_balance
-            peak = current_balance
-            await self._save_state()
+        async with self._lock:
+            peak = self._peak_balance.get(user_id, current_balance)
+            if current_balance >= peak:
+                self._peak_balance[user_id] = current_balance
+                peak = current_balance
+                await self._save_state()
 
-        if peak <= 0:
+            if peak <= 0:
+                return False
+
+            drawdown_pct = (peak - current_balance) / peak * 100
+            if drawdown_pct >= max_drawdown_percent:
+                log.warning(f"Drawdown limit breached for {user_id}: {drawdown_pct:.1f}% >= {max_drawdown_percent}%")
+                return True
             return False
-
-        drawdown_pct = (peak - current_balance) / peak * 100
-        if drawdown_pct >= max_drawdown_percent:
-            log.warning(f"Drawdown limit breached for {user_id}: {drawdown_pct:.1f}% >= {max_drawdown_percent}%")
-            return True
-        return False
 
     def update_global_limits(
         self, max_daily_loss: float | None = None, max_positions: int | None = None
@@ -141,7 +148,7 @@ class RiskEngine:
             return False
         return True
 
-    async def _check_user_limits(self, signal: Signal, config: UserConfig) -> bool:
+    async def _check_user_limits(self, signal: Signal, config: UserConfig, user_position_count: int = 0) -> bool:
         user_pnl = self._daily_pnl.get(signal.user_id, 0.0)
         if user_pnl <= -config.max_daily_loss:
             log.warning(f"User {signal.user_id} daily loss limit reached: {user_pnl:.2f}")
@@ -151,6 +158,11 @@ class RiskEngine:
         agent_config = config.agent_configs.get(signal.agent)
         if agent_config and user_trades >= agent_config.max_daily_trades:
             log.warning(f"User {signal.user_id} daily trade limit reached: {user_trades}")
+            return False
+
+        # Per-user max positions check
+        if user_position_count >= config.max_positions:
+            log.warning(f"User {signal.user_id} max positions reached: {user_position_count}/{config.max_positions}")
             return False
 
         return True

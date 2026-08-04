@@ -25,7 +25,11 @@
     --border: 30 8% 18%;
     --input: 30 8% 18%;
     --ring: 38 42% 52%;
-    --radius: 0.25rem;
+    /* Deliberate two-tier shape language: --radius drives small controls
+       (buttons/inputs land ~8px via rounded-md) while cards use Tailwind's
+       untouched rounded-xl (12px) directly — generous containers, modest
+       controls, not one uniform radius for everything. */
+    --radius: 0.625rem;
     /* Brand: gold is the identity/action color (logo, CTAs, chrome).
        Emerald is reserved for positive financial data (P&L, win rate, returns) — never decorative. */
     --gain: 160 84% 39%;

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ..ai.base import AIProvider
 from ..core.types import Order, SignalAction
@@ -51,7 +51,7 @@ class PostTradeAnalyzer:
                 "model": response.model,
                 "tokens": response.tokens_used,
                 "trade_id": order.id,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
             self._trade_log.append(result)

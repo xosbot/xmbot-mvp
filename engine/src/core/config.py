@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import os
 from dataclasses import dataclass
+
+
+def _derive_key(password: str) -> bytes:
+    """Derive a 32-byte Fernet key from a password using SHA-256."""
+    return base64.urlsafe_b64encode(hashlib.sha256(password.encode()).digest())
 
 
 @dataclass
@@ -57,6 +64,12 @@ class EngineConfig:
     # API
     api_key: str = ""
 
+    # MQL5
+    mql5_community_key: str = ""
+
+    # Encryption
+    encryption_key: str = ""
+
     # Monitoring
     sentry_dsn: str = ""
     log_level: str = "INFO"
@@ -92,9 +105,38 @@ class EngineConfig:
             trailing_stop_activation_atr=float(os.getenv("TRAILING_STOP_ACTIVATION_ATR", "1.0")),
             trailing_stop_distance_atr=float(os.getenv("TRAILING_STOP_DISTANCE_ATR", "1.5")),
             api_key=os.getenv("XMBOT_API_KEY", ""),
+            mql5_community_key=os.getenv("MQL5_COMMUNITY_KEY", ""),
+            encryption_key=os.getenv("ENCRYPTION_KEY", ""),
             sentry_dsn=os.getenv("SENTRY_DSN", ""),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
         )
+
+    def encrypt_secret(self, plaintext: str) -> str:
+        """Encrypt a secret value using Fernet symmetric encryption."""
+        if not self.encryption_key:
+            return plaintext
+        from cryptography.fernet import Fernet
+        key = _derive_key(self.encryption_key)
+        f = Fernet(key)
+        return f.encrypt(plaintext.encode()).decode()
+
+    def decrypt_secret(self, ciphertext: str) -> str:
+        """Decrypt a secret value using Fernet symmetric encryption."""
+        if not self.encryption_key or not ciphertext:
+            return ciphertext
+        from cryptography.fernet import Fernet
+        key = _derive_key(self.encryption_key)
+        f = Fernet(key)
+        return f.decrypt(ciphertext.encode()).decode()
+
+    def get_broker_creds(self) -> dict[str, str]:
+        """Get broker credentials, decrypting if encryption is enabled."""
+        return {
+            "binance_api_key": self.decrypt_secret(self.binance_api_key),
+            "binance_api_secret": self.decrypt_secret(self.binance_api_secret),
+            "mt5_password": self.decrypt_secret(self.mt5_password),
+            "ibkr_password": self.decrypt_secret(getattr(self, "ibkr_password", "")),
+        }
 
 
 def load_config(path: str | None = None) -> EngineConfig:

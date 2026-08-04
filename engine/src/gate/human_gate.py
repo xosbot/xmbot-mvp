@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ..core.types import Signal, SignalDecision
 
@@ -17,7 +17,7 @@ class GateDecision:
     modified_stop_loss: float | None = None
     modified_take_profit: float | None = None
     reason: str = ""
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 log = logging.getLogger("xmbot.gate")

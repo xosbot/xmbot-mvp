@@ -10,7 +10,7 @@ export function MovingBorder({
   return (
     <div
       className={cn(
-        "corner-frame relative overflow-hidden rounded-md border border-gold-500/50 bg-background/90",
+        "corner-frame relative overflow-hidden rounded-xl border border-gold-500/50 bg-background/90",
         className
       )}
     >

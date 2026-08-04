@@ -10,7 +10,7 @@ import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 export function CTASection() {
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -transtone-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -22,7 +22,7 @@ export function CTASection() {
                   <span>Limited Beta // First 10 Customers</span>
                 </div>
 
-                <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
+                <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
                   Your First Signal Is
                   <br />
                   <span className="text-gradient-gold">15 Minutes Away</span>
@@ -52,7 +52,7 @@ export function CTASection() {
                   <Link href="/register">
                     <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
                       Set Up in 15 Minutes
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:transtone-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer">

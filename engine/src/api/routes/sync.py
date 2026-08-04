@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -125,7 +125,7 @@ def apply_updates(data: dict, store: dict | None = None) -> None:
         store["trades"] = data["trades"]
     if "metrics" in data:
         store["metrics"].update(data["metrics"])
-    store["last_sync"] = datetime.utcnow().isoformat()
+    store["last_sync"] = datetime.now(UTC).isoformat()
 
 
 @router.post("/update")

@@ -4,7 +4,7 @@ import asyncio
 import logging
 import threading
 from collections.abc import AsyncIterator
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from ..core.types import (
@@ -162,6 +162,8 @@ class IBKRBroker(Broker):
         exchange: str = "SMART",
         currency: str = "USD",
         connect_timeout: float = 10.0,
+        max_reconnect_attempts: int = 5,
+        reconnect_delay: float = 5.0,
     ) -> None:
         super().__init__("ibkr")
         self._host = host
@@ -172,6 +174,8 @@ class IBKRBroker(Broker):
         self._exchange = exchange
         self._currency = currency
         self._connect_timeout = connect_timeout
+        self._max_reconnect_attempts = max_reconnect_attempts
+        self._reconnect_delay = reconnect_delay
 
         self._client: _IBClient | None = None
         self._thread: threading.Thread | None = None
@@ -181,6 +185,9 @@ class IBKRBroker(Broker):
         # order_id -> the (position-representing) stop-loss child order id, so
         # modify_position() knows what to cancel-and-replace.
         self._stop_child_orders: dict[str, int] = {}
+        self._reconnect_count = 0
+        self._last_health_check = 0.0
+        self._health_check_interval = 30.0  # seconds
 
     def _next_req_id(self) -> int:
         self._req_id += 1
@@ -222,6 +229,7 @@ class IBKRBroker(Broker):
             return False
 
         self._connected = True
+        self._reconnect_count = 0
         self.status = BrokerStatus.CONNECTED
         log.info(f"IBKR connected — {self._host}:{self._port} (client {self._client_id})")
         return True
@@ -238,9 +246,38 @@ class IBKRBroker(Broker):
     async def is_connected(self) -> bool:
         return bool(self._connected and self._client and self._client.isConnected())
 
+    async def _health_check(self) -> bool:
+        """Periodic health check to detect connection issues."""
+        import time
+        now = time.time()
+        if now - self._last_health_check < self._health_check_interval:
+            return True
+        
+        self._last_health_check = now
+        if not await self.is_connected():
+            log.warning("IBKR health check failed — connection lost")
+            return False
+        return True
+
+    async def _reconnect(self) -> bool:
+        """Attempt to reconnect to IBKR."""
+        if self._reconnect_count >= self._max_reconnect_attempts:
+            log.error(f"IBKR max reconnect attempts ({self._max_reconnect_attempts}) reached")
+            self.status = BrokerStatus.ERROR
+            return False
+
+        self._reconnect_count += 1
+        log.info(f"IBKR reconnecting (attempt {self._reconnect_count}/{self._max_reconnect_attempts})")
+
+        await self.disconnect()
+        await asyncio.sleep(self._reconnect_delay)
+        return await self.connect()
+
     async def place_order(self, order: Order) -> OrderResult:
         if not await self.is_connected() or not self._client or self._client.next_order_id is None:
-            return OrderResult(success=False, order_id=order.id, error="Not connected")
+            # Try to reconnect
+            if not await self._reconnect():
+                return OrderResult(success=False, order_id=order.id, error="Not connected and reconnect failed")
 
         parent_id = self._client.next_order_id
         self._client.next_order_id += 3  # reserve parent + SL + TP ids
@@ -373,7 +410,7 @@ class IBKRBroker(Broker):
                         entry_price=avg_cost,
                         current_price=avg_cost,
                         stop_loss=0.0,
-                        open_time=datetime.utcnow(),
+                        open_time=datetime.now(UTC),
                     )
                 )
         except TimeoutError:
@@ -464,7 +501,7 @@ class IBKRBroker(Broker):
                         low=bar.low,
                         close=bar.close,
                         volume=bar.volume,
-                        timestamp=datetime.utcnow(),
+                        timestamp=datetime.now(UTC),
                     )
                 )
         except TimeoutError:
@@ -506,7 +543,7 @@ class IBKRBroker(Broker):
                         symbol=sym,
                         bid=last[sym]["bid"],
                         ask=last[sym]["ask"],
-                        timestamp=datetime.utcnow(),
+                        timestamp=datetime.now(UTC),
                     )
         finally:
             for req_id in req_ids:

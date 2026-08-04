@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ..ai.base import AIProvider
 from ..core.types import Market
@@ -27,7 +27,7 @@ class MarketRegimeDetector:
 
     async def detect(self, symbol: str, market_data: list[Market]) -> dict:
         """Detect current market regime."""
-        now = datetime.utcnow().timestamp()
+        now = datetime.now(UTC).timestamp()
 
         if symbol in self._cache:
             cached = self._cache[symbol]
@@ -95,7 +95,7 @@ class MarketRegimeDetector:
             "confidence": 0.0,
             "reason": "AI unavailable",
             "source": "default",
-            "timestamp": datetime.utcnow().timestamp(),
+            "timestamp": datetime.now(UTC).timestamp(),
         }
 
     def _format_data(self, market_data: list[Market]) -> str:

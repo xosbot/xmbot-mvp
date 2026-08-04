@@ -6,12 +6,10 @@ import { FeaturesGrid } from "@/components/landing/features-grid"
 import { PricingCards } from "@/components/landing/pricing-cards"
 import { CTASection } from "@/components/landing/cta-section"
 import { FAQSection } from "@/components/landing/faq-section"
-import { SignalLattice } from "@/components/landing/signal-lattice"
 
 export default function HomePage() {
   return (
     <>
-      <SignalLattice />
       <HeroSection />
       <HowItWorks />
       <ProofSection />

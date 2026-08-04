@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 
 
@@ -70,7 +70,7 @@ class Signal:
     agent: str = ""
     user_id: str = ""
     metadata: dict = field(default_factory=dict)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def risk_amount(self) -> float:
@@ -97,7 +97,7 @@ class Order:
     broker: str = ""
     user_id: str = ""
     status: OrderStatus = OrderStatus.PENDING
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     filled_at: datetime | None = None
     filled_price: float | None = None
     broker_order_id: str | None = None
@@ -125,7 +125,7 @@ class Position:
     take_profit: float | None = None
     unrealized_pnl: float = 0.0
     realized_pnl: float = 0.0
-    open_time: datetime = field(default_factory=datetime.utcnow)
+    open_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     broker_position_id: str | None = None
 
 
@@ -161,6 +161,7 @@ class UserConfig:
     max_daily_loss: float = 500.0
     max_drawdown_percent: float = 20.0
     max_position_size: float = 0.5
+    max_positions: int = 10
     default_stop_loss: float = 30.0
     enable_ai_analysis: bool = True
     agent_configs: dict[str, AgentConfig] = field(default_factory=dict)

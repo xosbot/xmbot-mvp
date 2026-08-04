@@ -50,7 +50,7 @@ export function ProofSection() {
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
               // Backtested Results
             </div>
-            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
+            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
               Simple Doesn&apos;t Mean
               <br />
               <span className="text-gradient-emerald">Unproven</span>
@@ -71,7 +71,7 @@ export function ProofSection() {
             <StaggerItem key={stat.label}>
               {i === 1 ? (
                 <GlareCard className="p-8 text-center h-full">
-                  <div className="w-16 h-16 rounded-md mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
+                  <div className="w-16 h-16 rounded-xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
@@ -80,7 +80,7 @@ export function ProofSection() {
                 </GlareCard>
               ) : (
                 <CardSpotlight className="p-8 text-center h-full">
-                  <div className="w-16 h-16 rounded-md mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
+                  <div className="w-16 h-16 rounded-xl mx-auto mb-6 flex items-center justify-center bg-emerald-500/10 text-2xl">
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />

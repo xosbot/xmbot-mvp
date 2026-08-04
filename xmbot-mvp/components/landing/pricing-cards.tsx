@@ -11,7 +11,7 @@ import { CardSpotlight } from "@/components/ui/aceternity/card-spotlight"
 export function PricingCards() {
   return (
     <section id="pricing" className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -transtone-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -19,7 +19,7 @@ export function PricingCards() {
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
               // Pricing
             </div>
-            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
+            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
               Simple,
               <br />
               <span className="text-gradient-gold">Transparent Pricing</span>
@@ -50,7 +50,7 @@ export function PricingCards() {
                 <ul className="mt-6 space-y-3">
                   {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Setup assistance", "Email support"].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
-                      <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
+                      <Check className="h-4 w-4 text-foreground/40 mt-0.5 flex-shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
@@ -76,7 +76,7 @@ export function PricingCards() {
               <ul className="mt-6 space-y-3">
                 {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Email support"].map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
-                    <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
+                    <Check className="h-4 w-4 text-foreground/40 mt-0.5 flex-shrink-0" />{f}
                   </li>
                 ))}
               </ul>
@@ -91,7 +91,7 @@ export function PricingCards() {
           {/* Quarterly — GlareCard (Most Popular) */}
           <StaggerItem>
             <GlareCard className="relative h-full">
-              <div className="absolute -top-px left-1/2 -transtone-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
+              <div className="absolute -top-px left-1/2 -translate-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
                 Most Popular
               </div>
               <div className="p-8">
@@ -106,7 +106,7 @@ export function PricingCards() {
                 <ul className="mt-6 space-y-3">
                   {["Everything in Monthly", "Priority email support", "Advanced risk settings", "Performance reports", "Early access to new features"].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
-                      <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
+                      <Check className="h-4 w-4 text-foreground/40 mt-0.5 flex-shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
@@ -136,7 +136,7 @@ export function PricingCards() {
               <ul className="mt-6 space-y-3">
                 {["Everything in Quarterly", "Dedicated account manager", "Custom strategy requests", "API access", "White-glove onboarding"].map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
-                    <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
+                    <Check className="h-4 w-4 text-foreground/40 mt-0.5 flex-shrink-0" />{f}
                   </li>
                 ))}
               </ul>

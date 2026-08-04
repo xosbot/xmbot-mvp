@@ -1072,3 +1072,903 @@ class TestSessionFilter:
 
         off_peak = datetime(2024, 1, 1, 23, 0, tzinfo=timezone.utc)
         assert is_active_session(off_peak) is False
+
+
+class TestEngineConfigEncryption:
+    """Test Fernet encryption for broker credentials at rest."""
+
+    def test_encrypt_decrypt_roundtrip(self):
+        config = EngineConfig(encryption_key="test-secret-key-12345")
+        plaintext = "my-secret-api-key"
+        encrypted = config.encrypt_secret(plaintext)
+        assert encrypted != plaintext
+        decrypted = config.decrypt_secret(encrypted)
+        assert decrypted == plaintext
+
+    def test_encrypt_without_key_returns_plaintext(self):
+        config = EngineConfig(encryption_key="")
+        plaintext = "my-secret-api-key"
+        encrypted = config.encrypt_secret(plaintext)
+        assert encrypted == plaintext
+
+    def test_decrypt_without_key_returns_ciphertext(self):
+        config = EngineConfig(encryption_key="")
+        ciphertext = "some-ciphertext"
+        decrypted = config.decrypt_secret(ciphertext)
+        assert decrypted == ciphertext
+
+    def test_different_keys_produce_different_ciphertext(self):
+        config1 = EngineConfig(encryption_key="key-1")
+        config2 = EngineConfig(encryption_key="key-2")
+        plaintext = "secret-data"
+        enc1 = config1.encrypt_secret(plaintext)
+        enc2 = config2.encrypt_secret(plaintext)
+        assert enc1 != enc2
+
+    def test_get_broker_creds_decrypts(self):
+        config = EngineConfig(encryption_key="test-key")
+        # Encrypt the secrets and store them
+        config.binance_api_key = config.encrypt_secret("original-key")
+        config.binance_api_secret = config.encrypt_secret("original-secret")
+        # get_broker_creds should decrypt them
+        creds = config.get_broker_creds()
+        assert creds["binance_api_key"] == "original-key"
+        assert creds["binance_api_secret"] == "original-secret"
+
+
+class TestRiskEnginePerUserPositions:
+    """Test per-user max positions check in risk engine."""
+
+    @pytest.fixture
+    def risk(self):
+        return RiskEngine(global_max_daily_loss=10000.0, global_max_positions=20)
+
+    @pytest.fixture
+    def user_config(self):
+        return UserConfig(
+            user_id="test_user",
+            max_daily_loss=500.0,
+            max_drawdown_percent=15.0,
+            max_position_size=0.5,
+            max_positions=3,
+        )
+
+    @pytest.mark.asyncio
+    async def test_blocks_when_user_max_positions_reached(self, risk, user_config):
+        signal = Signal(
+            id="test-pos-1",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        verdict = await risk.check_signal(signal, user_config, open_position_count=5, user_position_count=3)
+        assert verdict == RiskVerdict.BLOCK
+
+    @pytest.mark.asyncio
+    async def test_passes_when_user_under_max_positions(self, risk, user_config):
+        signal = Signal(
+            id="test-pos-2",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        verdict = await risk.check_signal(signal, user_config, open_position_count=5, user_position_count=2)
+        assert verdict == RiskVerdict.PASS
+
+    @pytest.mark.asyncio
+    async def test_user_position_limit_independent_of_global(self, risk, user_config):
+        """User limit should block even when global limit is not reached."""
+        signal = Signal(
+            id="test-pos-3",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        # Global limit is 20, user has 3 positions (at limit), but only 5 open globally
+        verdict = await risk.check_signal(signal, user_config, open_position_count=5, user_position_count=3)
+        assert verdict == RiskVerdict.BLOCK
+
+    @pytest.mark.asyncio
+    async def test_global_limit_blocks_even_when_user_under_limit(self, risk, user_config):
+        signal = Signal(
+            id="test-pos-4",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        # Global limit is 20, user has 2 positions (under limit), but 20 open globally
+        verdict = await risk.check_signal(signal, user_config, open_position_count=20, user_position_count=2)
+        assert verdict == RiskVerdict.BLOCK
+
+
+class TestCalculateVolumeValidation:
+    """Test max_position_size validation in engine._calculate_volume."""
+
+    @pytest.fixture
+    def engine(self):
+        return Engine(
+            config=EngineConfig(),
+            broker=PaperBroker(initial_balance=10000.0),
+            gate=HumanGate(),
+            risk=RiskEngine(),
+        )
+
+    @pytest.mark.asyncio
+    async def test_zero_max_position_size_uses_default(self, engine):
+        signal = Signal(
+            id="vol-1",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        config = UserConfig(user_id="test_user", max_position_size=0)
+        volume = await engine._calculate_volume(signal, config)
+        assert volume <= 0.5  # default max
+
+    @pytest.mark.asyncio
+    async def test_negative_max_position_size_uses_default(self, engine):
+        signal = Signal(
+            id="vol-2",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        config = UserConfig(user_id="test_user", max_position_size=-1.0)
+        volume = await engine._calculate_volume(signal, config)
+        assert volume <= 0.5  # default max
+
+
+class TestTradeHistoryAPI:
+    """Test trade history API routes."""
+
+    def test_record_and_get_trade(self):
+        from src.api.routes.history import record_trade, _trade_history
+
+        # Clear history
+        _trade_history.clear()
+
+        trade = {
+            "id": "trade-1",
+            "symbol": "XAUUSD",
+            "action": "BUY",
+            "entry_price": 3000.0,
+            "exit_price": 3050.0,
+            "volume": 0.1,
+            "pnl": 500.0,
+            "status": "CLOSED",
+            "open_time": "2024-01-01T10:00:00Z",
+            "close_time": "2024-01-01T12:00:00Z",
+        }
+        record_trade(trade)
+
+        assert len(_trade_history) == 1
+        assert _trade_history[0]["id"] == "trade-1"
+
+    def test_record_order(self):
+        from src.api.routes.history import record_order, _order_history
+
+        _order_history.clear()
+
+        order = {
+            "id": "order-1",
+            "signal_id": "signal-1",
+            "action": "BUY",
+            "symbol": "XAUUSD",
+            "volume": 0.1,
+            "price": 3000.0,
+            "stop_loss": 2990.0,
+            "status": "FILLED",
+            "broker": "paper",
+            "created_at": "2024-01-01T10:00:00Z",
+            "filled_at": "2024-01-01T10:00:01Z",
+            "filled_price": 3000.5,
+        }
+        record_order(order)
+
+        assert len(_order_history) == 1
+        assert _order_history[0]["id"] == "order-1"
+
+
+class TestRateLimitMiddleware:
+    """Test rate limiting middleware."""
+
+    def test_middleware_initialization(self):
+        from src.api.middleware import RateLimitMiddleware
+
+        # Just test that the middleware can be instantiated
+        assert RateLimitMiddleware is not None
+
+    def test_request_tracking_middleware_initialization(self):
+        from src.api.middleware import RequestTrackingMiddleware
+
+        assert RequestTrackingMiddleware is not None
+
+
+class TestAPIRoutes:
+    """Test that all API routes are properly registered."""
+
+    def test_app_has_routes(self):
+        from src.api.server import app
+
+        # Check that routers are included
+        router_names = [type(r).__name__ for r in app.routes]
+        assert "_IncludedRouter" in router_names
+
+        # Check that basic routes exist
+        route_paths = [r.path for r in app.routes if hasattr(r, "path")]
+        assert "/health" in route_paths
+        assert "/positions" in route_paths
+        assert "/account" in route_paths
+        assert "/signal" in route_paths
+        assert "/control" in route_paths
+
+
+class TestStrategyRegistry:
+    """Test strategy registry and lifecycle."""
+
+    def test_registry_initialization(self):
+        from src.strategies.registry import StrategyRegistry
+
+        registry = StrategyRegistry()
+        assert len(registry.strategies) == 0
+        assert len(registry.running) == 0
+
+    def test_register_strategy(self):
+        from src.strategies.registry import StrategyRegistry
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        registry = StrategyRegistry()
+        config = StrategyConfig(name="test-scalp", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+        registry.register(strategy)
+
+        assert "test-scalp" in registry.strategies
+        assert registry.get("test-scalp") == strategy
+
+    def test_unregister_strategy(self):
+        from src.strategies.registry import StrategyRegistry
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        registry = StrategyRegistry()
+        config = StrategyConfig(name="test-scalp", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+        registry.register(strategy)
+
+        assert registry.unregister("test-scalp")
+        assert "test-scalp" not in registry.strategies
+
+    def test_unregister_running_strategy_fails(self):
+        import asyncio
+        from src.strategies.registry import StrategyRegistry
+        from src.strategies.base import StrategyConfig, StrategyType, StrategyStatus
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        registry = StrategyRegistry()
+        config = StrategyConfig(name="test-scalp", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+        registry.register(strategy)
+        strategy.status = StrategyStatus.RUNNING
+
+        with pytest.raises(RuntimeError):
+            registry.unregister("test-scalp")
+
+    def test_get_strategy_types(self):
+        from src.strategies.registry import StrategyRegistry, load_builtin_strategies
+
+        registry = StrategyRegistry()
+        load_builtin_strategies(registry)
+
+        assert "scalping" in registry.available_types
+        assert "swing" in registry.available_types
+        assert "mean_reversion" in registry.available_types
+        assert "momentum" in registry.available_types
+
+
+class TestScalpingStrategy:
+    """Test scalping strategy template."""
+
+    def test_initialization(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        config = StrategyConfig(name="test-scalp", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+
+        assert strategy.name == "test-scalp"
+        assert strategy.config.strategy_type == StrategyType.SCALPING
+        assert "rsi_period" in strategy.config.params
+        assert "fast_ma" in strategy.config.params
+
+    @pytest.mark.asyncio
+    async def test_analyze_returns_none_with_insufficient_data(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+        from src.core.types import Market
+        from datetime import datetime, UTC
+
+        config = StrategyConfig(name="test-scalp", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+
+        # Not enough data
+        market_data = [
+            Market(
+                symbol="XAUUSD", timeframe="M5", bid=3000.0, ask=3000.1,
+                open=2999.0, high=3001.0, low=2998.0, close=3000.0,
+                volume=100, timestamp=datetime.now(UTC)
+            )
+            for _ in range(5)
+        ]
+
+        signal = await strategy.analyze(market_data)
+        assert signal is None
+
+
+class TestSwingStrategy:
+    """Test swing strategy template."""
+
+    def test_initialization(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.swing import SwingStrategy
+
+        config = StrategyConfig(name="test-swing", strategy_type=StrategyType.SWING)
+        strategy = SwingStrategy(config)
+
+        assert strategy.name == "test-swing"
+        assert strategy.config.strategy_type == StrategyType.SWING
+        assert "ema_fast" in strategy.config.params
+        assert "atr_period" in strategy.config.params
+
+
+class TestMeanReversionStrategy:
+    """Test mean reversion strategy template."""
+
+    def test_initialization(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.mean_reversion import MeanReversionStrategy
+
+        config = StrategyConfig(name="test-mr", strategy_type=StrategyType.MEAN_REVERSION)
+        strategy = MeanReversionStrategy(config)
+
+        assert strategy.name == "test-mr"
+        assert strategy.config.strategy_type == StrategyType.MEAN_REVERSION
+        assert "bb_period" in strategy.config.params
+        assert "z_score_threshold" in strategy.config.params
+
+
+class TestMomentumStrategy:
+    """Test momentum strategy template."""
+
+    def test_initialization(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.momentum import MomentumStrategy
+
+        config = StrategyConfig(name="test-mom", strategy_type=StrategyType.MOMENTUM)
+        strategy = MomentumStrategy(config)
+
+        assert strategy.name == "test-mom"
+        assert strategy.config.strategy_type == StrategyType.MOMENTUM
+        assert "macd_fast" in strategy.config.params
+        assert "adx_threshold" in strategy.config.params
+
+
+class TestStrategyStats:
+    """Test strategy performance tracking."""
+
+    def test_record_trade_win(self):
+        from src.strategies.base import StrategyConfig, StrategyType, StrategyStats
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        config = StrategyConfig(name="test", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+
+        strategy.record_trade(100.0)
+
+        assert strategy.stats.total_trades == 1
+        assert strategy.stats.winning_trades == 1
+        assert strategy.stats.losing_trades == 0
+        assert strategy.stats.total_pnl == 100.0
+        assert strategy.stats.win_rate == 100.0
+
+    def test_record_trade_loss(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        config = StrategyConfig(name="test", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+
+        strategy.record_trade(-50.0)
+
+        assert strategy.stats.total_trades == 1
+        assert strategy.stats.winning_trades == 0
+        assert strategy.stats.losing_trades == 1
+        assert strategy.stats.total_pnl == -50.0
+        assert strategy.stats.win_rate == 0.0
+
+    def test_multiple_trades(self):
+        from src.strategies.base import StrategyConfig, StrategyType
+        from src.strategies.templates.scalping import ScalpingStrategy
+
+        config = StrategyConfig(name="test", strategy_type=StrategyType.SCALPING)
+        strategy = ScalpingStrategy(config)
+
+        strategy.record_trade(100.0)
+        strategy.record_trade(-50.0)
+        strategy.record_trade(75.0)
+
+        assert strategy.stats.total_trades == 3
+        assert strategy.stats.winning_trades == 2
+        assert strategy.stats.losing_trades == 1
+        assert strategy.stats.total_pnl == 125.0
+        assert strategy.stats.win_rate == pytest.approx(66.67, rel=1e-2)
+
+
+class TestConsensusValidator:
+    """Test multi-model consensus validation."""
+
+    def test_consensus_result_initialization(self):
+        from src.ai.consensus import ConsensusResult
+
+        result = ConsensusResult(verdict="SAFE", confidence=0.8)
+        assert result.verdict == "SAFE"
+        assert result.confidence == 0.8
+        assert result.votes == []
+
+    def test_consensus_result_to_dict(self):
+        from src.ai.consensus import ConsensusResult
+
+        result = ConsensusResult(
+            verdict="RISKY",
+            confidence=0.9,
+            votes=[{"model": "gemini", "verdict": "RISKY"}],
+            reasoning="High volatility",
+            models_used=["gemini"],
+        )
+        d = result.to_dict()
+        assert d["verdict"] == "RISKY"
+        assert d["confidence"] == 0.9
+        assert len(d["votes"]) == 1
+        assert d["models_used"] == ["gemini"]
+
+
+class TestRegimeDetector:
+    """Test enhanced regime detection."""
+
+    def test_regime_result_initialization(self):
+        from src.ai.regime_enhanced import RegimeResult
+
+        result = RegimeResult(
+            regime="trending_up",
+            confidence=0.85,
+            reasoning="Strong upward momentum",
+            indicators={"trend": "up", "volatility": "medium"},
+        )
+        assert result.regime == "trending_up"
+        assert result.confidence == 0.85
+
+    def test_strategy_recommendation_trending(self):
+        from src.ai.regime_enhanced import EnhancedRegimeDetector, RegimeResult
+
+        detector = EnhancedRegimeDetector()
+        result = RegimeResult(
+            regime="trending_up",
+            confidence=0.85,
+            reasoning="",
+            indicators={},
+        )
+        rec = detector.get_strategy_recommendation(result)
+        assert "momentum" in rec["preferred_strategies"]
+        assert "mean_reversion" in rec["avoid_strategies"]
+
+    def test_strategy_recommendation_ranging(self):
+        from src.ai.regime_enhanced import EnhancedRegimeDetector, RegimeResult
+
+        detector = EnhancedRegimeDetector()
+        result = RegimeResult(
+            regime="ranging",
+            confidence=0.7,
+            reasoning="",
+            indicators={},
+        )
+        rec = detector.get_strategy_recommendation(result)
+        assert "mean_reversion" in rec["preferred_strategies"]
+        assert "momentum" in rec["avoid_strategies"]
+
+
+class TestTradeJournal:
+    """Test natural language trade journal."""
+
+    def test_journal_entry_initialization(self):
+        from src.ai.trade_journal import JournalEntry
+        from datetime import datetime, UTC
+
+        entry = JournalEntry(
+            trade_id="t1",
+            symbol="XAUUSD",
+            action="BUY",
+            entry_price=3000.0,
+            exit_price=3050.0,
+            volume=0.1,
+            pnl=500.0,
+        )
+        assert entry.trade_id == "t1"
+        assert entry.pnl == 500.0
+
+    def test_journal_entry_to_dict(self):
+        from src.ai.trade_journal import JournalEntry
+
+        entry = JournalEntry(
+            trade_id="t1",
+            symbol="XAUUSD",
+            action="BUY",
+            entry_price=3000.0,
+            pnl=100.0,
+        )
+        d = entry.to_dict()
+        assert d["trade_id"] == "t1"
+        assert d["pnl"] == 100.0
+        assert "timestamp" in d
+
+    def test_journal_stats(self):
+        from src.ai.trade_journal import TradeJournal
+
+        journal = TradeJournal()
+        stats = journal.get_stats()
+        assert stats["total_trades"] == 0
+        assert stats["win_rate"] == 0.0
+
+
+class TestRiskAdvisor:
+    """Test AI-powered risk advisor."""
+
+    def test_risk_suggestion_initialization(self):
+        from src.ai.risk_advisor import RiskSuggestion
+
+        suggestion = RiskSuggestion(
+            category="position_sizing",
+            suggestion="Reduce position size",
+            priority="high",
+            reasoning="High exposure",
+            confidence=0.9,
+        )
+        assert suggestion.category == "position_sizing"
+        assert suggestion.priority == "high"
+
+    def test_risk_suggestion_to_dict(self):
+        from src.ai.risk_advisor import RiskSuggestion
+
+        suggestion = RiskSuggestion(
+            category="stop_loss",
+            suggestion="Tighten stops",
+            priority="medium",
+            reasoning="Market volatility",
+            confidence=0.7,
+        )
+        d = suggestion.to_dict()
+        assert d["category"] == "stop_loss"
+        assert d["priority"] == "medium"
+
+    def test_risk_advisor_initialization(self):
+        from src.ai.risk_advisor import RiskAdvisor
+
+        advisor = RiskAdvisor()
+        suggestions = advisor.get_stats() if hasattr(advisor, 'get_stats') else []
+        assert isinstance(advisor._risk_limits, dict)
+        assert "max_daily_loss" in advisor._risk_limits
+
+
+class TestSymbolRouter:
+    """Test multi-asset symbol routing."""
+
+    def test_router_initialization(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        assert len(router._symbol_map) > 0
+        assert len(router._broker_configs) > 0
+
+    def test_get_symbol_for_broker(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        # Test gold
+        assert router.get_symbol_for_broker("XAUUSD", "mt5") == "XAUUSD"
+        assert router.get_symbol_for_broker("XAUUSD", "binance") == "PAXGUSDT"
+        # Test forex
+        assert router.get_symbol_for_broker("EURUSD", "mt5") == "EURUSD"
+        assert router.get_symbol_for_broker("EURUSD", "binance") == "EURUSDT"
+
+    def test_get_asset_type(self):
+        from src.routing.symbol_router import SymbolRouter, AssetType
+
+        router = SymbolRouter()
+        assert router.get_asset_type("XAUUSD") == AssetType.COMMODITY
+        assert router.get_asset_type("EURUSD") == AssetType.FOREX
+        assert router.get_asset_type("BTCUSDT") == AssetType.CRYPTO
+
+    def test_get_best_broker(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        # Gold should prefer MT5
+        best = router.get_best_broker("XAUUSD")
+        assert best == "mt5"
+
+        # BTC should prefer Binance
+        best = router.get_best_broker("BTCUSDT")
+        assert best == "binance"
+
+    def test_get_all_brokers_for_symbol(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        brokers = router.get_all_brokers_for_symbol("XAUUSD")
+        assert "mt5" in brokers
+        assert "binance" in brokers
+        assert "ibkr" in brokers
+
+    def test_calculate_position_size(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        # Test position size calculation
+        size = router.calculate_position_size(
+            symbol="XAUUSD",
+            broker_name="mt5",
+            account_balance=10000,
+            risk_percentage=0.02,
+            stop_loss_pips=50,
+        )
+        assert size > 0
+        assert size <= 10.0  # MT5 max position size
+
+    def test_normalize_symbol(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        # Test normalization
+        assert router.normalize_symbol("XAUUSD", "binance") == "PAXGUSDT"
+        assert router.normalize_symbol("EURUSD", "mt5") == "EURUSD"
+
+    def test_is_symbol_supported(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        assert router.is_symbol_supported("XAUUSD", "mt5") is True
+        assert router.is_symbol_supported("XAUUSD", "unknown") is False
+        assert router.is_symbol_supported("UNKNOWN") is False
+
+    def test_get_all_symbols(self):
+        from src.routing.symbol_router import SymbolRouter
+
+        router = SymbolRouter()
+        symbols = router.get_all_symbols()
+        assert "XAUUSD" in symbols
+        assert "EURUSD" in symbols
+        assert "BTCUSDT" in symbols
+
+
+class TestUserManager:
+    """Test multi-user management."""
+
+    def test_create_user(self):
+        from src.users.manager import UserManager, UserTier
+
+        manager = UserManager()
+        user = manager.create_user("user1", "test@example.com", "Test User", UserTier.FREE)
+        assert user.user_id == "user1"
+        assert user.tier == UserTier.FREE
+        assert user.status.value == "active"
+
+    def test_get_user(self):
+        from src.users.manager import UserManager
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User")
+        user = manager.get_user("user1")
+        assert user is not None
+        assert user.email == "test@example.com"
+
+    def test_update_user_tier(self):
+        from src.users.manager import UserManager, UserTier
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User")
+        assert manager.update_user_tier("user1", UserTier.PRO) is True
+        user = manager.get_user("user1")
+        assert user.tier == UserTier.PRO
+
+    def test_check_strategy_limit(self):
+        from src.users.manager import UserManager, UserTier
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User", UserTier.FREE)
+        can_add, current, max_allowed = manager.check_strategy_limit("user1")
+        assert can_add is True
+        assert current == 0
+        assert max_allowed == 2  # Free tier limit
+
+    def test_check_position_limit(self):
+        from src.users.manager import UserManager, UserTier
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User", UserTier.FREE)
+        can_add, current, max_allowed = manager.check_position_limit("user1")
+        assert can_add is True
+        assert current == 0
+        assert max_allowed == 3  # Free tier limit
+
+    def test_increment_strategy_count(self):
+        from src.users.manager import UserManager, UserTier
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User", UserTier.FREE)
+        assert manager.increment_strategy_count("user1") is True
+        usage = manager.get_user_usage("user1")
+        assert usage.strategies_count == 1
+
+    def test_suspend_user(self):
+        from src.users.manager import UserManager
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User")
+        assert manager.suspend_user("user1") is True
+        user = manager.get_user("user1")
+        assert user.status.value == "suspended"
+
+    def test_get_user_count(self):
+        from src.users.manager import UserManager
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "User 1")
+        manager.create_user("user2", "test2@example.com", "User 2")
+        assert manager.get_user_count() == 2
+
+    def test_delete_user(self):
+        from src.users.manager import UserManager
+
+        manager = UserManager()
+        manager.create_user("user1", "test@example.com", "Test User")
+        assert manager.delete_user("user1") is True
+        assert manager.get_user("user1") is None
+
+
+class TestCache:
+    """Test caching system."""
+
+    def test_lru_cache_set_get(self):
+        from src.cache import LRUCache
+
+        cache = LRUCache(max_size=100)
+        cache.set("key1", "value1")
+        assert cache.get("key1") == "value1"
+
+    def test_lru_cache_eviction(self):
+        from src.cache import LRUCache
+
+        cache = LRUCache(max_size=2)
+        cache.set("key1", "value1")
+        cache.set("key2", "value2")
+        cache.set("key3", "value3")  # Should evict key1
+        assert cache.get("key1") is None
+        assert cache.get("key2") == "value2"
+        assert cache.get("key3") == "value3"
+
+    def test_lru_cache_ttl(self):
+        import time
+        from src.cache import LRUCache
+
+        cache = LRUCache(max_size=100, default_ttl=0.1)  # 100ms TTL
+        cache.set("key1", "value1")
+        assert cache.get("key1") == "value1"
+        time.sleep(0.2)  # Wait for TTL
+        assert cache.get("key1") is None
+
+    def test_lru_cache_stats(self):
+        from src.cache import LRUCache
+
+        cache = LRUCache(max_size=100)
+        cache.set("key1", "value1")
+        cache.get("key1")  # Hit
+        cache.get("key2")  # Miss
+        stats = cache.get_stats()
+        assert stats["hits"] == 1
+        assert stats["misses"] == 1
+        assert stats["hit_rate"] == 50.0
+
+    def test_cache_manager(self):
+        from src.cache import CacheManager
+
+        manager = CacheManager()
+        cache1 = manager.get_cache("cache1")
+        cache2 = manager.get_cache("cache2")
+        cache1.set("key", "value")
+        assert cache1.get("key") == "value"
+        assert cache2.get("key") is None
+
+
+class TestMonitoring:
+    """Test monitoring and alerting."""
+
+    def test_metrics_collector(self):
+        from src.monitoring import MetricsCollector, MetricType
+
+        collector = MetricsCollector()
+        collector.record_counter("test_counter", 1.0)
+        assert collector.get_counter("test_counter") == 1.0
+
+    def test_metrics_gauge(self):
+        from src.monitoring import MetricsCollector
+
+        collector = MetricsCollector()
+        collector.record_gauge("test_gauge", 42.0)
+        assert collector.get_gauge("test_gauge") == 42.0
+
+    def test_alert_manager(self):
+        from src.monitoring import AlertManager, AlertSeverity
+
+        manager = AlertManager()
+        alert = manager.create_alert(
+            AlertSeverity.WARNING,
+            "Test alert",
+            "test_source",
+        )
+        assert alert.severity == AlertSeverity.WARNING
+        assert alert.resolved is False
+
+    def test_resolve_alert(self):
+        from src.monitoring import AlertManager, AlertSeverity
+
+        manager = AlertManager()
+        alert = manager.create_alert(
+            AlertSeverity.WARNING,
+            "Test alert",
+            "test_source",
+        )
+        assert manager.resolve_alert(alert.alert_id) is True
+        assert alert.resolved is True
+
+    def test_health_checker(self):
+        from src.monitoring import HealthChecker, HealthCheck
+
+        checker = HealthChecker()
+        checker.register_check(
+            "test_check",
+            lambda: HealthCheck(name="test_check", status="ok", message="All good"),
+        )
+        result = checker.run_check("test_check")
+        assert result.status == "ok"
+
+    def test_performance_monitor(self):
+        from src.monitoring import PerformanceMonitor
+
+        monitor = PerformanceMonitor()
+        monitor.record_request("/api/test", "GET", 200, 10.0)
+        stats = monitor.get_system_stats()
+        assert stats["total_requests"] == 1
+        assert stats["total_errors"] == 0

@@ -5,7 +5,7 @@ import logging
 import random
 import uuid
 from collections.abc import AsyncIterator
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ..core.types import (
     AccountInfo,
@@ -72,7 +72,7 @@ class PaperBroker(Broker):
 
         order.status = OrderStatus.FILLED
         order.filled_price = filled_price
-        order.filled_at = datetime.utcnow()
+        order.filled_at = datetime.now(UTC)
 
         self._orders.append(order)
 
@@ -135,7 +135,7 @@ class PaperBroker(Broker):
                 low=low,
                 close=c,
                 volume=random.uniform(100, 1000),
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(UTC),
             ))
             base = c
         self._prices[symbol] = base
@@ -151,7 +151,7 @@ class PaperBroker(Broker):
                     symbol=symbol,
                     bid=tick - 0.1,
                     ask=tick + 0.1,
-                    timestamp=datetime.utcnow(),
+                    timestamp=datetime.now(UTC),
                 )
             await asyncio.sleep(1)
 

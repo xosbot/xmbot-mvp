@@ -9,17 +9,32 @@ from pydantic import BaseModel
 from ..core.engine import Engine
 from ..core.types import Signal, SignalAction
 from .routes.ai import router as ai_router
+from .routes.ai_advanced import router as ai_advanced_router
 from .routes.config import router as config_router
+from .routes.history import router as history_router
+from .routes.strategies import router as strategies_router
 from .routes.sync import router as sync_router
 from .routes.trading import router as trading_router
+from .routes.websocket import router as ws_router
+from .middleware import RateLimitMiddleware, RequestTrackingMiddleware
 
 log = logging.getLogger("xmbot.api")
 
-app = FastAPI(title="XMBot Engine API", version="0.1.0")
+app = FastAPI(title="XMBot Engine API", version="0.2.0")
+
+# Add middleware
+app.add_middleware(RequestTrackingMiddleware)
+app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
+
+# Include routers
 app.include_router(sync_router)
 app.include_router(config_router)
 app.include_router(ai_router)
+app.include_router(ai_advanced_router)
 app.include_router(trading_router)
+app.include_router(history_router)
+app.include_router(strategies_router)
+app.include_router(ws_router)
 
 engine_ref: Engine | None = None
 _api_key: str = ""
@@ -30,13 +45,26 @@ def init_api(engine: Engine) -> FastAPI:
     engine_ref = engine
     _api_key = engine.config.api_key
     _add_auth_middleware()
+
+    # Initialize strategy registry
+    from ..strategies.registry import StrategyRegistry, load_builtin_strategies
+    from .routes.strategies import init_strategies_api
+
+    registry = StrategyRegistry()
+    load_builtin_strategies(registry)
+    init_strategies_api(registry)
+
     return app
 
 
 def _add_auth_middleware() -> None:
     @app.middleware("http")
     async def auth_middleware(request: Request, call_next):
-        if request.url.path in ("/health", "/docs", "/openapi.json"):
+        # Allow health, docs, and WebSocket endpoints without auth
+        if request.url.path in ("/health", "/docs", "/openapi.json", "/redoc", "/ws/status"):
+            return await call_next(request)
+        # Allow WebSocket upgrade without API key auth (handled by WebSocket)
+        if request.headers.get("upgrade", "").lower() == "websocket":
             return await call_next(request)
         if not _api_key:
             return JSONResponse(status_code=503, content={"detail": "Engine API key not configured"})
