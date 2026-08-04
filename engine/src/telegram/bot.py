@@ -109,10 +109,13 @@ class TelegramBot:
 
     async def start_polling(self, timeout: int = 30) -> None:
         self._running = True
+        # getUpdates blocks for `timeout` seconds on Telegram's side, so our
+        # client read timeout must be longer than that to avoid ReadTimeout.
+        poll_timeout = httpx.Timeout(timeout + 10.0, connect=10.0)
         while self._running:
             try:
                 url = f"https://api.telegram.org/bot{self.token}/getUpdates?offset={self._offset}&timeout={timeout}"
-                resp = await self.client.get(url)
+                resp = await self.client.get(url, timeout=poll_timeout)
                 if not resp.is_success:
                     log.error(f"Polling HTTP {resp.status_code}")
                     await asyncio.sleep(5)
@@ -126,7 +129,7 @@ class TelegramBot:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                log.error(f"Polling error: {e}")
+                log.error(f"Polling error: {type(e).__name__}: {e}")
                 await asyncio.sleep(5)
 
     def stop(self) -> None:
