@@ -9,10 +9,10 @@ log = logging.getLogger("xmbot.persistence")
 
 
 class Persistence:
-    def __init__(self, data_dir: str | None = None) -> None:
+    def __init__(self, data_dir: str | None = None, filename: str = "sync_store.json") -> None:
         self._data_dir = Path(data_dir or os.getenv("DATA_DIR", "./data"))
         self._data_dir.mkdir(parents=True, exist_ok=True)
-        self._file_path = self._data_dir / "sync_store.json"
+        self._file_path = self._data_dir / filename
 
     def load(self) -> dict:
         if not self._file_path.exists():
@@ -20,7 +20,7 @@ class Persistence:
         try:
             return json.loads(self._file_path.read_text())
         except Exception:
-            log.exception("Failed to load sync store from %s", self._file_path)
+            log.exception("Failed to load state from %s", self._file_path)
             return {}
 
     async def save(self, data: dict) -> None:
@@ -29,4 +29,4 @@ class Persistence:
             tmp.write_text(json.dumps(data, indent=2, default=str))
             tmp.replace(self._file_path)
         except Exception:
-            log.exception("Failed to save sync store to %s", self._file_path)
+            log.exception("Failed to save state to %s", self._file_path)

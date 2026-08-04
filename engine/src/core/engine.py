@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from collections.abc import Awaitable, Callable
 from datetime import datetime
 
 from ..agents.base import Agent, AgentStatus
@@ -36,6 +37,7 @@ class Engine:
         risk: RiskEngine,
         signal_bus: SignalBus | None = None,
         ai_registry: AIRegistry | None = None,
+        alert_callback: Callable[[str], Awaitable[None]] | None = None,
     ) -> None:
         self.config = config
         self.broker = broker
@@ -43,6 +45,8 @@ class Engine:
         self.risk = risk
         self.signal_bus = signal_bus or SignalBus()
         self.ai_registry = ai_registry or AIRegistry()
+        self._alert_callback = alert_callback
+        self._last_alert_at: dict[str, datetime] = {}
         self._agents: dict[str, Agent] = {}
         self._user_configs: dict[str, UserConfig] = {}
         self._running = False
@@ -72,6 +76,27 @@ class Engine:
     def register_user(self, config: UserConfig) -> None:
         self._user_configs[config.user_id] = config
         log.info(f"Registered user: {config.user_id}")
+
+    async def _alert(self, text: str) -> None:
+        if not self._alert_callback:
+            return
+        try:
+            await self._alert_callback(text)
+        except Exception:
+            log.exception("Failed to send engine alert")
+
+    async def _alert_throttled(
+        self, key: str, text: str, min_interval_seconds: float = 300
+    ) -> None:
+        """Like _alert, but at most once per `min_interval_seconds` per key —
+        for loops that retry every few seconds, so a sustained outage sends
+        one notification instead of spamming Telegram."""
+        now = datetime.utcnow()
+        last = self._last_alert_at.get(key)
+        if last and (now - last).total_seconds() < min_interval_seconds:
+            return
+        self._last_alert_at[key] = now
+        await self._alert(text)
 
     def update_agent_params(self, agent_name: str, params: dict) -> dict:
         """Push live strategy-parameter overrides to a registered agent.
@@ -211,6 +236,7 @@ class Engine:
 
             except Exception as e:
                 log.error(f"Sync error: {e}")
+                await self._alert_throttled("sync_loop", f"⚠️ Trade sync failing: {e}")
 
             await asyncio.sleep(30)
 
@@ -261,6 +287,9 @@ class Engine:
 
             except Exception as e:
                 log.error(f"Position monitor error: {e}")
+                await self._alert_throttled(
+                    "position_monitor", f"⚠️ Position monitoring failing: {e}"
+                )
 
             await asyncio.sleep(15)
 
@@ -334,7 +363,12 @@ class Engine:
             except asyncio.CancelledError:
                 break
             except Exception as e:
+                was_error = agent.status == AgentStatus.ERROR
                 await agent.on_error(e)
+                if agent.status == AgentStatus.ERROR and not was_error:
+                    await self._alert(
+                        f"⚠️ Agent '{agent.name}' disabled after repeated errors: {e}"
+                    )
                 await asyncio.sleep(5)
 
     async def _fetch_markets(self, agent: Agent) -> list:

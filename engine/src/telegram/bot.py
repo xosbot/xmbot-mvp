@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 import httpx
 
@@ -12,6 +12,7 @@ from ..core.types import Signal, SignalDecision
 log = logging.getLogger("xmbot.telegram")
 
 SignalHandler = Callable[[str, SignalDecision], None]
+StatusProvider = Callable[[], Awaitable[dict]]
 
 
 class TelegramBot:
@@ -23,6 +24,7 @@ class TelegramBot:
         self._decision_handlers: dict[str, list[SignalHandler]] = {}
         self._default_handler: SignalHandler | None = None
         self._pending_callbacks: dict[str, str] = {}
+        self._status_provider: StatusProvider | None = None
         self._client: httpx.AsyncClient | None = None
 
     @property
@@ -41,6 +43,11 @@ class TelegramBot:
 
     def set_default_handler(self, handler: SignalHandler) -> None:
         self._default_handler = handler
+
+    def set_status_provider(self, provider: StatusProvider) -> None:
+        """Provider is called on /status to report real engine state instead
+        of a hardcoded string."""
+        self._status_provider = provider
 
     async def send_message(
         self,
@@ -70,13 +77,13 @@ class TelegramBot:
     async def send_signal(
         self, signal: Signal, user_message: str = ""
     ) -> None:
+        # No "Modify" button: there's no follow-up flow to collect a new
+        # price/SL from a Telegram reply, so it would silently behave like
+        # Approve — worse than not offering the control at all.
         buttons = [
             [
                 {"text": "✅ Approve", "callback_data": f"approve_{signal.id}"},
                 {"text": "❌ Reject", "callback_data": f"reject_{signal.id}"},
-            ],
-            [
-                {"text": "✏️ Modify", "callback_data": f"modify_{signal.id}"},
             ],
         ]
 
@@ -125,6 +132,12 @@ class TelegramBot:
     def stop(self) -> None:
         self._running = False
 
+    def _is_authorized(self, sender_id: str) -> bool:
+        """Fail closed: only the configured owner chat may issue commands or
+        approve/reject signals — checked against the sender, not the chat,
+        so this still holds if the bot is ever added to a group."""
+        return bool(self.chat_id) and sender_id == str(self.chat_id)
+
     def _process_update(self, update: dict) -> None:
         if "callback_query" in update:
             self._handle_callback(update["callback_query"])
@@ -132,6 +145,11 @@ class TelegramBot:
             self._handle_message(update["message"])
 
     def _handle_callback(self, query: dict) -> None:
+        sender_id = str(query.get("from", {}).get("id", ""))
+        if not self._is_authorized(sender_id):
+            log.warning(f"Ignoring Telegram callback from unauthorized sender {sender_id}")
+            return
+
         data = query.get("data", "")
         signal_id = data.split("_", 1)[1] if "_" in data else ""
 
@@ -160,6 +178,10 @@ class TelegramBot:
     def _handle_message(self, message: dict) -> None:
         text = message.get("text", "").strip()
         chat_id = str(message.get("chat", {}).get("id", ""))
+        sender_id = str(message.get("from", {}).get("id", ""))
+
+        if not self._is_authorized(sender_id):
+            return
 
         if not text.startswith("/"):
             return
@@ -187,13 +209,31 @@ class TelegramBot:
         await self.send_message(welcome)
 
     async def _cmd_status(self, chat_id: str) -> None:
+        if not self._status_provider:
+            await self.send_message(
+                "📡 *Bot Status*\n────────────────\nStatus unavailable\n────────────────"
+            )
+            return
+
+        try:
+            data = await self._status_provider()
+        except Exception as e:
+            log.error(f"Status provider error: {e}")
+            await self.send_message("⚠️ Failed to fetch engine status.")
+            return
+
+        engine_state = "Running" if data.get("running") else "Stopped"
+        if data.get("paused"):
+            engine_state += " (paused)"
+
         status = (
             "📡 *Bot Status*\n"
             "────────────────\n"
-            "*Engine:* Running\n"
-            "*Broker:* Paper Trading\n"
-            "*Symbol:* XAUUSD\n"
-            "*Timeframe:* M5\n"
+            f"*Engine:* {engine_state}\n"
+            f"*Broker:* {data.get('broker', 'unknown')} "
+            f"({'connected' if data.get('broker_connected') else 'disconnected'})\n"
+            f"*Open Positions:* {data.get('open_positions', 0)}\n"
+            f"*Pending Signals:* {data.get('pending_signals', 0)}\n"
             "────────────────"
         )
         await self.send_message(status)

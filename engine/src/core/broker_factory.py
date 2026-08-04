@@ -13,6 +13,7 @@ def create_broker(config: EngineConfig, broker_type: str) -> Broker:
         return BinanceBroker(
             api_key=config.binance_api_key,
             api_secret=config.binance_api_secret,
+            testnet=config.binance_testnet,
         )
     if broker_type == "mt5":
         return MT5Broker(

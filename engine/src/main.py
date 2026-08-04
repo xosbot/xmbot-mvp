@@ -83,7 +83,7 @@ def setup_agents(engine: Engine, ai_registry: AIRegistry) -> None:
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="XMBot Engine")
-    parser.add_argument("--broker", choices=["paper", "mt5", "binance"], default="paper")
+    parser.add_argument("--broker", choices=["paper", "mt5", "binance", "ibkr"], default="paper")
     parser.add_argument("--config", type=str, help="Path to config JSON")
     parser.add_argument("--data-dir", type=str, help="Data directory for persistence")
     args = parser.parse_args()
@@ -114,12 +114,20 @@ async def main() -> None:
         notify_callback=telegram.send_signal if config.telegram_token else None,
     )
 
+    risk_persistence = Persistence(data_dir=args.data_dir, filename="risk_state.json")
     risk = RiskEngine(
         global_max_daily_loss=config.global_max_daily_loss,
         global_max_positions=config.global_max_positions,
+        persistence=risk_persistence,
     )
 
-    engine = Engine(config=config, broker=broker, gate=gate, risk=risk)
+    engine = Engine(
+        config=config,
+        broker=broker,
+        gate=gate,
+        risk=risk,
+        alert_callback=telegram.send_alert if config.telegram_token else None,
+    )
     init_api(engine)
     init_trading_api(engine)
 
@@ -139,6 +147,20 @@ async def main() -> None:
         max_drawdown_percent=20.0,
         max_position_size=0.1,
     ))
+
+    async def get_status() -> dict:
+        connected = await engine.broker.is_connected()
+        positions = await engine.broker.get_positions()
+        return {
+            "running": engine.running,
+            "paused": engine.paused,
+            "broker": engine.config.default_broker,
+            "broker_connected": connected,
+            "open_positions": len(positions),
+            "pending_signals": engine.gate.pending_count,
+        }
+
+    telegram.set_status_provider(get_status)
 
     if config.telegram_token:
         telegram.set_default_handler(
@@ -165,7 +187,12 @@ async def main() -> None:
     try:
         await server.serve()
     finally:
+        pending = gate.pending_count
         await engine.stop()
+        if pending and config.telegram_token:
+            await telegram.send_alert(
+                f"Engine shutting down — {pending} pending signal(s) cancelled."
+            )
         await telegram.close()
         log.info("Engine shut down")
 

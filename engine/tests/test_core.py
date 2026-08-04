@@ -12,12 +12,14 @@ from src.broker.paper import PaperBroker
 from src.broker.ibkr import IBKRBroker
 from src.core.broker_factory import create_broker
 from src.agents.technical import TechnicalAnalysisAgent
+from src.agents.base import AgentStatus
 from src.core.engine import Engine
 from src.core.config import EngineConfig
 from src.gate.human_gate import HumanGate
 from src.telegram.bot import TelegramBot
 from src.ai.base import AIProvider, AIResponse
 from src.ai.registry import AIRegistry
+from src.core.persistence import Persistence
 
 
 class TestRiskEngine:
@@ -115,6 +117,54 @@ class TestRiskEngine:
         assert verdict == RiskVerdict.PASS
 
 
+class TestRiskEnginePersistence:
+    """Daily risk counters must survive a process restart — previously they
+    were in-memory only, so every redeploy silently reset the loss circuit
+    breaker to zero."""
+
+    @pytest.mark.asyncio
+    async def test_daily_pnl_survives_restart(self, tmp_path):
+        persistence = Persistence(data_dir=str(tmp_path), filename="risk_state.json")
+        risk1 = RiskEngine(persistence=persistence)
+        await risk1.record_pnl("test_user", -300.0)
+        await risk1.record_trade(Order(
+            id="o1", signal_id="s1", action=SignalAction.BUY, market="PAXGUSDT",
+            volume=0.1, price=3000.0, stop_loss=2990.0, user_id="test_user",
+        ))
+
+        risk2 = RiskEngine(persistence=persistence)
+        stats = risk2.get_daily_stats("test_user")
+        assert stats["daily_pnl"] == -300.0
+        assert stats["daily_trades"] == 1
+
+    @pytest.mark.asyncio
+    async def test_stale_daily_state_not_restored_across_day_boundary(self, tmp_path):
+        persistence = Persistence(data_dir=str(tmp_path), filename="risk_state.json")
+        await persistence.save({
+            "date": "2000-01-01",
+            "daily_pnl": {"test_user": -9999.0},
+            "daily_trades": {"test_user": 50},
+            "peak_balance": {"test_user": 5000.0},
+        })
+
+        risk = RiskEngine(persistence=persistence)
+        stats = risk.get_daily_stats("test_user")
+        assert stats["daily_pnl"] == 0.0
+        assert stats["daily_trades"] == 0
+        # Peak balance is an all-time high-water mark, not a daily counter —
+        # it should survive regardless of the saved date.
+        assert stats["peak_balance"] == 5000.0
+
+    @pytest.mark.asyncio
+    async def test_peak_balance_survives_restart(self, tmp_path):
+        persistence = Persistence(data_dir=str(tmp_path), filename="risk_state.json")
+        risk1 = RiskEngine(persistence=persistence)
+        await risk1.check_drawdown("test_user", 8500.0, 15.0)
+
+        risk2 = RiskEngine(persistence=persistence)
+        assert risk2.get_daily_stats("test_user")["peak_balance"] == 8500.0
+
+
 class TestPaperBroker:
     @pytest.fixture
     def broker(self):
@@ -156,6 +206,16 @@ class TestPaperBroker:
         data = await broker.get_market_data("PAXGUSDT", "M5", 50)
         assert len(data) == 50
         assert data[0].symbol == "PAXGUSDT"
+
+
+class TestBinanceBrokerFactory:
+    def test_default_broker_targets_production_api(self):
+        broker = create_broker(EngineConfig(binance_testnet=False), "binance")
+        assert broker._get_base_url() == "https://api.binance.com"
+
+    def test_testnet_flag_targets_testnet_api(self):
+        broker = create_broker(EngineConfig(binance_testnet=True), "binance")
+        assert broker._get_base_url() == "https://testnet.binance.vision"
 
 
 class TestIBKRBroker:
@@ -222,6 +282,82 @@ class TestTechnicalAgent:
     def test_update_params_rejects_bad_value(self, agent):
         with pytest.raises(ValueError):
             agent.update_params(adx_threshold="not-a-number")
+
+
+class TestEngineErrorAlerting:
+    """Repeated agent/loop errors used to degrade silently — no Telegram
+    alert was ever sent, so a broker outage would only surface via logs."""
+
+    @pytest.mark.asyncio
+    async def test_agent_error_threshold_triggers_one_alert(self, monkeypatch):
+        real_sleep = asyncio.sleep
+        monkeypatch.setattr(asyncio, "sleep", lambda *_args: real_sleep(0))
+
+        alerts = []
+
+        async def fake_alert(text):
+            alerts.append(text)
+
+        config = EngineConfig(tick_interval_seconds=0.001, candle_interval_seconds=0.001)
+        engine = Engine(
+            config=config,
+            broker=PaperBroker(),
+            gate=HumanGate(),
+            risk=RiskEngine(),
+            alert_callback=fake_alert,
+        )
+
+        fake_agent = MagicMock()
+        fake_agent.name = "fake"
+        fake_agent.config.confirmation_timeframe = None
+        fake_agent.config.markets = ["XAUUSD"]
+        fake_agent.status = AgentStatus.IDLE
+        fake_agent.analyze = AsyncMock(side_effect=RuntimeError("boom"))
+        fake_agent._error_count = 0
+
+        async def fake_on_error(error):
+            fake_agent._error_count += 1
+            if fake_agent._error_count > 10:
+                fake_agent.status = AgentStatus.ERROR
+
+        fake_agent.on_error = fake_on_error
+
+        engine._running = True
+        task = asyncio.create_task(engine._agent_loop(fake_agent))
+        for _ in range(500):
+            if alerts:
+                break
+            await real_sleep(0)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+        assert len(alerts) == 1
+        assert "disabled after repeated errors" in alerts[0]
+
+    @pytest.mark.asyncio
+    async def test_alert_throttled_fires_once_per_window(self):
+        alerts = []
+
+        async def fake_alert(text):
+            alerts.append(text)
+
+        engine = Engine(
+            config=EngineConfig(),
+            broker=PaperBroker(),
+            gate=HumanGate(),
+            risk=RiskEngine(),
+            alert_callback=fake_alert,
+        )
+
+        await engine._alert_throttled("k", "first", min_interval_seconds=300)
+        await engine._alert_throttled("k", "second", min_interval_seconds=300)
+
+        assert alerts == ["first"]
+
+    @pytest.mark.asyncio
+    async def test_alert_is_noop_without_callback(self):
+        engine = Engine(config=EngineConfig(), broker=PaperBroker(), gate=HumanGate(), risk=RiskEngine())
+        await engine._alert("no callback configured")  # must not raise
 
 
 class TestEnginePauseResume:
@@ -392,6 +528,128 @@ class TestSignalNotification:
         await bot.send_signal(signal)
 
         assert "Trade Signal" in sent["text"]
+
+    @pytest.mark.asyncio
+    async def test_send_signal_has_no_modify_button(self, monkeypatch):
+        """The Modify button had no follow-up flow to collect a new price/SL,
+        so tapping it silently behaved like Approve — removed rather than left
+        misleading."""
+        bot = TelegramBot(token="fake-token", chat_id="fake-chat")
+        sent = {}
+
+        async def fake_send_message(text, buttons=None, parse_mode="Markdown"):
+            sent["buttons"] = buttons
+            return True
+
+        monkeypatch.setattr(bot, "send_message", fake_send_message)
+
+        signal = Signal(
+            id="sig-3",
+            action=SignalAction.BUY,
+            market="XAUUSD",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="technical",
+            reason="RSI oversold bounce",
+        )
+        await bot.send_signal(signal)
+
+        button_texts = [btn["text"] for row in sent["buttons"] for btn in row]
+        assert "✅ Approve" in button_texts
+        assert "❌ Reject" in button_texts
+        assert not any("Modify" in t for t in button_texts)
+
+
+class TestTelegramSenderVerification:
+    """A public bot (can_join_groups=True) handling live trade approvals
+    must not act on callbacks/commands from anyone but the configured
+    owner chat."""
+
+    def test_callback_from_owner_is_processed(self):
+        bot = TelegramBot(token="fake-token", chat_id="12345")
+        received = []
+        bot.set_default_handler(lambda signal_id, decision: received.append((signal_id, decision)))
+
+        bot._handle_callback({
+            "data": "approve_sig-1",
+            "from": {"id": 12345},
+            "message": {"chat": {"id": 12345}},
+        })
+
+        assert received == [("sig-1", SignalDecision.APPROVED)]
+
+    def test_callback_from_stranger_is_ignored(self):
+        bot = TelegramBot(token="fake-token", chat_id="12345")
+        received = []
+        bot.set_default_handler(lambda signal_id, decision: received.append((signal_id, decision)))
+
+        bot._handle_callback({
+            "data": "approve_sig-1",
+            "from": {"id": 99999},
+            "message": {"chat": {"id": 99999}},
+        })
+
+        assert received == []
+
+    def test_callback_ignored_when_chat_id_unconfigured(self):
+        """Fail closed: an unset owner chat_id must never mean allow-all."""
+        bot = TelegramBot(token="fake-token", chat_id="")
+        received = []
+        bot.set_default_handler(lambda signal_id, decision: received.append((signal_id, decision)))
+
+        bot._handle_callback({
+            "data": "approve_sig-1",
+            "from": {"id": 12345},
+            "message": {"chat": {"id": 12345}},
+        })
+
+        assert received == []
+
+
+class TestTelegramStatusCommand:
+    @pytest.mark.asyncio
+    async def test_status_reports_real_engine_state(self, monkeypatch):
+        bot = TelegramBot(token="fake-token", chat_id="fake-chat")
+        sent = {}
+
+        async def fake_send_message(text, buttons=None, parse_mode="Markdown"):
+            sent["text"] = text
+            return True
+
+        monkeypatch.setattr(bot, "send_message", fake_send_message)
+
+        async def status_provider():
+            return {
+                "running": True,
+                "paused": False,
+                "broker": "binance",
+                "broker_connected": True,
+                "open_positions": 2,
+                "pending_signals": 1,
+            }
+
+        bot.set_status_provider(status_provider)
+        await bot._cmd_status("fake-chat")
+
+        assert "Running" in sent["text"]
+        assert "binance" in sent["text"]
+        assert "connected" in sent["text"]
+        assert "Open Positions:* 2" in sent["text"]
+
+    @pytest.mark.asyncio
+    async def test_status_without_provider_reports_unavailable(self, monkeypatch):
+        bot = TelegramBot(token="fake-token", chat_id="fake-chat")
+        sent = {}
+
+        async def fake_send_message(text, buttons=None, parse_mode="Markdown"):
+            sent["text"] = text
+            return True
+
+        monkeypatch.setattr(bot, "send_message", fake_send_message)
+        await bot._cmd_status("fake-chat")
+
+        assert "unavailable" in sent["text"]
 
 
 class _FakeAIProvider(AIProvider):

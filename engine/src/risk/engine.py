@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
+from ..core.persistence import Persistence
 from ..core.types import (
     Order,
     RiskVerdict,
@@ -14,18 +15,59 @@ log = logging.getLogger("xmbot.risk")
 
 
 class RiskEngine:
-    def __init__(self, global_max_daily_loss: float = 10000.0, global_max_positions: int = 20) -> None:
+    def __init__(
+        self,
+        global_max_daily_loss: float = 10000.0,
+        global_max_positions: int = 20,
+        persistence: Persistence | None = None,
+    ) -> None:
         self._global_max_daily_loss = global_max_daily_loss
         self._global_max_positions = global_max_positions
+        self._persistence = persistence
         self._daily_pnl: dict[str, float] = {}
         self._daily_trades: dict[str, int] = {}
         self._peak_balance: dict[str, float] = {}
         self._last_reset: datetime | None = datetime.now(UTC)
+        self._load_state()
+
+    def _load_state(self) -> None:
+        """Restore risk counters saved before a restart, so the daily-loss
+        circuit breaker survives a redeploy instead of silently resetting."""
+        if not self._persistence:
+            return
+        data = self._persistence.load()
+        if not data:
+            return
+
+        saved_date = data.get("date")
+        today = datetime.now(UTC).date().isoformat()
+        if saved_date == today:
+            self._daily_pnl = dict(data.get("daily_pnl", {}))
+            self._daily_trades = dict(data.get("daily_trades", {}))
+            log.info(
+                f"Risk: restored daily state from {saved_date} ({len(self._daily_pnl)} user(s))"
+            )
+        # Peak balance is an all-time high-water mark for drawdown checks,
+        # not a daily counter — restore it regardless of the saved date.
+        self._peak_balance = dict(data.get("peak_balance", {}))
+
+    async def _save_state(self) -> None:
+        if not self._persistence:
+            return
+        await self._persistence.save(
+            {
+                "date": datetime.now(UTC).date().isoformat(),
+                "daily_pnl": self._daily_pnl,
+                "daily_trades": self._daily_trades,
+                "peak_balance": self._peak_balance,
+            }
+        )
 
     async def check_signal(
         self, signal: Signal, user_config: UserConfig, open_position_count: int = 0
     ) -> RiskVerdict:
-        self._maybe_reset_daily()
+        if self._maybe_reset_daily():
+            await self._save_state()
 
         if not await self._check_global_limits(open_position_count):
             return RiskVerdict.BLOCK
@@ -38,12 +80,14 @@ class RiskEngine:
     async def record_trade(self, order: Order) -> None:
         self._daily_trades.setdefault(order.user_id, 0)
         self._daily_trades[order.user_id] += 1
+        await self._save_state()
 
     async def record_pnl(self, user_id: str, pnl: float) -> None:
         """Called when a position closes to update daily PnL tracking."""
         self._daily_pnl.setdefault(user_id, 0.0)
         self._daily_pnl[user_id] += pnl
         log.info(f"Risk: Recorded PnL for {user_id}: {pnl:+.2f} (daily total: {self._daily_pnl[user_id]:+.2f})")
+        await self._save_state()
 
     async def check_drawdown(self, user_id: str, current_balance: float, max_drawdown_percent: float = 15.0) -> bool:
         """Check if max drawdown is exceeded. Returns True if limit breached."""
@@ -51,6 +95,7 @@ class RiskEngine:
         if current_balance >= peak:
             self._peak_balance[user_id] = current_balance
             peak = current_balance
+            await self._save_state()
 
         if peak <= 0:
             return False
@@ -80,13 +125,15 @@ class RiskEngine:
             "peak_balance": self._peak_balance.get(user_id, 0.0),
         }
 
-    def _maybe_reset_daily(self) -> None:
+    def _maybe_reset_daily(self) -> bool:
         now = datetime.now(UTC)
         if self._last_reset is None or now.date() > self._last_reset.date():
             log.info("Risk: Daily reset — clearing PnL and trade counters")
             self._daily_pnl.clear()
             self._daily_trades.clear()
             self._last_reset = now
+            return True
+        return False
 
     async def _check_global_limits(self, open_position_count: int) -> bool:
         if open_position_count >= self._global_max_positions:
