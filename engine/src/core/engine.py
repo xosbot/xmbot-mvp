@@ -15,6 +15,7 @@ from ..risk.engine import RiskEngine
 from .config import EngineConfig
 from .session import get_session_name, is_active_session
 from .signal_bus import SignalBus
+from .instruments import get_contract_size, get_instrument
 from .types import (
     Order,
     OrderStatus,
@@ -255,9 +256,26 @@ class Engine:
                             user_id, account.balance, user_config.max_drawdown_percent
                         )
                         if drawdown_breached:
-                            log.warning(f"Drawdown limit breached — pausing new trades for {user_id}")
+                            log.warning(
+                                f"Drawdown limit breached — flattening all positions "
+                                f"and pausing engine for {user_id}"
+                            )
+                            # Flatten all open positions (real exchange orders)
                             for pos in positions:
-                                await self.broker.cancel_order(pos.id)
+                                try:
+                                    await self.broker.cancel_order(pos.id)
+                                    await self.risk.record_pnl(user_id, 0)  # realized at market
+                                except Exception as e:
+                                    log.error(f"Failed to flatten position {pos.id}: {e}")
+
+                            # Pause engine to block new trades
+                            self.pause()
+                            await self._alert(
+                                f"🛑 *Drawdown Limit Breached*\n"
+                                f"Balance: ${account.balance:.2f}\n"
+                                f"All positions flattened. Engine paused."
+                            )
+                            continue  # skip trailing-stop logic this tick
 
                 for pos in positions:
                     entry_atr = self._position_atr.get(pos.id)
@@ -407,7 +425,7 @@ class Engine:
             signal_id=signal.id,
             action=signal.action,
             market=signal.market,
-            volume=self._calculate_volume(signal, user_config),
+            volume=await self._calculate_volume(signal, user_config),
             price=signal.entry_price,
             stop_loss=signal.stop_loss,
             take_profit=signal.take_profit,
@@ -452,19 +470,31 @@ class Engine:
 
         return message
 
-    def _calculate_volume(self, signal: Signal, config: UserConfig) -> float:
-        """Risk-based position sizing: risk X% of account per trade."""
-        risk_percent = 0.02  # Risk 2% per trade
-        account_balance = self._account_balance
+    async def _calculate_volume(self, signal: Signal, config: UserConfig) -> float:
+        """Risk-based position sizing: risk X% of account per trade.
+
+        Fetches live balance from the broker instead of using stale cached
+        value, so position size always reflects actual account equity.
+        """
+        risk_percent = config.risk_per_trade_pct / 100 if hasattr(config, 'risk_per_trade_pct') else 0.02
+
+        # Fetch live balance from broker
+        account = await self.broker.get_account()
+        if account and account.balance > 0:
+            account_balance = account.balance
+        else:
+            # Fallback to cached balance if broker unavailable
+            account_balance = self._account_balance
+
         risk_amount = account_balance * risk_percent
 
         price_risk = abs(signal.entry_price - signal.stop_loss)
         if price_risk <= 0:
             return min(0.01, config.max_position_size)
 
-        # For XAUUSD: 1 lot = 100 oz, point = $0.01
-        # Risk per lot = price_risk * 100
-        risk_per_lot = price_risk * 100
+        # Instrument-specific contract size from registry
+        contract_size = get_contract_size(signal.market)
+        risk_per_lot = price_risk * contract_size
         if risk_per_lot <= 0:
             return min(0.01, config.max_position_size)
 

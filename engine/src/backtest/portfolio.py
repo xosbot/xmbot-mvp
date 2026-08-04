@@ -125,13 +125,19 @@ class BacktestPortfolio:
         self._open_trade: BacktestTrade | None = None
         self._position_size: float = 0.0
 
-    def open_trade(self, signal: Signal, timestamp: datetime) -> bool:
-        """Open a new trade from a signal."""
+    def open_trade(self, signal: Signal, entry_price: float, timestamp: datetime) -> bool:
+        """Open a new trade from a signal.
+
+        Args:
+            signal: The trade signal from the agent.
+            entry_price: Actual execution price (e.g. next candle open).
+            timestamp: Execution timestamp.
+        """
         if self._open_trade is not None:
             return False  # Already in a trade
 
         risk_amount = self.capital * self.risk_per_trade
-        price_risk = abs(signal.entry_price - signal.stop_loss)
+        price_risk = abs(entry_price - signal.stop_loss)
         if price_risk <= 0:
             return False
 
@@ -142,7 +148,7 @@ class BacktestPortfolio:
         self._open_trade = BacktestTrade(
             signal=signal,
             entry_time=timestamp,
-            entry_price=signal.entry_price,
+            entry_price=entry_price,
             volume=volume,
         )
         self._position_size = volume

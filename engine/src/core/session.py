@@ -1,82 +1,92 @@
-"""Trading session filter for XAUUSD.
+"""Trading session filter — instrument-aware.
 
-Gold (XAUUSD) has specific active sessions with good liquidity:
-- London: 07:00 - 16:00 UTC
-- New York: 12:00 - 21:00 UTC
-- Best liquidity: London-NY overlap (12:00 - 16:00 UTC)
+Default behaviour targets XAUUSD (London/NY sessions).  When an instrument
+symbol is provided, sessions are read from the instrument registry so that
+the same engine code works for forex, crypto, and other asset classes.
 
-Avoid trading during low-volume Asian session (21:00 - 07:00 UTC).
+Gold (XAUUSD) active sessions (UTC):
+- London:       07:00 - 16:00
+- New York:     12:00 - 21:00
+- Best liquidity: London-NY overlap (12:00 - 16:00)
 """
 from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
 
+from .instruments import get_sessions, is_session_active as _registry_active
+
 log = logging.getLogger("xmbot.session")
 
-# XAUUSD active sessions (UTC hours)
+# XAUUSD defaults (used when no instrument is specified)
 LONDON_START = 7
 LONDON_END = 16
 NEW_YORK_START = 12
 NEW_YORK_END = 21
 
-# Minimum ADX during off-peak sessions (higher threshold to filter noise)
 OFF_PEAK_ADX_BONUS = 5.0
 
 
 def is_london_active(now: datetime | None = None) -> bool:
-    """Check if London session is active."""
     if now is None:
         now = datetime.now(UTC)
-    hour = now.hour
-    return LONDON_START <= hour < LONDON_END
+    return LONDON_START <= now.hour < LONDON_END
 
 
 def is_new_york_active(now: datetime | None = None) -> bool:
-    """Check if New York session is active."""
     if now is None:
         now = datetime.now(UTC)
-    hour = now.hour
-    return NEW_YORK_START <= hour < NEW_YORK_END
+    return NEW_YORK_START <= now.hour < NEW_YORK_END
 
 
 def is_overlap_active(now: datetime | None = None) -> bool:
-    """Check if London-NY overlap (best liquidity) is active."""
     if now is None:
         now = datetime.now(UTC)
-    hour = now.hour
-    return NEW_YORK_START <= hour < LONDON_END  # 12:00 - 16:00 UTC
+    return NEW_YORK_START <= now.hour < LONDON_END
 
 
-def is_active_session(now: datetime | None = None) -> bool:
-    """Check if any major session is active (London or New York)."""
-    if now is None:
-        now = datetime.now(UTC)
-    hour = now.hour
-    return LONDON_START <= hour < NEW_YORK_END  # 07:00 - 21:00 UTC
+def is_active_session(now: datetime | None = None, symbol: str = "XAUUSD") -> bool:
+    """Check if *now* falls within an active trading session for *symbol*.
 
-
-def get_session_name(now: datetime | None = None) -> str:
-    """Get the name of the current active session."""
+    If the instrument has no session configuration (e.g. crypto) or is
+    unknown, returns True (always active).
+    """
     if now is None:
         now = datetime.now(UTC)
 
-    if is_overlap_active(now):
+    # Try instrument-aware check first
+    spec_sessions = get_sessions(symbol)
+    if spec_sessions:
+        return _registry_active(symbol, now.hour)
+
+    # Fallback to XAUUSD defaults
+    return LONDON_START <= now.hour < NEW_YORK_END
+
+
+def get_session_name(now: datetime | None = None, symbol: str = "XAUUSD") -> str:
+    if now is None:
+        now = datetime.now(UTC)
+
+    if is_overlap_active(now) and symbol.upper() in ("XAUUSD", "XAU/USD"):
         return "London-NY Overlap"
     elif is_london_active(now):
         return "London"
     elif is_new_york_active(now):
         return "New York"
     else:
-        return "Off-Peak (Asian)"
+        sessions = get_sessions(symbol)
+        if sessions:
+            names = [n.title() for n in sessions]
+            return f"Sessions: {', '.join(names)}"
+        return "Off-Peak"
 
 
-def get_session_adx_threshold(base_threshold: float, now: datetime | None = None) -> float:
-    """Get ADX threshold adjusted for current session.
-
-    During off-peak sessions, require higher ADX to filter noise.
-    """
-    if is_active_session(now):
+def get_session_adx_threshold(
+    base_threshold: float,
+    now: datetime | None = None,
+    symbol: str = "XAUUSD",
+) -> float:
+    """Higher ADX required during off-peak sessions to filter noise."""
+    if is_active_session(now, symbol):
         return base_threshold
-    else:
-        return base_threshold + OFF_PEAK_ADX_BONUS
+    return base_threshold + OFF_PEAK_ADX_BONUS

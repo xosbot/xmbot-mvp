@@ -69,6 +69,14 @@ class BacktestEngine:
         """Run backtest on historical data.
 
         Uses a rolling window of 100 candles for analysis.
+
+        Timing alignment: the agent's ``analyze_with_confirmation`` reads
+        ``df.iloc[-2]`` (signal candle) and ``df.iloc[-3]`` (previous candle)
+        to detect a Supertrend flip or RSI crossover.  We include candle `i`
+        in the window so that ``iloc[-2]`` = candle `i-1` — the last *closed*
+        candle before the current one.  The trade then executes at candle `i`
+        open, matching live behaviour where a signal at candle close executes
+        at the next candle open.
         """
         if len(market_data) < 100:
             log.error(f"Not enough data: {len(market_data)} candles (need 100)")
@@ -77,10 +85,12 @@ class BacktestEngine:
         self.portfolio = BacktestPortfolio(start_capital, self.agent.risk_per_trade_pct / 100)
 
         for i in range(100, len(market_data)):
-            window = market_data[i - 100:i]
+            # Include candle i so iloc[-2] = candle i-1 (last closed),
+            # iloc[-1] = candle i (current, for indicator calculation only).
+            window = market_data[i - 99:i + 1]
             current = market_data[i]
 
-            # Check for exit on current candle
+            # Check for exit on current candle before opening new trades
             if self.portfolio._open_trade is not None:
                 self.portfolio.check_exit(
                     current.close,
@@ -94,12 +104,12 @@ class BacktestEngine:
             if signal is None:
                 continue
 
-            # Open trade
-            success = self.portfolio.open_trade(signal, current.timestamp)
+            # Open trade at current candle open (next candle after signal)
+            success = self.portfolio.open_trade(signal, current.open, current.timestamp)
             if success:
                 log.debug(
                     f"[{current.timestamp}] {signal.action.value} "
-                    f"@ {signal.entry_price:.2f} SL={signal.stop_loss:.2f}"
+                    f"@ {current.open:.2f} SL={signal.stop_loss:.2f}"
                 )
 
         # Close any remaining open position at last price
