@@ -278,6 +278,226 @@ class TestBinanceOrderFillPrice:
         assert result.filled_price == pytest.approx(4061.24)
 
 
+class TestBinanceProtectiveOrders:
+    """cancel_order()/modify_position() previously only touched local
+    bookkeeping — a "closed" position stayed open on the real exchange, and
+    trailing-stop updates never moved the real stop. Also: a filled MARKET
+    entry had no stop-loss enforcement on Binance at all (unlike the paper
+    broker, which simulates SL/TP hits itself). Verified live against
+    Binance Testnet: real OCO placement, real cancellation, real fill-price
+    parsing."""
+
+    def _make_broker(self, monkeypatch, router):
+        broker = BinanceBroker(api_key="k", api_secret="s", testnet=True)
+
+        async def fake_request(method, path, params=None, signed=False):
+            return router(method, path, params or {})
+
+        monkeypatch.setattr(broker, "_request", fake_request)
+        return broker
+
+    @pytest.mark.asyncio
+    async def test_place_order_attaches_oco_when_take_profit_set(self, monkeypatch):
+        calls = []
+
+        def router(method, path, params):
+            calls.append((method, path, params))
+            if path == "/api/v3/order":
+                return {"orderId": 1, "executedQty": "0.1", "cummulativeQuoteQty": "406.0"}
+            if path == "/api/v3/orderList/oco":
+                return {"orderListId": 999}
+            raise AssertionError(f"unexpected call: {method} {path}")
+
+        broker = self._make_broker(monkeypatch, router)
+        order = Order(
+            id="o1", signal_id="s1", action=SignalAction.BUY, market="PAXGUSDT",
+            volume=0.1, price=4060.0, stop_loss=4040.0, take_profit=4100.0,
+        )
+        result = await broker.place_order(order)
+
+        assert result.success
+        oco_calls = [c for c in calls if c[1] == "/api/v3/orderList/oco"]
+        assert len(oco_calls) == 1
+        _, _, oco_params = oco_calls[0]
+        assert oco_params["side"] == "SELL"  # closes a BUY
+        assert oco_params["aboveType"] == "LIMIT_MAKER"
+        assert oco_params["belowType"] == "STOP_LOSS_LIMIT"
+        assert broker._protective_orders["o1"] == 999
+        assert broker._protective_is_oco["o1"] is True
+
+    @pytest.mark.asyncio
+    async def test_place_order_attaches_plain_stop_when_no_take_profit(self, monkeypatch):
+        calls = []
+
+        def router(method, path, params):
+            calls.append((method, path, params))
+            if params.get("type") == "MARKET":
+                return {"orderId": 1, "executedQty": "0.1", "cummulativeQuoteQty": "406.0"}
+            if params.get("type") == "STOP_LOSS_LIMIT":
+                return {"orderId": 42}
+            raise AssertionError(f"unexpected call: {method} {path} {params}")
+
+        broker = self._make_broker(monkeypatch, router)
+        order = Order(
+            id="o2", signal_id="s1", action=SignalAction.BUY, market="PAXGUSDT",
+            volume=0.1, price=4060.0, stop_loss=4040.0,
+        )
+        result = await broker.place_order(order)
+
+        assert result.success
+        assert broker._protective_orders["o2"] == 42
+        assert broker._protective_is_oco["o2"] is False
+
+    @pytest.mark.asyncio
+    async def test_place_order_skips_protective_order_without_stop_loss(self, monkeypatch):
+        def router(method, path, params):
+            return {"orderId": 1, "executedQty": "0.1", "cummulativeQuoteQty": "406.0"}
+
+        broker = self._make_broker(monkeypatch, router)
+        order = Order(
+            id="o3", signal_id="s1", action=SignalAction.BUY, market="PAXGUSDT",
+            volume=0.1, price=4060.0, stop_loss=0,
+        )
+        await broker.place_order(order)
+
+        assert "o3" not in broker._protective_orders
+
+    @pytest.mark.asyncio
+    async def test_cancel_order_cancels_protective_order_and_flattens(self, monkeypatch):
+        calls = []
+
+        def router(method, path, params):
+            calls.append((method, path, params))
+            if method == "DELETE":
+                return {"orderListId": 999}
+            return {"orderId": 2, "executedQty": "0.1", "cummulativeQuoteQty": "410.0"}
+
+        broker = self._make_broker(monkeypatch, router)
+        broker._positions["o1"] = Position(
+            id="o1", symbol="PAXGUSDT", direction=SignalAction.BUY, volume=0.1,
+            entry_price=4060.0, current_price=4060.0, stop_loss=4040.0,
+        )
+        broker._protective_orders["o1"] = 999
+        broker._protective_is_oco["o1"] = True
+
+        closed = await broker.cancel_order("o1")
+
+        assert closed is True
+        assert "o1" not in broker._positions
+        assert "o1" not in broker._protective_orders
+        delete_calls = [c for c in calls if c[0] == "DELETE"]
+        assert delete_calls == [("DELETE", "/api/v3/orderList", {"symbol": "PAXGUSDT", "orderListId": 999})]
+        market_calls = [c for c in calls if c[2].get("side") == "SELL" and c[2].get("type") == "MARKET"]
+        assert len(market_calls) == 1
+
+    @pytest.mark.asyncio
+    async def test_cancel_order_returns_false_for_unknown_position(self, monkeypatch):
+        broker = self._make_broker(monkeypatch, lambda *a: {})
+        assert await broker.cancel_order("nonexistent") is False
+
+    @pytest.mark.asyncio
+    async def test_modify_position_cancels_and_replaces_protective_order(self, monkeypatch):
+        calls = []
+
+        def router(method, path, params):
+            calls.append((method, path, params))
+            if method == "DELETE":
+                return {"orderListId": 999}
+            return {"orderId": 3}
+
+        broker = self._make_broker(monkeypatch, router)
+        broker._positions["o1"] = Position(
+            id="o1", symbol="PAXGUSDT", direction=SignalAction.BUY, volume=0.1,
+            entry_price=4060.0, current_price=4070.0, stop_loss=4040.0,
+        )
+        broker._protective_orders["o1"] = 999
+        broker._protective_is_oco["o1"] = True
+
+        updated = await broker.modify_position("o1", stop_loss=4055.0)
+
+        assert updated is True
+        assert broker._positions["o1"].stop_loss == 4055.0
+        delete_calls = [c for c in calls if c[0] == "DELETE"]
+        assert len(delete_calls) == 1
+        new_stop_calls = [c for c in calls if c[1] == "/api/v3/order" and c[2].get("type") == "STOP_LOSS_LIMIT"]
+        assert len(new_stop_calls) == 1
+        assert new_stop_calls[0][2]["stopPrice"] == "4055.00"
+
+    @pytest.mark.asyncio
+    async def test_modify_position_returns_false_for_unknown_position(self, monkeypatch):
+        broker = self._make_broker(monkeypatch, lambda *a: {})
+        assert await broker.modify_position("nonexistent", stop_loss=100.0) is False
+
+    @pytest.mark.asyncio
+    async def test_get_positions_reconciles_closed_protective_order(self, monkeypatch):
+        def router(method, path, params):
+            if path == "/api/v3/order":
+                return {"status": "FILLED"}
+            raise AssertionError(f"unexpected call: {method} {path}")
+
+        broker = self._make_broker(monkeypatch, router)
+        broker._positions["o1"] = Position(
+            id="o1", symbol="PAXGUSDT", direction=SignalAction.BUY, volume=0.1,
+            entry_price=4060.0, current_price=4060.0, stop_loss=4040.0,
+        )
+        broker._protective_orders["o1"] = 42
+        broker._protective_is_oco["o1"] = False
+
+        positions = await broker.get_positions()
+
+        assert positions == []
+        assert "o1" not in broker._positions
+
+    @pytest.mark.asyncio
+    async def test_get_positions_reconciles_closed_oco(self, monkeypatch):
+        """GET /api/v3/orderList — unlike DELETE — does not accept `symbol`,
+        only orderListId. Sending it anyway is rejected by Binance with a
+        parameter-count error, found live against Testnet."""
+        calls = []
+
+        def router(method, path, params):
+            calls.append((method, path, params))
+            if path == "/api/v3/orderList":
+                assert "symbol" not in params
+                return {"listOrderStatus": "ALL_DONE"}
+            raise AssertionError(f"unexpected call: {method} {path}")
+
+        broker = self._make_broker(monkeypatch, router)
+        broker._positions["o1"] = Position(
+            id="o1", symbol="PAXGUSDT", direction=SignalAction.BUY, volume=0.1,
+            entry_price=4060.0, current_price=4060.0, stop_loss=4040.0,
+        )
+        broker._protective_orders["o1"] = 999
+        broker._protective_is_oco["o1"] = True
+
+        positions = await broker.get_positions()
+
+        assert positions == []
+        assert "o1" not in broker._positions
+
+    @pytest.mark.asyncio
+    async def test_get_positions_throttles_reconciliation_checks(self, monkeypatch):
+        call_count = 0
+
+        def router(method, path, params):
+            nonlocal call_count
+            call_count += 1
+            return {"status": "NEW"}
+
+        broker = self._make_broker(monkeypatch, router)
+        broker._positions["o1"] = Position(
+            id="o1", symbol="PAXGUSDT", direction=SignalAction.BUY, volume=0.1,
+            entry_price=4060.0, current_price=4060.0, stop_loss=4040.0,
+        )
+        broker._protective_orders["o1"] = 42
+        broker._protective_is_oco["o1"] = False
+
+        await broker.get_positions()
+        await broker.get_positions()
+
+        assert call_count == 1
+
+
 class TestBinanceRequestFormat:
     """Binance's REST API reads params from the query string (or form body)
     for every method, including signed trading endpoints — it does not parse
