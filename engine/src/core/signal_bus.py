@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-import uuid
 import logging
-from typing import Callable, Optional
+import uuid
+from collections.abc import Callable
 
 from .types import Signal, SignalDecision
-
 
 log = logging.getLogger("xmbot.signal_bus")
 

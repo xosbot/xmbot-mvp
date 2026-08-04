@@ -1,3 +1,3 @@
-from .human_gate import HumanGate, GateDecision
+from .human_gate import GateDecision, HumanGate
 
 __all__ = ["HumanGate", "GateDecision"]

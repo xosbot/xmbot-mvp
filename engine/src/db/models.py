@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Enum, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
 import enum
+from datetime import UTC, datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 from .session import Base
 
@@ -29,8 +30,8 @@ class User(Base):
     binance_api_key = Column(String(255))
     binance_api_secret = Column(String(255))
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     trades = relationship("Trade", back_populates="user")
     subscription = relationship("Subscription", back_populates="user", uselist=False)
@@ -53,7 +54,7 @@ class Trade(Base):
     signal_id = Column(String(100))
     agent = Column(String(100))
     reason = Column(Text)
-    opened_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    opened_at = Column(DateTime, default=lambda: datetime.now(UTC))
     closed_at = Column(DateTime)
 
     user = relationship("User", back_populates="trades")
@@ -67,7 +68,7 @@ class Subscription(Base):
     plan = Column(String(50), nullable=False)
     amount = Column(Float, nullable=False)
     status = Column(String(20), default=SubscriptionStatus.ACTIVE)
-    starts_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    starts_at = Column(DateTime, default=lambda: datetime.now(UTC))
     expires_at = Column(DateTime)
     payment_id = Column(String(255))
 

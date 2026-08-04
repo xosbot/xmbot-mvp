@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from ..core.types import (
     Order,
@@ -10,7 +9,6 @@ from ..core.types import (
     Signal,
     UserConfig,
 )
-
 
 log = logging.getLogger("xmbot.risk")
 
@@ -22,7 +20,7 @@ class RiskEngine:
         self._daily_pnl: dict[str, float] = {}
         self._daily_trades: dict[str, int] = {}
         self._peak_balance: dict[str, float] = {}
-        self._last_reset: Optional[datetime] = datetime.now(timezone.utc)
+        self._last_reset: datetime | None = datetime.now(UTC)
 
     async def check_signal(
         self, signal: Signal, user_config: UserConfig, open_position_count: int = 0
@@ -64,7 +62,7 @@ class RiskEngine:
         return False
 
     def update_global_limits(
-        self, max_daily_loss: Optional[float] = None, max_positions: Optional[int] = None
+        self, max_daily_loss: float | None = None, max_positions: int | None = None
     ) -> None:
         if max_daily_loss is not None:
             self._global_max_daily_loss = max_daily_loss
@@ -83,9 +81,9 @@ class RiskEngine:
         }
 
     def _maybe_reset_daily(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if self._last_reset is None or now.date() > self._last_reset.date():
-            log.info(f"Risk: Daily reset — clearing PnL and trade counters")
+            log.info("Risk: Daily reset — clearing PnL and trade counters")
             self._daily_pnl.clear()
             self._daily_trades.clear()
             self._last_reset = now

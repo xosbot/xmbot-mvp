@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ..broker.base import Broker
 from ..broker.binance import BinanceBroker
+from ..broker.ibkr import IBKRBroker
 from ..broker.mt5 import MT5Broker
 from ..broker.paper import PaperBroker
 from .config import EngineConfig
@@ -19,6 +20,12 @@ def create_broker(config: EngineConfig, broker_type: str) -> Broker:
             login=config.mt5_login,
             password=config.mt5_password,
             server=config.mt5_server,
+        )
+    if broker_type == "ibkr":
+        return IBKRBroker(
+            host=config.ibkr_host,
+            port=config.ibkr_port,
+            client_id=config.ibkr_client_id,
         )
     if broker_type == "paper":
         return PaperBroker()

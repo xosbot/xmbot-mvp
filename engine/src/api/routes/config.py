@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from ...core.types import AgentConfig, UserConfig
-
 
 log = logging.getLogger("xmbot.api.config")
 
@@ -24,11 +22,11 @@ def _get_or_create(user_id: str) -> UserConfig:
 
 class BrokerConfig(BaseModel):
     broker: str = "paper"
-    account_id: Optional[str] = None
-    server: Optional[str] = None
-    mt5_path: Optional[str] = None
-    mt5_login: Optional[int] = None
-    mt5_password: Optional[str] = None
+    account_id: str | None = None
+    server: str | None = None
+    mt5_path: str | None = None
+    mt5_login: int | None = None
+    mt5_password: str | None = None
     symbol: str = "XAUUSD"
     magic_number: int = 999001
     deviation: int = 20
@@ -52,7 +50,7 @@ class AgentConfigModel(BaseModel):
 
 class UserConfigOut(BaseModel):
     user_id: str
-    telegram_chat_id: Optional[str] = None
+    telegram_chat_id: str | None = None
     broker: BrokerConfig
     risk: RiskConfig
     agents: list[AgentConfigModel]
@@ -60,14 +58,14 @@ class UserConfigOut(BaseModel):
 
 
 class UserConfigUpdate(BaseModel):
-    broker: Optional[BrokerConfig] = None
-    risk: Optional[RiskConfig] = None
-    agents: Optional[list[AgentConfigModel]] = None
-    telegram_chat_id: Optional[str] = None
-    enable_ai_analysis: Optional[bool] = None
+    broker: BrokerConfig | None = None
+    risk: RiskConfig | None = None
+    agents: list[AgentConfigModel] | None = None
+    telegram_chat_id: str | None = None
+    enable_ai_analysis: bool | None = None
 
 
-def _live_params(engine_ref, agent_name: str) -> Optional[dict]:
+def _live_params(engine_ref, agent_name: str) -> dict | None:
     """Read a running agent's actual live parameter values, if it exposes any."""
     if engine_ref is None:
         return None

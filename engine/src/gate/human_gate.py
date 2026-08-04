@@ -4,7 +4,6 @@ import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
 
 from ..core.types import Signal, SignalDecision
 
@@ -14,9 +13,9 @@ class GateDecision:
     signal_id: str
     decision: SignalDecision
     user_id: str
-    modified_price: Optional[float] = None
-    modified_stop_loss: Optional[float] = None
-    modified_take_profit: Optional[float] = None
+    modified_price: float | None = None
+    modified_stop_loss: float | None = None
+    modified_take_profit: float | None = None
     reason: str = ""
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
@@ -38,7 +37,7 @@ class HumanGate:
         self,
         signal: Signal,
         user_message: str = "",
-        buttons: Optional[list] = None,
+        buttons: list | None = None,
     ) -> GateDecision:
         decision = GateDecision(
             signal_id=signal.id,
@@ -56,7 +55,7 @@ class HumanGate:
         try:
             result = await asyncio.wait_for(future, timeout=self._signal_timeout)
             return result
-        except asyncio.TimeoutError:
+        except TimeoutError:
             decision.decision = SignalDecision.TIMEOUT
             decision.reason = "User did not respond in time"
             return decision

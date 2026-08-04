@@ -5,10 +5,8 @@ import hashlib
 import hmac
 import logging
 import time
-import uuid
-from collections import defaultdict
-from datetime import datetime, timezone
-from typing import AsyncIterator, Optional
+from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from urllib.parse import urlencode
 
 import aiohttp
@@ -24,7 +22,6 @@ from ..core.types import (
     SignalAction,
 )
 from .base import Broker, BrokerStatus
-
 
 log = logging.getLogger("xmbot.broker.binance")
 
@@ -59,10 +56,10 @@ class BinanceBroker(Broker):
         self._api_key = api_key
         self._api_secret = api_secret
         self._testnet = testnet
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: aiohttp.ClientSession | None = None
         self._positions: dict[str, Position] = {}
         self._orders: dict[str, Order] = {}
-        self._ws: Optional[asyncio.Task] = None
+        self._ws: asyncio.Task | None = None
         self._price_cache: dict[str, dict] = {}
 
     def _get_base_url(self) -> str:
@@ -218,8 +215,8 @@ class BinanceBroker(Broker):
     async def modify_position(
         self,
         position_id: str,
-        stop_loss: Optional[float] = None,
-        take_profit: Optional[float] = None,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
     ) -> bool:
         pos = self._positions.get(position_id)
         if pos:
@@ -233,7 +230,7 @@ class BinanceBroker(Broker):
     async def get_positions(self) -> list[Position]:
         return list(self._positions.values())
 
-    async def get_account(self) -> Optional[AccountInfo]:
+    async def get_account(self) -> AccountInfo | None:
         if not self._api_key or not self._api_secret:
             total_pnl = sum(p.unrealized_pnl for p in self._positions.values())
             return AccountInfo(
@@ -308,7 +305,7 @@ class BinanceBroker(Broker):
                     low=float(k[3]),
                     close=float(k[4]),
                     volume=float(k[5]),
-                    timestamp=datetime.fromtimestamp(k[0] / 1000, tz=timezone.utc),
+                    timestamp=datetime.fromtimestamp(k[0] / 1000, tz=UTC),
                 ))
 
             if markets:
@@ -337,7 +334,7 @@ class BinanceBroker(Broker):
                         symbol=symbol,
                         bid=price - 0.01,
                         ask=price + 0.01,
-                        timestamp=datetime.now(timezone.utc),
+                        timestamp=datetime.now(UTC),
                         volume=float(data.get("v", 0)),
                     )
         except Exception as e:

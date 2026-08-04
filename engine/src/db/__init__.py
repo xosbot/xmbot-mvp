@@ -1,4 +1,4 @@
-from .session import Base, engine, get_db, SessionLocal
-from .models import User, Trade, Subscription, DailyStats
+from .models import DailyStats, Subscription, Trade, User
+from .session import Base, SessionLocal, engine, get_db
 
 __all__ = ["Base", "engine", "get_db", "SessionLocal", "User", "Trade", "Subscription", "DailyStats"]

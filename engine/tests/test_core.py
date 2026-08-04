@@ -9,6 +9,8 @@ from src.core.types import (
 )
 from src.risk.engine import RiskEngine
 from src.broker.paper import PaperBroker
+from src.broker.ibkr import IBKRBroker
+from src.core.broker_factory import create_broker
 from src.agents.technical import TechnicalAnalysisAgent
 from src.core.engine import Engine
 from src.core.config import EngineConfig
@@ -151,6 +153,24 @@ class TestPaperBroker:
         data = await broker.get_market_data("PAXGUSDT", "M5", 50)
         assert len(data) == 50
         assert data[0].symbol == "PAXGUSDT"
+
+
+class TestIBKRBroker:
+    """No live TWS/Gateway is available in CI, so this only covers what's testable
+    without a real connection: construction and graceful degradation."""
+
+    def test_broker_factory_creates_ibkr_broker(self):
+        broker = create_broker(EngineConfig(), "ibkr")
+        assert isinstance(broker, IBKRBroker)
+
+    @pytest.mark.asyncio
+    async def test_connect_fails_gracefully_without_ibapi_installed(self, monkeypatch):
+        import src.broker.ibkr as ibkr_module
+
+        monkeypatch.setattr(ibkr_module, "_IBAPI_AVAILABLE", False)
+        broker = IBKRBroker()
+        result = await broker.connect()
+        assert result is False
 
 
 class TestTechnicalAgent:

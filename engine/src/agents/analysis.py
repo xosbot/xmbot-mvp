@@ -3,11 +3,9 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Optional
 
-from ..ai.base import AIProvider, AIResponse
+from ..ai.base import AIProvider
 from ..core.types import Order, SignalAction
-
 
 log = logging.getLogger("xmbot.agent.analysis")
 
@@ -21,7 +19,7 @@ class PostTradeAnalyzer:
     - Generate insights for strategy improvement
     """
 
-    def __init__(self, ai_provider: Optional[AIProvider] = None) -> None:
+    def __init__(self, ai_provider: AIProvider | None = None) -> None:
         self.ai = ai_provider
         self._trade_log: list[dict] = []
 

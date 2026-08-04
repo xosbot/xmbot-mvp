@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import json
 import logging
-from typing import Optional
 
 import httpx
 
 from ..base import AIProvider, AIResponse
-
 
 log = logging.getLogger("xmbot.ai.gemini")
 
@@ -30,7 +27,7 @@ class GeminiProvider(AIProvider):
             await self._client.aclose()
             self._client = None
 
-    async def generate(self, prompt: str, system: Optional[str] = None) -> AIResponse:
+    async def generate(self, prompt: str, system: str | None = None) -> AIResponse:
         contents = []
         if system:
             contents.append({"role": "user", "parts": [{"text": system}]})
@@ -78,7 +75,7 @@ class GeminiProvider(AIProvider):
             return AIResponse(content="", model=self.model, error=str(e))
 
     async def analyze_market(
-        self, market_data: str, context: Optional[str] = None
+        self, market_data: str, context: str | None = None
     ) -> AIResponse:
         system = (
             "You are XM1 Trader, an expert gold (XAUUSD) market analyst. "

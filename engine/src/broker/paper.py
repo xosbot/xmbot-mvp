@@ -4,8 +4,8 @@ import asyncio
 import logging
 import random
 import uuid
+from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import AsyncIterator, Optional
 
 from ..core.types import (
     AccountInfo,
@@ -18,7 +18,6 @@ from ..core.types import (
     SignalAction,
 )
 from .base import Broker, BrokerStatus
-
 
 log = logging.getLogger("xmbot.broker.paper")
 
@@ -88,8 +87,8 @@ class PaperBroker(Broker):
     async def modify_position(
         self,
         position_id: str,
-        stop_loss: Optional[float] = None,
-        take_profit: Optional[float] = None,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
     ) -> bool:
         for pos in self._positions:
             if pos.id == position_id:
@@ -104,7 +103,7 @@ class PaperBroker(Broker):
         self._simulate_price_movement()
         return self._positions
 
-    async def get_account(self) -> Optional[AccountInfo]:
+    async def get_account(self) -> AccountInfo | None:
         total_pnl = sum(p.unrealized_pnl for p in self._positions)
         return AccountInfo(
             broker="paper",
@@ -124,8 +123,8 @@ class PaperBroker(Broker):
             volatility = base * 0.001
             o = base + random.uniform(-volatility, volatility)
             h = o + random.uniform(0, volatility)
-            l = o - random.uniform(0, volatility)
-            c = random.uniform(l, h)
+            low = o - random.uniform(0, volatility)
+            c = random.uniform(low, h)
             markets.append(Market(
                 symbol=symbol,
                 timeframe=timeframe,
@@ -133,7 +132,7 @@ class PaperBroker(Broker):
                 ask=c + 0.1,
                 open=o,
                 high=h,
-                low=l,
+                low=low,
                 close=c,
                 volume=random.uniform(100, 1000),
                 timestamp=datetime.utcnow(),

@@ -2,11 +2,9 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
 
 log = logging.getLogger("xmbot.api.ai")
 
@@ -24,12 +22,12 @@ _ai_config: dict = {
 
 
 class AIConfigUpdate(BaseModel):
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    enabled: Optional[bool] = None
-    regime_detection: Optional[bool] = None
-    trade_validation: Optional[bool] = None
-    daily_reports: Optional[bool] = None
+    provider: str | None = None
+    model: str | None = None
+    enabled: bool | None = None
+    regime_detection: bool | None = None
+    trade_validation: bool | None = None
+    daily_reports: bool | None = None
 
 
 @router.get("/config")

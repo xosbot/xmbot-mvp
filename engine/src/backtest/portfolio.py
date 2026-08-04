@@ -2,12 +2,10 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Optional
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 from ..core.types import Signal, SignalAction
-
 
 log = logging.getLogger("xmbot.backtest")
 
@@ -17,8 +15,8 @@ class BacktestTrade:
     signal: Signal
     entry_time: datetime
     entry_price: float
-    exit_time: Optional[datetime] = None
-    exit_price: Optional[float] = None
+    exit_time: datetime | None = None
+    exit_price: float | None = None
     volume: float = 0.1
     pnl: float = 0.0
     exit_reason: str = ""
@@ -28,7 +26,7 @@ class BacktestTrade:
         return self.exit_time is None
 
     @property
-    def hold_duration(self) -> Optional[timedelta]:
+    def hold_duration(self) -> timedelta | None:
         if self.exit_time and self.entry_time:
             return self.exit_time - self.entry_time
         return None
@@ -124,7 +122,7 @@ class BacktestPortfolio:
         self.peak_capital = initial_capital
         self.risk_per_trade = risk_per_trade
         self.trades: list[BacktestTrade] = []
-        self._open_trade: Optional[BacktestTrade] = None
+        self._open_trade: BacktestTrade | None = None
         self._position_size: float = 0.0
 
     def open_trade(self, signal: Signal, timestamp: datetime) -> bool:

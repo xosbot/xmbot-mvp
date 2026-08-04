@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional
 
 from ..core.types import AgentConfig, Market, Signal, SignalAction
 
@@ -30,7 +29,7 @@ class Agent(ABC):
         return self.config.name
 
     @abstractmethod
-    async def analyze(self, market_data: list[Market]) -> Optional[Signal]:
+    async def analyze(self, market_data: list[Market]) -> Signal | None:
         ...
 
     async def on_signal_approved(self, signal: Signal) -> None:

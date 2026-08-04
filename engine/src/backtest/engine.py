@@ -1,18 +1,15 @@
 """Core backtesting engine for XMBot strategies."""
 from __future__ import annotations
 
-import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
 from ..agents.technical import TechnicalAnalysisAgent
-from ..core.types import Market, Signal, SignalAction
+from ..core.types import Market
 from .portfolio import BacktestPortfolio, BacktestResult
-
 
 log = logging.getLogger("xmbot.backtest")
 
@@ -22,7 +19,7 @@ class BacktestEngine:
 
     def __init__(
         self,
-        agent: Optional[TechnicalAnalysisAgent] = None,
+        agent: TechnicalAnalysisAgent | None = None,
         initial_capital: float = 10000.0,
         risk_per_trade: float = 0.02,
     ) -> None:
@@ -47,9 +44,9 @@ class BacktestEngine:
             ts = row[time_col]
             # Convert unix timestamp to datetime
             if isinstance(ts, (int, float)):
-                dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+                dt = datetime.fromtimestamp(ts, tz=UTC)
             else:
-                dt = pd.to_datetime(ts).to_pydatetime().replace(tzinfo=timezone.utc)
+                dt = pd.to_datetime(ts).to_pydatetime().replace(tzinfo=UTC)
 
             close = float(row["close"])
             markets.append(Market(

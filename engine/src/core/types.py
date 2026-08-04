@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 
 class SignalAction(str, Enum):
@@ -65,7 +64,7 @@ class Signal:
     market: str
     entry_price: float
     stop_loss: float
-    take_profit: Optional[float] = None
+    take_profit: float | None = None
     confidence: float = 0.0
     reason: str = ""
     agent: str = ""
@@ -93,25 +92,25 @@ class Order:
     volume: float
     price: float
     stop_loss: float
-    take_profit: Optional[float] = None
+    take_profit: float | None = None
     order_type: str = "market"
     broker: str = ""
     user_id: str = ""
     status: OrderStatus = OrderStatus.PENDING
     created_at: datetime = field(default_factory=datetime.utcnow)
-    filled_at: Optional[datetime] = None
-    filled_price: Optional[float] = None
-    broker_order_id: Optional[str] = None
+    filled_at: datetime | None = None
+    filled_price: float | None = None
+    broker_order_id: str | None = None
 
 
 @dataclass
 class OrderResult:
     success: bool
     order_id: str
-    broker_order_id: Optional[str] = None
-    filled_price: Optional[float] = None
-    filled_volume: Optional[float] = None
-    error: Optional[str] = None
+    broker_order_id: str | None = None
+    filled_price: float | None = None
+    filled_volume: float | None = None
+    error: str | None = None
 
 
 @dataclass
@@ -123,11 +122,11 @@ class Position:
     entry_price: float
     current_price: float
     stop_loss: float
-    take_profit: Optional[float] = None
+    take_profit: float | None = None
     unrealized_pnl: float = 0.0
     realized_pnl: float = 0.0
     open_time: datetime = field(default_factory=datetime.utcnow)
-    broker_position_id: Optional[str] = None
+    broker_position_id: str | None = None
 
 
 @dataclass
@@ -148,7 +147,7 @@ class AgentConfig:
     enabled: bool = True
     markets: list[str] = field(default_factory=lambda: ["XAUUSD"])
     timeframe: str = "M5"
-    confirmation_timeframe: Optional[str] = "H1"  # Higher TF for trend confirmation
+    confirmation_timeframe: str | None = "H1"  # Higher TF for trend confirmation
     max_positions: int = 3
     confidence_threshold: float = 0.6
     max_daily_trades: int = 5
@@ -158,7 +157,7 @@ class AgentConfig:
 @dataclass
 class UserConfig:
     user_id: str
-    telegram_chat_id: Optional[str] = None
+    telegram_chat_id: str | None = None
     max_daily_loss: float = 500.0
     max_drawdown_percent: float = 20.0
     max_position_size: float = 0.5

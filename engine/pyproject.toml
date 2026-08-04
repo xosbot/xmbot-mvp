@@ -13,6 +13,15 @@ dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
     "python-dotenv>=1.0.0",
+    # Kept in sync with requirements.txt (what the Dockerfile actually installs) —
+    # these were previously only there, so `pip install -e .[dev]` didn't match
+    # what runs in production.
+    "sqlalchemy>=2.0.0",
+    "sentry-sdk>=2.0.0",
+    "websockets>=12.0",
+    "python-dateutil>=2.8.0",
+    "pytz>=2024.1",
+    "asyncio-throttle>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -25,6 +34,24 @@ dev = ["pytest>=8.0.0", "pytest-asyncio>=0.24.0", "ruff>=0.3.0"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# Conservative starter set: pyflakes, pycodestyle, isort, pyupgrade. Deliberately
+# excludes blind-except rules (BLE) — the agent/position-monitor loops intentionally
+# catch broad `Exception` to keep the engine alive across a bad tick or API error.
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# These re-export modules have a load-bearing import order to avoid circular
+# imports (e.g. src/__init__.py must import .core before .agents) — isort's
+# alphabetical reordering (I001) breaks that. Everything else about them still
+# gets linted.
+"src/__init__.py" = ["I001"]
+"src/core/__init__.py" = ["I001"]
 
 [build-system]
 requires = ["setuptools>=69.0.0"]

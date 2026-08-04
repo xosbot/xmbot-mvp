@@ -1,22 +1,20 @@
 """Parameter optimization for XMBot strategy."""
-import sys
 import csv
 import json
-from datetime import datetime, timezone
-from dataclasses import dataclass
-from typing import Optional
+import sys
+from datetime import UTC, datetime
 from itertools import product
 
 sys.path.insert(0, '.')
 
-from src.core.types import Market, AgentConfig, Signal, SignalAction
 from src.agents.technical import TechnicalAnalysisAgent
 from src.backtest.portfolio import BacktestPortfolio, BacktestResult
+from src.core.types import AgentConfig, Market
 
 
 def load_csv(filepath: str) -> list[Market]:
     markets = []
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         reader = csv.DictReader(f)
         for row in reader:
             ts = int(row['time'])
@@ -24,7 +22,7 @@ def load_csv(filepath: str) -> list[Market]:
             markets.append(Market(
                 symbol="XAUUSD",
                 timeframe="M5",
-                timestamp=datetime.fromtimestamp(ts, tz=timezone.utc),
+                timestamp=datetime.fromtimestamp(ts, tz=UTC),
                 bid=close,
                 ask=close + 0.3,
                 open=float(row['open']),

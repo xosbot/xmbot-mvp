@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
-
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from ...core.engine import Engine
 from ...core.types import Signal, SignalAction
 
-
 router = APIRouter(prefix="/api/trading", tags=["trading"])
 
-_engine: Optional[Engine] = None
+_engine: Engine | None = None
 
 
 def init_trading_api(engine: Engine) -> None:
@@ -29,10 +25,10 @@ def get_engine() -> Engine:
 class TradeSignalRequest(BaseModel):
     symbol: str = "PAXGUSDT"
     action: str  # BUY or SELL
-    entry_price: Optional[float] = None
-    stop_loss: Optional[float] = None
-    take_profit: Optional[float] = None
-    volume: Optional[float] = None
+    entry_price: float | None = None
+    stop_loss: float | None = None
+    take_profit: float | None = None
+    volume: float | None = None
     reason: str = "manual"
 
 
@@ -41,9 +37,9 @@ class EngineControlRequest(BaseModel):
 
 
 class RiskConfigRequest(BaseModel):
-    max_daily_loss: Optional[float] = None
-    max_positions: Optional[int] = None
-    max_drawdown_percent: Optional[float] = None
+    max_daily_loss: float | None = None
+    max_positions: int | None = None
+    max_drawdown_percent: float | None = None
 
 
 @router.get("/status")

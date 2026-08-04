@@ -3,14 +3,12 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from ..core.types import AgentConfig, Market, Signal, SignalAction
 from .base import Agent
-
 
 log = logging.getLogger("xmbot.agent.technical")
 
@@ -62,7 +60,7 @@ class TechnicalAnalysisAgent(Agent):
         self.tp_ratio = tp_ratio
         self.min_sl_distance = min_sl_distance
         self.risk_per_trade_pct = risk_per_trade_pct
-        self._last_signal_time: Optional[datetime] = None
+        self._last_signal_time: datetime | None = None
         self._min_candle_gap = 5  # minutes between signals
 
     def update_params(self, **kwargs) -> dict:
@@ -87,7 +85,7 @@ class TechnicalAnalysisAgent(Agent):
             log.info(f"[{self.name}] Strategy params updated: {applied}")
         return applied
 
-    async def analyze(self, market_data: list[Market]) -> Optional[Signal]:
+    async def analyze(self, market_data: list[Market]) -> Signal | None:
         """Analyze market data for trading signals.
 
         Args:
@@ -126,8 +124,8 @@ class TechnicalAnalysisAgent(Agent):
         return None
 
     def analyze_with_confirmation(
-        self, m5_data: list[Market], h1_data: Optional[list[Market]] = None
-    ) -> Optional[Signal]:
+        self, m5_data: list[Market], h1_data: list[Market] | None = None
+    ) -> Signal | None:
         """Analyze M5 data with optional H1 trend confirmation.
 
         This is the synchronous version called by the engine when

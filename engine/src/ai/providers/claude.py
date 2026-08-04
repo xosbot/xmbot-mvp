@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import httpx
 
 from ..base import AIProvider, AIResponse
-
 
 log = logging.getLogger("xmbot.ai.claude")
 
@@ -23,7 +21,7 @@ class ClaudeProvider(AIProvider):
     def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514") -> None:
         super().__init__(model, api_key)
 
-    async def generate(self, prompt: str, system: Optional[str] = None) -> AIResponse:
+    async def generate(self, prompt: str, system: str | None = None) -> AIResponse:
         messages = [{"role": "user", "content": prompt}]
         return await self._call_api(messages, system)
 
@@ -36,7 +34,7 @@ class ClaudeProvider(AIProvider):
             })
         return await self._call_api(formatted)
 
-    async def _call_api(self, messages: list[dict], system: Optional[str] = None) -> AIResponse:
+    async def _call_api(self, messages: list[dict], system: str | None = None) -> AIResponse:
         payload = {
             "model": self.model,
             "max_tokens": 1024,

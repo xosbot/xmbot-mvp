@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
-
 
 log = logging.getLogger("xmbot.ai")
 
@@ -14,8 +12,8 @@ class AIResponse:
     content: str
     model: str
     tokens_used: int = 0
-    error: Optional[str] = None
-    raw: Optional[dict] = None
+    error: str | None = None
+    raw: dict | None = None
 
 
 class AIProvider(ABC):
@@ -24,7 +22,7 @@ class AIProvider(ABC):
         self.api_key = api_key
 
     @abstractmethod
-    async def generate(self, prompt: str, system: Optional[str] = None) -> AIResponse:
+    async def generate(self, prompt: str, system: str | None = None) -> AIResponse:
         ...
 
     @abstractmethod
@@ -32,7 +30,7 @@ class AIProvider(ABC):
         ...
 
     async def analyze_market(
-        self, market_data: str, context: Optional[str] = None
+        self, market_data: str, context: str | None = None
     ) -> AIResponse:
         system = "You are a professional market analyst. Analyze the data and provide clear, actionable insights."
         prompt = f"Market Data:\n{market_data}\n"

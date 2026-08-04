@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from collections.abc import AsyncIterator
 from enum import Enum
-from typing import AsyncIterator, Optional
 
 from ..core.types import AccountInfo, Market, Order, OrderResult, Position, PriceTick
 
@@ -48,8 +47,8 @@ class Broker(ABC):
     async def modify_position(
         self,
         position_id: str,
-        stop_loss: Optional[float] = None,
-        take_profit: Optional[float] = None,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
     ) -> bool:
         ...
 
@@ -58,7 +57,7 @@ class Broker(ABC):
         ...
 
     @abstractmethod
-    async def get_account(self) -> Optional[AccountInfo]:
+    async def get_account(self) -> AccountInfo | None:
         ...
 
     @abstractmethod

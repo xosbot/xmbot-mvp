@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
 import logging
-from typing import Optional
+from datetime import datetime
 
 from ..agents.base import Agent, AgentStatus
 from ..ai.registry import AIRegistry
-from ..ai.base import AIProvider
 from ..api.routes.sync import get_store as get_sync_store
 from ..broker.base import Broker
-from ..gate.human_gate import HumanGate, GateDecision
+from ..gate.human_gate import GateDecision, HumanGate
 from ..risk.engine import RiskEngine
 from .config import EngineConfig
+from .session import get_session_name, is_active_session
 from .signal_bus import SignalBus
-from .session import is_active_session, get_session_name
 from .types import (
     Order,
     OrderStatus,
@@ -24,7 +22,6 @@ from .types import (
     SignalDecision,
     UserConfig,
 )
-
 
 log = logging.getLogger("xmbot.engine")
 
@@ -36,8 +33,8 @@ class Engine:
         broker: Broker,
         gate: HumanGate,
         risk: RiskEngine,
-        signal_bus: Optional[SignalBus] = None,
-        ai_registry: Optional[AIRegistry] = None,
+        signal_bus: SignalBus | None = None,
+        ai_registry: AIRegistry | None = None,
     ) -> None:
         self.config = config
         self.broker = broker
@@ -195,7 +192,6 @@ class Engine:
 
                 if account:
                     self._cached_balance = account.balance
-                    closed_trades = [t for t in store.get("trades", []) if t["status"] == "CLOSED"]
                     total = len(store["trades"])
                     winning = sum(1 for t in store["trades"] if t.get("profit", 0) > 0)
                     total_pnl = sum(t.get("profit", 0) for t in store["trades"])

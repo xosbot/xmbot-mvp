@@ -25,8 +25,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.agents.technical import TechnicalAnalysisAgent
 from src.ai.providers import ClaudeProvider, GeminiProvider
 from src.ai.registry import AIRegistry
-from src.api.server import app, init_api
 from src.api.routes.trading import init_trading_api
+from src.api.server import app, init_api
 from src.core.broker_factory import create_broker
 from src.core.config import EngineConfig, load_config
 from src.core.engine import Engine
@@ -35,7 +35,6 @@ from src.core.types import AgentConfig, UserConfig
 from src.gate.human_gate import HumanGate
 from src.risk.engine import RiskEngine
 from src.telegram.bot import TelegramBot
-
 
 log = logging.getLogger("xmbot")
 

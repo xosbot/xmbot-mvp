@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -9,11 +8,10 @@ from pydantic import BaseModel
 
 from ..core.engine import Engine
 from ..core.types import Signal, SignalAction
-from .routes.sync import router as sync_router
-from .routes.config import router as config_router
 from .routes.ai import router as ai_router
+from .routes.config import router as config_router
+from .routes.sync import router as sync_router
 from .routes.trading import router as trading_router
-
 
 log = logging.getLogger("xmbot.api")
 
@@ -23,7 +21,7 @@ app.include_router(config_router)
 app.include_router(ai_router)
 app.include_router(trading_router)
 
-engine_ref: Optional[Engine] = None
+engine_ref: Engine | None = None
 _api_key: str = ""
 
 
@@ -53,7 +51,7 @@ class SignalRequest(BaseModel):
     market: str
     entry_price: float
     stop_loss: float
-    take_profit: Optional[float] = None
+    take_profit: float | None = None
     confidence: float = 0.8
     reason: str = ""
     agent: str = "manual"

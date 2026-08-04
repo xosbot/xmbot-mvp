@@ -3,12 +3,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import httpx
 
 from ..core.types import Signal, SignalDecision
-
 
 log = logging.getLogger("xmbot.telegram")
 
@@ -22,7 +21,7 @@ class TelegramBot:
         self._offset = 0
         self._running = False
         self._decision_handlers: dict[str, list[SignalHandler]] = {}
-        self._default_handler: Optional[SignalHandler] = None
+        self._default_handler: SignalHandler | None = None
         self._pending_callbacks: dict[str, str] = {}
         self._client: httpx.AsyncClient | None = None
 
@@ -46,7 +45,7 @@ class TelegramBot:
     async def send_message(
         self,
         text: str,
-        buttons: Optional[list[list[dict]]] = None,
+        buttons: list[list[dict]] | None = None,
         parse_mode: str = "Markdown",
     ) -> bool:
         if not self.token:

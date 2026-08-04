@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-
 
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 
@@ -44,15 +42,15 @@ class TradeOut(BaseModel):
     symbol: str
     action: str
     open_price: float
-    close_price: Optional[float] = None
+    close_price: float | None = None
     lot_size: float
-    profit: Optional[float] = None
-    stop_loss: Optional[float] = None
-    take_profit: Optional[float] = None
+    profit: float | None = None
+    stop_loss: float | None = None
+    take_profit: float | None = None
     open_time: str
-    close_time: Optional[str] = None
+    close_time: str | None = None
     status: str
-    broker_trade_id: Optional[str] = None
+    broker_trade_id: str | None = None
 
 
 class MetricsOut(BaseModel):
@@ -72,18 +70,18 @@ class StatusOut(BaseModel):
     agents: list[str]
     pending_signals: int
     uptime_hours: float
-    last_sync: Optional[str] = None
+    last_sync: str | None = None
 
 
 @router.get("/trades", response_model=list[TradeOut])
 async def get_trades(
-    since: Optional[str] = Query(None, description="ISO timestamp"),
+    since: str | None = Query(None, description="ISO timestamp"),
     limit: int = Query(50, le=200),
     store: dict = Depends(get_store),
 ):
     trades = store.get("trades", [])
     if since:
-        since_dt = datetime.fromisoformat(since)
+        datetime.fromisoformat(since)  # validate the ISO timestamp; comparison below is lexicographic
         trades = [t for t in trades if t.get("open_time", "") >= since]
     return trades[:limit]
 

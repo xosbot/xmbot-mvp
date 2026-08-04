@@ -10,8 +10,7 @@ Avoid trading during low-volume Asian session (21:00 - 07:00 UTC).
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-
+from datetime import UTC, datetime
 
 log = logging.getLogger("xmbot.session")
 
@@ -28,7 +27,7 @@ OFF_PEAK_ADX_BONUS = 5.0
 def is_london_active(now: datetime | None = None) -> bool:
     """Check if London session is active."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
     hour = now.hour
     return LONDON_START <= hour < LONDON_END
 
@@ -36,7 +35,7 @@ def is_london_active(now: datetime | None = None) -> bool:
 def is_new_york_active(now: datetime | None = None) -> bool:
     """Check if New York session is active."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
     hour = now.hour
     return NEW_YORK_START <= hour < NEW_YORK_END
 
@@ -44,7 +43,7 @@ def is_new_york_active(now: datetime | None = None) -> bool:
 def is_overlap_active(now: datetime | None = None) -> bool:
     """Check if London-NY overlap (best liquidity) is active."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
     hour = now.hour
     return NEW_YORK_START <= hour < LONDON_END  # 12:00 - 16:00 UTC
 
@@ -52,7 +51,7 @@ def is_overlap_active(now: datetime | None = None) -> bool:
 def is_active_session(now: datetime | None = None) -> bool:
     """Check if any major session is active (London or New York)."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
     hour = now.hour
     return LONDON_START <= hour < NEW_YORK_END  # 07:00 - 21:00 UTC
 
@@ -60,7 +59,7 @@ def is_active_session(now: datetime | None = None) -> bool:
 def get_session_name(now: datetime | None = None) -> str:
     """Get the name of the current active session."""
     if now is None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
     if is_overlap_active(now):
         return "London-NY Overlap"

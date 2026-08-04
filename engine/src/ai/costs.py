@@ -4,8 +4,6 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Optional
-
 
 log = logging.getLogger("xmbot.ai.costs")
 
@@ -39,7 +37,7 @@ class AICostTracker:
 class AICostController:
     """Control AI usage costs with rate limiting and budget enforcement."""
 
-    def __init__(self, budget: Optional[AIBudget] = None) -> None:
+    def __init__(self, budget: AIBudget | None = None) -> None:
         self.budget = budget or AIBudget()
         self.tracker = AICostTracker()
         self._last_request_time: float = 0

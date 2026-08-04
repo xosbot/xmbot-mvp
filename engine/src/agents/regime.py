@@ -4,11 +4,9 @@ from __future__ import annotations
 import json
 import logging
 from datetime import datetime
-from typing import Optional
 
-from ..ai.base import AIProvider, AIResponse
+from ..ai.base import AIProvider
 from ..core.types import Market
-
 
 log = logging.getLogger("xmbot.agent.regime")
 
@@ -22,7 +20,7 @@ class MarketRegimeDetector:
     - Risk management adjustments
     """
 
-    def __init__(self, ai_provider: Optional[AIProvider] = None) -> None:
+    def __init__(self, ai_provider: AIProvider | None = None) -> None:
         self.ai = ai_provider
         self._cache: dict[str, dict] = {}
         self._cache_ttl = 3600  # 1 hour

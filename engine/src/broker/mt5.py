@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import AsyncIterator, Optional
 
 from ..core.types import (
     AccountInfo,
     Market,
     Order,
     OrderResult,
-    OrderStatus,
     Position,
     PriceTick,
     SignalAction,
 )
 from .base import Broker, BrokerStatus
-
 
 log = logging.getLogger("xmbot.broker.mt5")
 
@@ -171,8 +169,8 @@ class MT5Broker(Broker):
     async def modify_position(
         self,
         position_id: str,
-        stop_loss: Optional[float] = None,
-        take_profit: Optional[float] = None,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
     ) -> bool:
         if not await self.is_connected():
             return False
@@ -215,7 +213,7 @@ class MT5Broker(Broker):
 
         return positions
 
-    async def get_account(self) -> Optional[AccountInfo]:
+    async def get_account(self) -> AccountInfo | None:
         if not await self.is_connected():
             return None
 

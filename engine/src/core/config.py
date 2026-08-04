@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -96,7 +95,7 @@ class EngineConfig:
         )
 
 
-def load_config(path: Optional[str] = None) -> EngineConfig:
+def load_config(path: str | None = None) -> EngineConfig:
     if path and os.path.exists(path):
         with open(path) as f:
             data = json.load(f)
