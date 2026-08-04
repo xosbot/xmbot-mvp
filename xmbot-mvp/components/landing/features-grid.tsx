@@ -67,7 +67,7 @@ const features = [
 export function FeaturesGrid() {
   return (
     <section id="features" className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -transtone-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -75,12 +75,12 @@ export function FeaturesGrid() {
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
               // Platform
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
+            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
               Simple to Use.
               <br />
               <span className="text-gradient-gold">Serious Underneath.</span>
             </h2>
-            <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+            <p className="mt-6 text-lg text-stone-400 leading-relaxed">
               Everything you need to run a disciplined, automated gold trading operation — without ever opening a terminal yourself.
             </p>
           </div>
@@ -90,15 +90,15 @@ export function FeaturesGrid() {
         <StaggerChildren className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6" staggerDelay={0.1}>
           {features.filter(f => f.featured).map((f) => (
             <StaggerItem key={f.title}>
-              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.08)" : "rgba(212, 175, 55, 0.08)"}>
+              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.08)" : "rgba(184, 135, 63, 0.08)"}>
                 <GlareCard className="p-8 h-full">
                   <div className={`w-14 h-14 rounded-md flex items-center justify-center mb-6 ${
                     f.color === "emerald" ? "bg-emerald-500/10" : "bg-gold-500/10"
                   }`}>
                     <f.icon className={`h-7 w-7 ${f.color === "emerald" ? "text-emerald-400" : "text-gold-400"}`} />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">{f.title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{f.description}</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{f.title}</h3>
+                  <p className="text-sm text-stone-400 leading-relaxed">{f.description}</p>
                 </GlareCard>
               </Spotlight>
             </StaggerItem>
@@ -109,15 +109,15 @@ export function FeaturesGrid() {
         <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.08}>
           {features.filter(f => !f.featured).map((f) => (
             <StaggerItem key={f.title}>
-              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.06)" : "rgba(212, 175, 55, 0.06)"}>
-                <div className="p-6 rounded-md border border-white/10 bg-white/[0.03] hover:bg-white/[0.05] hover:border-white/20 transition-colors duration-200 group h-full">
+              <Spotlight className="rounded-md" fill={f.color === "emerald" ? "rgba(16, 185, 129, 0.06)" : "rgba(184, 135, 63, 0.06)"}>
+                <div className="p-6 rounded-md border border-foreground/10 bg-foreground/[0.03] hover:bg-foreground/[0.05] hover:border-foreground/20 transition-colors duration-200 group h-full">
                   <div className={`w-12 h-12 rounded-md flex items-center justify-center mb-5 ${
                     f.color === "emerald" ? "bg-emerald-500/10 group-hover:bg-emerald-500/20" : "bg-gold-500/10 group-hover:bg-gold-500/20"
                   } transition-colors duration-300`}>
                     <f.icon className={`h-6 w-6 ${f.color === "emerald" ? "text-emerald-400" : "text-gold-400"}`} />
                   </div>
-                  <h3 className="text-base font-semibold text-white mb-2">{f.title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{f.description}</p>
+                  <h3 className="text-base font-semibold text-foreground mb-2">{f.title}</h3>
+                  <p className="text-sm text-stone-400 leading-relaxed">{f.description}</p>
                 </div>
               </Spotlight>
             </StaggerItem>

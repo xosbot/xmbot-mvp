@@ -17,7 +17,7 @@ export function Select({ value, onValueChange, children, disabled, id }: SelectP
       value={value}
       onChange={(e) => onValueChange(e.target.value)}
       disabled={disabled}
-      className="flex h-9 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-1 text-sm text-white shadow-sm placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex h-9 w-full rounded-md border border-input bg-secondary px-3 py-1 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </select>

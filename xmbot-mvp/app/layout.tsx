@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
+import { Source_Serif_4 } from "next/font/google"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
 import { StructuredData } from "@/components/structured-data"
@@ -14,6 +15,11 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
+})
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  weight: ["500", "600", "700"],
 })
 
 export const metadata: Metadata = {
@@ -85,7 +91,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#030712",
+  themeColor: "#171512",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -102,7 +108,7 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
           {children}

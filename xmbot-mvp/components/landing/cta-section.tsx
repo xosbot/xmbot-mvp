@@ -10,7 +10,7 @@ import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 export function CTASection() {
   return (
     <section className="py-24 sm:py-32 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -transtone-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -22,18 +22,18 @@ export function CTASection() {
                   <span>Limited Beta // First 10 Customers</span>
                 </div>
 
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
+                <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
                   Your First Signal Is
                   <br />
                   <span className="text-gradient-gold">15 Minutes Away</span>
                 </h2>
 
-                <p className="mt-6 text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
+                <p className="mt-6 text-lg text-stone-400 max-w-xl mx-auto leading-relaxed">
                   Connect Telegram, set your risk limits, and let the multi-agent system
                   handle the analysis. You stay the one who taps Approve.
                 </p>
 
-                <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-slate-500">
+                <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-stone-500">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-gold-500" />
                     <span>2% max risk</span>
@@ -52,17 +52,17 @@ export function CTASection() {
                   <Link href="/register">
                     <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
                       Set Up in 15 Minutes
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:transtone-x-1 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="https://t.me/xmbot" target="_blank" rel="noopener noreferrer">
-                    <Button size="lg" variant="outline" className="border-white/15 text-slate-300 hover:bg-white/5 h-14 text-base">
+                    <Button size="lg" variant="outline" className="border-foreground/15 text-stone-300 hover:bg-foreground/5 h-14 text-base">
                       Join Telegram
                     </Button>
                   </Link>
                 </div>
 
-                <p className="mt-8 text-xs text-slate-400">
+                <p className="mt-8 text-xs text-stone-400">
                   No hidden fees. Cancel anytime. Trading involves risk.
                 </p>
               </div>

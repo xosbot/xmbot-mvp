@@ -11,7 +11,7 @@ import { CardSpotlight } from "@/components/ui/aceternity/card-spotlight"
 export function PricingCards() {
   return (
     <section id="pricing" className="py-24 sm:py-32 relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -transtone-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
@@ -19,12 +19,12 @@ export function PricingCards() {
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
               // Pricing
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
+            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
               Simple,
               <br />
               <span className="text-gradient-gold">Transparent Pricing</span>
             </h2>
-            <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+            <p className="mt-6 text-lg text-stone-400 leading-relaxed">
               Choose the plan that fits your trading style. Upgrade anytime.
             </p>
           </div>
@@ -38,18 +38,18 @@ export function PricingCards() {
                 <div className="inline-flex items-center gap-2 rounded-sm bg-gold-500/10 border border-gold-500/30 px-2.5 py-1 text-xs mono-label text-gold-400 mb-4">
                   <Star className="h-3 w-3" /> Best Value
                 </div>
-                <h3 className="text-lg font-semibold text-white">Beta Access</h3>
+                <h3 className="text-lg font-semibold text-foreground">Beta Access</h3>
                 <div className="mt-4">
-                  <span className="text-lg text-slate-500 line-through">₹19,999</span>
+                  <span className="text-lg text-stone-500 line-through">₹19,999</span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-4xl font-bold text-white">₹9,999</span>
-                    <span className="text-sm text-slate-400">/3 months</span>
+                    <span className="text-4xl font-bold text-foreground">₹9,999</span>
+                    <span className="text-sm text-stone-400">/3 months</span>
                   </div>
                   <p className="text-xs text-emerald-400/80 mt-2">50% off — Limited spots</p>
                 </div>
                 <ul className="mt-6 space-y-3">
                   {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Setup assistance", "Email support"].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
                       <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
                     </li>
                   ))}
@@ -66,22 +66,22 @@ export function PricingCards() {
           {/* Monthly — CardSpotlight */}
           <StaggerItem>
             <CardSpotlight className="p-8 h-full">
-              <h3 className="text-lg font-semibold text-white">Monthly</h3>
+              <h3 className="text-lg font-semibold text-foreground">Monthly</h3>
               <div className="mt-4">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">₹2,999</span>
-                  <span className="text-sm text-slate-400">/month</span>
+                  <span className="text-4xl font-bold text-foreground">₹2,999</span>
+                  <span className="text-sm text-stone-400">/month</span>
                 </div>
               </div>
               <ul className="mt-6 space-y-3">
                 {["Full bot access for XAUUSD", "AI analysis 24/5", "Telegram trade alerts", "Risk management built-in", "Email support"].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
                     <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
                   </li>
                 ))}
               </ul>
               <Link href="/register" className="block mt-8">
-                <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
+                <Button variant="outline" className="w-full border-stone-700 text-foreground hover:bg-foreground/5 h-11 transition-all duration-300">
                   Get Started
                 </Button>
               </Link>
@@ -91,21 +91,21 @@ export function PricingCards() {
           {/* Quarterly — GlareCard (Most Popular) */}
           <StaggerItem>
             <GlareCard className="relative h-full">
-              <div className="absolute -top-px left-1/2 -translate-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
+              <div className="absolute -top-px left-1/2 -transtone-x-1/2 px-3 py-1 rounded-b-sm bg-gold-500 text-xs mono-label font-bold text-neutral-950 z-10">
                 Most Popular
               </div>
               <div className="p-8">
-                <h3 className="text-lg font-semibold text-white">Quarterly</h3>
+                <h3 className="text-lg font-semibold text-foreground">Quarterly</h3>
                 <div className="mt-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">₹7,999</span>
-                    <span className="text-sm text-slate-400">/quarter</span>
+                    <span className="text-4xl font-bold text-foreground">₹7,999</span>
+                    <span className="text-sm text-stone-400">/quarter</span>
                   </div>
                   <p className="text-xs text-emerald-400/80 mt-2">Save ₹1,000 vs monthly</p>
                 </div>
                 <ul className="mt-6 space-y-3">
                   {["Everything in Monthly", "Priority email support", "Advanced risk settings", "Performance reports", "Early access to new features"].map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
                       <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
                     </li>
                   ))}
@@ -122,26 +122,26 @@ export function PricingCards() {
           {/* Yearly — CardSpotlight */}
           <StaggerItem>
             <CardSpotlight className="p-8 h-full">
-              <div className="inline-flex items-center gap-2 rounded-sm bg-white/5 border border-white/15 px-2.5 py-1 text-xs mono-label text-slate-300 mb-4">
+              <div className="inline-flex items-center gap-2 rounded-sm bg-foreground/5 border border-foreground/15 px-2.5 py-1 text-xs mono-label text-stone-300 mb-4">
                 <Zap className="h-3 w-3" /> Best for Pros
               </div>
-              <h3 className="text-lg font-semibold text-white">Yearly</h3>
+              <h3 className="text-lg font-semibold text-foreground">Yearly</h3>
               <div className="mt-4">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">₹24,999</span>
-                  <span className="text-sm text-slate-400">/year</span>
+                  <span className="text-4xl font-bold text-foreground">₹24,999</span>
+                  <span className="text-sm text-stone-400">/year</span>
                 </div>
                 <p className="text-xs text-emerald-400/80 mt-2">Save ₹11,000 vs monthly</p>
               </div>
               <ul className="mt-6 space-y-3">
                 {["Everything in Quarterly", "Dedicated account manager", "Custom strategy requests", "API access", "White-glove onboarding"].map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-stone-300">
                     <Check className="h-4 w-4 text-gold-500 mt-0.5 flex-shrink-0" />{f}
                   </li>
                 ))}
               </ul>
               <Link href="/register" className="block mt-8">
-                <Button variant="outline" className="w-full border-slate-700 text-white hover:bg-white/5 h-11 transition-all duration-300">
+                <Button variant="outline" className="w-full border-stone-700 text-foreground hover:bg-foreground/5 h-11 transition-all duration-300">
                   Get Started
                 </Button>
               </Link>

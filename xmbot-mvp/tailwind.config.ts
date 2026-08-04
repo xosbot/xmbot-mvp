@@ -51,16 +51,18 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			},
   			gold: {
-  				50: '#FBF3DC',
-  				100: '#F6E6B4',
-  				200: '#EED37E',
-  				300: '#E4BE55',
-  				400: '#D9AF3E',
-  				500: '#D4AF37',
-  				600: '#B08B23',
-  				700: '#8A6B1B',
-  				800: '#644D14',
-  				900: '#3D2F0C'
+  				// Muted brass/antique-gold — "Institutional Desk" refines the brand's
+  				// gold identity down from bright coin-gold, doesn't replace it.
+  				50: '#FAF3E4',
+  				100: '#F1E2C0',
+  				200: '#E4C98A',
+  				300: '#D4AD66',
+  				400: '#C39A52',
+  				500: '#B8873F',
+  				600: '#96702F',
+  				700: '#745725',
+  				800: '#533E1A',
+  				900: '#33270F'
   			}
   		},
   		borderRadius: {
@@ -70,7 +72,8 @@ const config: Config = {
   		},
   		fontFamily: {
   			mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-  			sans: ['var(--font-geist-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif']
+  			sans: ['var(--font-geist-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			serif: ['var(--font-source-serif)', 'ui-serif', 'Georgia', 'serif']
   		}
   	}
   },

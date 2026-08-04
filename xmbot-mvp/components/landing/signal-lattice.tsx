@@ -5,8 +5,11 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import { cn } from "@/lib/cn"
 
-const GOLD = new THREE.Color("#D9AF3E")
-const GOLD_BRIGHT = new THREE.Color("#F6E6B4")
+// "Institutional Desk" palette: muted brass-gold, not bright coin-gold —
+// sparse and deliberate against the void, echoing gold-as-precious-accent
+// rather than gold-as-decoration.
+const GOLD = new THREE.Color("#B8873F")
+const GOLD_BRIGHT = new THREE.Color("#E4C98A")
 const EMERALD = new THREE.Color("#34D399")
 
 const MAX_DEGREE = 4
@@ -230,7 +233,7 @@ function LatticeField({ count, bounds }: LatticeConfig) {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#D9AF3E" transparent opacity={0.25} depthWrite={false} />
+        <lineBasicMaterial color="#B8873F" transparent opacity={0.2} depthWrite={false} />
       </lineSegments>
       <points ref={pointsRef}>
         <bufferGeometry>

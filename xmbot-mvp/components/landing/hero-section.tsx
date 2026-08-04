@@ -52,9 +52,9 @@ function TerminalSimulation() {
     if (line.includes("$")) return "text-gold-400"
     if (line.includes("[SIGNAL]") || line.includes("[ORDER]") || line.includes("[APPROVAL]")) return "text-emerald-400 font-medium"
     if (line.includes("[P&L]")) return "text-emerald-400 font-bold text-sm"
-    if (line.includes("[SCAN]")) return "text-slate-300"
+    if (line.includes("[SCAN]")) return "text-stone-300"
     if (line.includes("[TELEGRAM]") || line.includes("[MONITOR]")) return "text-yellow-400"
-    return "text-slate-500"
+    return "text-stone-500"
   }
 
   return (
@@ -62,16 +62,16 @@ function TerminalSimulation() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="corner-frame relative rounded-md border border-white/10 bg-black/80 overflow-hidden"
+      className="corner-frame relative rounded-md border border-foreground/10 bg-background/80 overflow-hidden"
     >
       <div className="relative">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/[0.03]">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-foreground/10 bg-foreground/[0.03]">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500/80" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
             <div className="w-3 h-3 rounded-full bg-green-500/80" />
           </div>
-          <span className="text-xs text-slate-500 ml-2 font-mono">xmbot-engine</span>
+          <span className="text-xs text-stone-500 ml-2 font-mono">xmbot-engine</span>
           <div className="ml-auto flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs text-emerald-400 font-mono">LIVE</span>
@@ -100,7 +100,7 @@ function StatsBar() {
   ]
 
   return (
-    <div className="grid grid-cols-3 divide-x divide-white/10 border border-white/10 rounded-md max-w-lg">
+    <div className="grid grid-cols-3 divide-x divide-foreground/10 border border-foreground/10 rounded-md max-w-lg">
       {stats.map((s, i) => (
         <motion.div
           key={s.label}
@@ -111,9 +111,9 @@ function StatsBar() {
         >
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <s.icon className={`h-3.5 w-3.5 ${s.tone === "gold" ? "text-gold-400" : "text-emerald-400"}`} />
-            <span className="text-xl sm:text-2xl font-bold text-white font-mono tracking-tight">{s.value}</span>
+            <span className="text-xl sm:text-2xl font-bold text-foreground font-mono tracking-tight">{s.value}</span>
           </div>
-          <div className="text-[10px] sm:text-xs text-slate-500 mono-label">{s.label}</div>
+          <div className="text-[10px] sm:text-xs text-stone-500 mono-label">{s.label}</div>
         </motion.div>
       ))}
     </div>
@@ -142,8 +142,8 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               <LampEffect>
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-aggressive leading-[1.05]">
-                  <span className="text-white">
+                <h1 className="font-serif text-6xl sm:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.02]">
+                  <span className="text-foreground">
                     <TextGenerateEffect words="Gold Trading," filter={false} />
                   </span>
                   <br />
@@ -158,17 +158,17 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-8 text-lg text-slate-400 leading-relaxed"
+              className="mt-8 text-lg text-stone-400 leading-relaxed"
             >
               No charts to babysit, no code to write. Connect Telegram, and the AI scans
-              XAUUSD 24/5 for you. <span className="text-white font-medium">Every signal lands in your pocket — you tap Approve or Reject.</span>
+              XAUUSD 24/5 for you. <span className="text-foreground font-medium">Every signal lands in your pocket — you tap Approve or Reject.</span>
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-500"
+              className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-stone-500"
             >
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-gold-500" />
@@ -193,11 +193,11 @@ export function HeroSection() {
               <Link href="/register">
                 <Button size="lg" className="bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold px-10 h-14 text-base transition-colors duration-200 group">
                   Set Up in 15 Minutes
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:transtone-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="#how-it-works">
-                <Button size="lg" variant="outline" className="border-white/15 text-slate-300 hover:bg-white/5 h-14 text-base">
+                <Button size="lg" variant="outline" className="border-foreground/15 text-stone-300 hover:bg-foreground/5 h-14 text-base">
                   See How It Works
                 </Button>
               </Link>

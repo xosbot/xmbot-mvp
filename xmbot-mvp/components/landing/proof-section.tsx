@@ -35,7 +35,7 @@ function AnimatedNumber({ target, suffix = "", prefix = "" }: { target: number; 
   }, [target, hasAnimated])
 
   return (
-    <div ref={ref} className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white font-mono tracking-tight">
+    <div ref={ref} className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground font-mono tracking-tight">
       {prefix}{target % 1 === 0 ? Math.round(current) : current.toFixed(1)}{suffix}
     </div>
   )
@@ -50,12 +50,12 @@ export function ProofSection() {
             <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
               // Backtested Results
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-aggressive">
+            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground tracking-tight">
               Simple Doesn&apos;t Mean
               <br />
               <span className="text-gradient-emerald">Unproven</span>
             </h2>
-            <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+            <p className="mt-6 text-lg text-stone-400 leading-relaxed">
               Validated on 6 months of XAUUSD M5 data with walk-forward analysis — before it ever touched real money.
             </p>
           </div>
@@ -75,8 +75,8 @@ export function ProofSection() {
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
-                  <div className="mt-3 text-sm font-medium text-slate-300">{stat.label}</div>
-                  <div className="mt-1 text-xs text-slate-500">{stat.sub}</div>
+                  <div className="mt-3 text-sm font-medium text-stone-300">{stat.label}</div>
+                  <div className="mt-1 text-xs text-stone-500">{stat.sub}</div>
                 </GlareCard>
               ) : (
                 <CardSpotlight className="p-8 text-center h-full">
@@ -84,15 +84,15 @@ export function ProofSection() {
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
-                  <div className="mt-3 text-sm font-medium text-slate-300">{stat.label}</div>
-                  <div className="mt-1 text-xs text-slate-500">{stat.sub}</div>
+                  <div className="mt-3 text-sm font-medium text-stone-300">{stat.label}</div>
+                  <div className="mt-1 text-xs text-stone-500">{stat.sub}</div>
                 </CardSpotlight>
               )}
             </StaggerItem>
           ))}
         </StaggerChildren>
 
-        <p className="text-center text-xs text-slate-400 mt-10 max-w-lg mx-auto">
+        <p className="text-center text-xs text-stone-400 mt-10 max-w-lg mx-auto">
           * Past performance does not guarantee future results. Trading involves significant risk of loss.
           Results based on backtested data from Jul–Dec 2025.
         </p>
