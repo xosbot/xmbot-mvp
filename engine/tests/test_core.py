@@ -10,6 +10,7 @@ from src.core.types import (
 from src.risk.engine import RiskEngine
 from src.broker.paper import PaperBroker
 from src.broker.ibkr import IBKRBroker
+from src.broker.binance import BinanceBroker
 from src.core.broker_factory import create_broker
 from src.agents.technical import TechnicalAnalysisAgent
 from src.agents.base import AgentStatus
@@ -216,6 +217,123 @@ class TestBinanceBrokerFactory:
     def test_testnet_flag_targets_testnet_api(self):
         broker = create_broker(EngineConfig(binance_testnet=True), "binance")
         assert broker._get_base_url() == "https://testnet.binance.vision"
+
+
+class _FakeBinanceResponse:
+    def __init__(self, status=200, payload=None):
+        self.status = status
+        self._payload = payload or {}
+
+    async def json(self):
+        return self._payload
+
+
+class _FakeBinanceRequestCM:
+    def __init__(self, response, record, method, url, kwargs):
+        self._response = response
+        record.append({"method": method, "url": url, **kwargs})
+
+    async def __aenter__(self):
+        return self._response
+
+    async def __aexit__(self, *args):
+        return False
+
+
+class _FakeBinanceSession:
+    def __init__(self, response):
+        self._response = response
+        self.calls = []
+
+    def request(self, method, url, **kwargs):
+        return _FakeBinanceRequestCM(self._response, self.calls, method, url, kwargs)
+
+
+class TestBinanceOrderFillPrice:
+    """MARKET orders always report price="0.00000000" at the top level —
+    the real fill price is cummulativeQuoteQty / executedQty. Found via the
+    same live testnet order that surfaced the request-format bug above."""
+
+    @pytest.mark.asyncio
+    async def test_market_order_fill_price_derived_from_cumulative_quote(self, monkeypatch):
+        broker = BinanceBroker(api_key="k", api_secret="s", testnet=True)
+
+        async def fake_request(method, path, params=None, signed=False):
+            return {
+                "orderId": 5638125,
+                "price": "0.00000000",
+                "executedQty": "0.10000000",
+                "cummulativeQuoteQty": "406.12400000",
+            }
+
+        monkeypatch.setattr(broker, "_request", fake_request)
+
+        order = Order(
+            id="o1", signal_id="s1", action=SignalAction.BUY, market="PAXGUSDT",
+            volume=0.1, price=4061.24, stop_loss=4050.0,
+        )
+        result = await broker.place_order(order)
+
+        assert result.success
+        assert result.filled_price == pytest.approx(4061.24)
+
+
+class TestBinanceRequestFormat:
+    """Binance's REST API reads params from the query string (or form body)
+    for every method, including signed trading endpoints — it does not parse
+    a JSON body. Sending `json=params` on POST meant the server saw no params
+    at all, so every real order silently failed with a missing-parameter
+    error. Found by running a real signal through to real testnet order
+    placement."""
+
+    @pytest.mark.asyncio
+    async def test_signed_post_sends_params_as_query_string_not_json(self):
+        broker = BinanceBroker(api_key="k", api_secret="s", testnet=True)
+        fake_session = _FakeBinanceSession(
+            _FakeBinanceResponse(200, {"orderId": 1, "price": "100.0"})
+        )
+        broker._session = fake_session
+
+        await broker._request("POST", "/api/v3/order", {"symbol": "PAXGUSDT"}, signed=True)
+
+        call = fake_session.calls[0]
+        assert call["method"] == "POST"
+        assert call.get("json") is None
+        assert call["params"]["symbol"] == "PAXGUSDT"
+        assert "signature" in call["params"]
+
+
+class TestBinanceSpotBalance:
+    """GET /api/v3/account (spot) returns a `balances` array, not the
+    `totalWalletBalance` field that only exists on the Futures API — reading
+    the wrong field meant balance was always read as 0 on spot (masked in
+    production only because that account happens to hold funds in margin,
+    which Testnet doesn't support at all)."""
+
+    def test_reads_free_and_locked_usdt_from_balances_array(self):
+        account = {
+            "balances": [
+                {"asset": "BTC", "free": "1.0", "locked": "0.0"},
+                {"asset": "USDT", "free": "8500.50", "locked": "1499.50"},
+            ]
+        }
+        assert BinanceBroker._spot_usdt_balance(account) == 10000.0
+
+    def test_returns_zero_when_no_usdt_balance(self):
+        assert BinanceBroker._spot_usdt_balance({"balances": []}) == 0.0
+
+    @pytest.mark.asyncio
+    async def test_get_account_reports_real_spot_balance(self, monkeypatch):
+        broker = BinanceBroker(api_key="k", api_secret="s", testnet=True)
+
+        async def fake_request(method, path, params=None, signed=False):
+            return {"balances": [{"asset": "USDT", "free": "10000.0", "locked": "0.0"}]}
+
+        monkeypatch.setattr(broker, "_request", fake_request)
+        account = await broker.get_account()
+
+        assert account.balance == 10000.0
+        assert account.equity == 10000.0
 
 
 class TestIBKRBroker:

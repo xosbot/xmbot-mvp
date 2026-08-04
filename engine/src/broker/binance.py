@@ -93,9 +93,12 @@ class BinanceBroker(Broker):
         if self._session is None:
             self._session = aiohttp.ClientSession()
 
+        # Binance's REST API takes params as a query string (or form-encoded
+        # body) for every method, signed trading endpoints included — it does
+        # not parse a JSON body. A previous `json=params` on POST meant the
+        # server saw no params at all and rejected every order.
         async with self._session.request(
-            method, url, params=params if method == "GET" else None,
-            json=params if method != "GET" else None,
+            method, url, params=params,
             headers=headers,
         ) as resp:
             data = await resp.json()
@@ -112,13 +115,24 @@ class BinanceBroker(Broker):
                 return True
 
             account = await self._request("GET", "/api/v3/account", signed=True)
-            log.info(f"Binance connected — balance: {float(account.get('totalWalletBalance', 0)):.2f} USDT")
+            log.info(f"Binance connected — balance: {self._spot_usdt_balance(account):.2f} USDT")
             self.status = BrokerStatus.CONNECTED
             return True
         except Exception as e:
             log.error(f"Binance connection failed: {e}")
             self.status = BrokerStatus.ERROR
             return False
+
+    @staticmethod
+    def _spot_usdt_balance(account: dict) -> float:
+        """Spot's GET /api/v3/account returns a `balances` array of
+        {asset, free, locked} — not the `totalWalletBalance` field that
+        exists only on the Futures API. Free + locked is the real spot
+        USDT position."""
+        for asset in account.get("balances", []):
+            if asset.get("asset") == "USDT":
+                return float(asset.get("free", 0)) + float(asset.get("locked", 0))
+        return 0.0
 
     async def disconnect(self) -> bool:
         self.status = BrokerStatus.DISCONNECTED
@@ -172,7 +186,12 @@ class BinanceBroker(Broker):
 
             result = await self._request("POST", "/api/v3/order", params, signed=True)
 
-            filled_price = float(result.get("price", 0))
+            # MARKET orders always report price="0.00000000" at the top level —
+            # the real (volume-weighted average) fill price has to be derived
+            # from cummulativeQuoteQty / executedQty.
+            executed_qty = float(result.get("executedQty", 0))
+            cumulative_quote = float(result.get("cummulativeQuoteQty", 0))
+            filled_price = (cumulative_quote / executed_qty) if executed_qty > 0 else 0.0
             broker_order_id = str(result.get("orderId", ""))
 
             order.status = OrderStatus.FILLED
@@ -246,10 +265,11 @@ class BinanceBroker(Broker):
         try:
             # Try spot account first
             account = await self._request("GET", "/api/v3/account", signed=True)
-            balance = float(account.get("totalWalletBalance", 0))
-            equity = float(account.get("totalMarginBalance", 0))
+            balance = self._spot_usdt_balance(account)
+            equity = balance  # spot has no separate margin/equity concept
 
-            # If spot balance is near zero, check margin account
+            # If spot balance is near zero, check margin account (production
+            # accounts may hold funds there instead — not available on Testnet)
             if balance < 1.0:
                 try:
                     margin = await self._request("GET", "/sapi/v1/margin/account", signed=True)
