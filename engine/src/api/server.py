@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from ..core.engine import Engine
 from ..core.types import Signal, SignalAction
+from .middleware import RateLimitMiddleware, RequestTrackingMiddleware
 from .routes.ai import router as ai_router
 from .routes.ai_advanced import router as ai_advanced_router
 from .routes.config import router as config_router
@@ -15,7 +17,7 @@ from .routes.strategies import router as strategies_router
 from .routes.sync import router as sync_router
 from .routes.trading import router as trading_router
 from .routes.websocket import router as ws_router
-from .middleware import RateLimitMiddleware, RequestTrackingMiddleware
+from .user_auth import verified_user_id
 
 log = logging.getLogger("xmbot.api")
 
@@ -54,8 +56,15 @@ def init_api(engine: Engine) -> FastAPI:
 
 
 def get_request_user_id(request: Request) -> str:
-    user_id = request.headers.get("X-User-Id", "")
-    return user_id if user_id else "anonymous"
+    """User id for the current request, verified once by auth_middleware.
+
+    Falls back to re-verifying here (e.g. websocket upgrades, or tests that
+    call a route function directly without going through the middleware).
+    """
+    state_user_id = getattr(request.state, "user_id", None)
+    if state_user_id:
+        return state_user_id
+    return verified_user_id(request, _api_key)
 
 
 def _add_auth_middleware() -> None:
@@ -64,14 +73,14 @@ def _add_auth_middleware() -> None:
         if request.url.path in ("/health", "/docs", "/openapi.json", "/redoc", "/ws/status"):
             return await call_next(request)
         if request.headers.get("upgrade", "").lower() == "websocket":
-            request.state.user_id = get_request_user_id(request)
+            request.state.user_id = verified_user_id(request, _api_key)
             return await call_next(request)
         if not _api_key:
             return JSONResponse(status_code=503, content={"detail": "Engine API key not configured"})
         key = request.headers.get("x-api-key", "")
         if key != _api_key:
             return JSONResponse(status_code=403, content={"detail": "Forbidden"})
-        request.state.user_id = get_request_user_id(request)
+        request.state.user_id = verified_user_id(request, _api_key)
         response = await call_next(request)
         return response
 

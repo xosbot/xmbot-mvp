@@ -10,11 +10,11 @@ import { PositionsPanel } from "@/components/dashboard/positions-panel"
 import { LivePnL } from "@/components/dashboard/live-pnl"
 import { TradeFeed } from "@/components/dashboard/trade-feed"
 import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist"
+import { engineAuthHeaders } from "@/lib/engine-client"
 
 export const dynamic = "force-dynamic"
 
 const ENGINE_URL = process.env.ENGINE_API_URL || "http://localhost:8080"
-const API_KEY = process.env.XMBOT_API_KEY || ""
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -23,11 +23,7 @@ export default async function DashboardPage() {
   const userId = session.user.id
   await enforceBotExpiry(userId)
 
-  const engineHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
-    "X-User-Id": userId,
-  }
-  if (API_KEY) engineHeaders["x-api-key"] = API_KEY
+  const engineHeaders = engineAuthHeaders(userId)
 
   const [user, trades, tradeStats, openTradesCount, engineMetricsRes, engineTradesRes] = await Promise.all([
     db.user.findUnique({

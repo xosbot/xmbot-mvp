@@ -1,7 +1,31 @@
+import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 const ENGINE_BASE = process.env.ENGINE_API_URL || "http://localhost:8080";
 const API_KEY = process.env.XMBOT_API_KEY || "";
+
+/**
+ * The engine trusts X-User-Id to scope trades/positions/metrics per user, but
+ * only ever talks to this Next.js server (bound to 127.0.0.1 in production).
+ * That's a single point of failure: if the engine port is ever exposed
+ * directly, X-User-Id becomes a trivially spoofable header. Sign it with the
+ * same shared secret both sides already hold (XMBOT_API_KEY) so the engine
+ * can reject a forged user id even if the network boundary is misconfigured.
+ */
+export function signUserId(userId: string): string {
+  return createHmac("sha256", API_KEY).update(userId).digest("hex");
+}
+
+/** Headers to attach to any authenticated engine request for `userId`. */
+export function engineAuthHeaders(userId: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-User-Id": userId,
+    "X-User-Signature": signUserId(userId),
+  };
+  if (API_KEY) headers["x-api-key"] = API_KEY;
+  return headers;
+}
 
 interface EngineStatus {
   engine: string;
@@ -99,14 +123,7 @@ export async function proxyEngineRequest(
   userId: string
 ): Promise<NextResponse> {
   try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-User-Id": userId,
-    };
-    if (API_KEY) {
-      headers["x-api-key"] = API_KEY;
-    }
-
+    const headers = engineAuthHeaders(userId);
     const init: RequestInit = { method, headers };
 
     if (method !== "GET" && method !== "HEAD") {
