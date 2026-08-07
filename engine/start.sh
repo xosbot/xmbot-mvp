@@ -58,8 +58,8 @@ while [ $restart_count -le $MAX_RESTARTS ]; do
     echo "[$(date)] Starting $APP_NAME (attempt $((restart_count + 1)))"
     echo $$ > "$PID_FILE"
 
-    exec python src/main.py "$@" 2>&1 | tee -a "$LOG_FILE"
-    exit_code=$?
+    python src/main.py "$@" 2>&1 | tee -a "$LOG_FILE"
+    exit_code=${PIPESTATUS[0]}
 
     if [ $exit_code -eq 0 ]; then
         echo "[$(date)] $APP_NAME exited normally"

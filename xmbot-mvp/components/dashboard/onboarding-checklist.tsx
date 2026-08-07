@@ -37,10 +37,10 @@ export function OnboardingChecklist() {
     },
     {
       id: "broker",
-      title: "Connect Binance",
-      description: "Add your Binance API keys to start live trading",
+      title: "Connect Broker",
+      description: "Add your broker API keys to start live trading",
       icon: Wallet,
-      href: "/dashboard/settings",
+      href: "/dashboard/brokers",
       completed: false,
     },
     {
@@ -59,18 +59,18 @@ export function OnboardingChecklist() {
   if (dismissed || allDone) return null
 
   return (
-    <Card className="bg-gradient-to-br from-gold-500/5 to-transparent border-gold-500/20 rounded-md">
+    <Card className="bg-gradient-to-br from-gold-500/5 to-transparent border-gold-200 rounded-md">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-white text-sm flex items-center gap-2">
-            <Zap className="h-4 w-4 text-gold-400" />
+          <CardTitle className="text-foreground text-sm flex items-center gap-2">
+            <Zap className="h-4 w-4 text-gold-600" />
             Quick Setup
           </CardTitle>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">{completedCount}/{steps.length}</span>
+            <span className="text-xs text-muted-foreground">{completedCount}/{steps.length}</span>
             <button
               onClick={() => setDismissed(true)}
-              className="text-slate-500 hover:text-white transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Dismiss checklist"
             >
               <X className="h-4 w-4" />
@@ -78,7 +78,7 @@ export function OnboardingChecklist() {
           </div>
         </div>
         {/* Progress bar */}
-        <div className="h-1 rounded-full bg-slate-800 mt-2">
+        <div className="h-1 rounded-full bg-accent mt-2">
           <div
             className="h-full rounded-full bg-gold-500 transition-all duration-500"
             style={{ width: `${(completedCount / steps.length) * 100}%` }}
@@ -94,27 +94,27 @@ export function OnboardingChecklist() {
               className={cn(
                 "flex items-center gap-3 p-3 rounded-lg border transition-all duration-200",
                 step.completed
-                  ? "border-emerald-500/20 bg-emerald-500/5"
-                  : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20"
+                  ? "border-emerald-200 bg-emerald-500/5"
+                  : "border-border bg-accent/50 hover:bg-accent hover:border-gold-200"
               )}
             >
               {step.completed ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
               ) : (
-                <Circle className="h-5 w-5 text-slate-500 flex-shrink-0" />
+                <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               )}
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium", step.completed ? "text-emerald-300" : "text-white")}>
+                <p className={cn("text-sm font-medium", step.completed ? "text-emerald-600" : "text-foreground")}>
                   {step.title}
                 </p>
-                <p className="text-xs text-slate-500 truncate">{step.description}</p>
+                <p className="text-xs text-muted-foreground truncate">{step.description}</p>
               </div>
-              <step.icon className={cn("h-4 w-4 flex-shrink-0", step.completed ? "text-emerald-400" : "text-slate-500")} />
+              <step.icon className={cn("h-4 w-4 flex-shrink-0", step.completed ? "text-emerald-600" : "text-muted-foreground")} />
             </Link>
           ))}
         </div>
         {completedCount === steps.length - 1 && (
-          <p className="text-xs text-gold-400 mt-3 text-center">Almost there! Complete the last step to start trading.</p>
+          <p className="text-xs text-gold-600 mt-3 text-center">Almost there! Complete the last step to start trading.</p>
         )}
       </CardContent>
     </Card>

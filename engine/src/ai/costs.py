@@ -26,12 +26,15 @@ class AICostTracker:
     last_reset: float = field(default_factory=time.time)
     last_daily_reset: float = field(default_factory=time.time)
 
-    # Cost per 1M tokens (approximate)
-    COSTS: dict[str, float] = {
-        "gemini-2.5-flash": 0.075,
-        "claude-sonnet-4-20250514": 3.0,
-        "gpt-4o-mini": 0.15,
-    }
+    @staticmethod
+    def _default_costs() -> dict[str, float]:
+        return {
+            "gemini-2.5-flash": 0.075,
+            "claude-sonnet-4-20250514": 3.0,
+            "gpt-4o-mini": 0.15,
+        }
+
+    COSTS: dict[str, float] = field(default_factory=lambda: AICostTracker._default_costs())
 
 
 class AICostController:

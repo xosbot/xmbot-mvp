@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-xmbot_dev}
       POSTGRES_DB: xmbot
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -16,6 +16,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - xmbot-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - redis:/data
 
   engine:
     build:
@@ -32,6 +46,8 @@ services:
       - xmbot-net
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -68,7 +84,8 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  postgres:
+  redis:
   engine_data:
   caddy_data:
   caddy_config:

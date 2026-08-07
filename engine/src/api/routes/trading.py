@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ...core.engine import Engine
@@ -20,6 +20,10 @@ def get_engine() -> Engine:
     if not _engine:
         raise HTTPException(status_code=503, detail="Engine not ready")
     return _engine
+
+
+def get_user_id(request: Request) -> str:
+    return request.headers.get("X-User-Id", "") or "anonymous"
 
 
 class TradeSignalRequest(BaseModel):
@@ -62,7 +66,8 @@ async def trading_status(engine: Engine = Depends(get_engine)):
 
 
 @router.post("/signal")
-async def submit_signal(req: TradeSignalRequest, engine: Engine = Depends(get_engine)):
+async def submit_signal(req: TradeSignalRequest, request: Request, engine: Engine = Depends(get_engine)):
+    user_id = get_user_id(request)
     action = SignalAction(req.action.upper())
     entry = req.entry_price or 0
     sl = req.stop_loss or 0
@@ -82,7 +87,7 @@ async def submit_signal(req: TradeSignalRequest, engine: Engine = Depends(get_en
         confidence=0.8,
         reason=req.reason,
         agent="manual",
-        user_id="default",
+        user_id=user_id,
     )
 
     await engine.signal_bus.emit_signal(signal)
@@ -110,8 +115,10 @@ async def control_engine(req: EngineControlRequest, engine: Engine = Depends(get
 
 
 @router.get("/positions")
-async def get_positions(engine: Engine = Depends(get_engine)):
+async def get_positions(request: Request, engine: Engine = Depends(get_engine)):
+    user_id = get_user_id(request)
     positions = await engine.broker.get_positions()
+    user_positions = [p for p in positions if p.user_id == user_id] if user_id != "anonymous" else positions
     return [
         {
             "id": p.id,
@@ -125,12 +132,13 @@ async def get_positions(engine: Engine = Depends(get_engine)):
             "unrealized_pnl": p.unrealized_pnl,
             "open_time": p.open_time.isoformat(),
         }
-        for p in positions
+        for p in user_positions
     ]
 
 
 @router.get("/account")
-async def get_account(engine: Engine = Depends(get_engine)):
+async def get_account(request: Request, engine: Engine = Depends(get_engine)):
+    user_id = get_user_id(request)
     account = await engine.broker.get_account()
     if not account:
         raise HTTPException(status_code=503, detail="Account not available")
@@ -140,19 +148,21 @@ async def get_account(engine: Engine = Depends(get_engine)):
         "margin": account.margin,
         "margin_free": account.margin_free,
         "currency": account.currency,
+        "user_id": user_id,
     }
 
 
 @router.get("/risk")
-async def get_risk_stats(engine: Engine = Depends(get_engine)):
-    user_id = "default"
+async def get_risk_stats(request: Request, engine: Engine = Depends(get_engine)):
+    user_id = get_user_id(request)
     return engine.risk.get_daily_stats(user_id)
 
 
 @router.post("/risk")
-async def update_risk_config(req: RiskConfigRequest, engine: Engine = Depends(get_engine)):
+async def update_risk_config(req: RiskConfigRequest, request: Request, engine: Engine = Depends(get_engine)):
+    user_id = get_user_id(request)
     engine.risk.update_global_limits(
         max_daily_loss=req.max_daily_loss,
         max_positions=req.max_positions,
     )
-    return {"status": "updated"}
+    return {"status": "updated", "user_id": user_id}

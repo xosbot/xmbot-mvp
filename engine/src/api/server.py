@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -20,13 +19,11 @@ from .middleware import RateLimitMiddleware, RequestTrackingMiddleware
 
 log = logging.getLogger("xmbot.api")
 
-app = FastAPI(title="XMBot Engine API", version="0.2.0")
+app = FastAPI(title="XMBot Engine API", version="0.3.0")
 
-# Add middleware
 app.add_middleware(RequestTrackingMiddleware)
 app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
 
-# Include routers
 app.include_router(sync_router)
 app.include_router(config_router)
 app.include_router(ai_router)
@@ -44,9 +41,7 @@ def init_api(engine: Engine) -> FastAPI:
     global engine_ref, _api_key
     engine_ref = engine
     _api_key = engine.config.api_key
-    _add_auth_middleware()
 
-    # Initialize strategy registry
     from ..strategies.registry import StrategyRegistry, load_builtin_strategies
     from .routes.strategies import init_strategies_api
 
@@ -54,24 +49,93 @@ def init_api(engine: Engine) -> FastAPI:
     load_builtin_strategies(registry)
     init_strategies_api(registry)
 
+    _add_auth_middleware()
     return app
+
+
+def get_request_user_id(request: Request) -> str:
+    user_id = request.headers.get("X-User-Id", "")
+    return user_id if user_id else "anonymous"
 
 
 def _add_auth_middleware() -> None:
     @app.middleware("http")
     async def auth_middleware(request: Request, call_next):
-        # Allow health, docs, and WebSocket endpoints without auth
         if request.url.path in ("/health", "/docs", "/openapi.json", "/redoc", "/ws/status"):
             return await call_next(request)
-        # Allow WebSocket upgrade without API key auth (handled by WebSocket)
         if request.headers.get("upgrade", "").lower() == "websocket":
+            request.state.user_id = get_request_user_id(request)
             return await call_next(request)
         if not _api_key:
             return JSONResponse(status_code=503, content={"detail": "Engine API key not configured"})
         key = request.headers.get("x-api-key", "")
         if key != _api_key:
             return JSONResponse(status_code=403, content={"detail": "Forbidden"})
-        return await call_next(request)
+        request.state.user_id = get_request_user_id(request)
+        response = await call_next(request)
+        return response
+
+
+@app.get("/health")
+async def health(request: Request):
+    if not engine_ref:
+        return {"status": "not_ready"}
+    connected = await engine_ref.broker.is_connected()
+    return {
+        "status": "running" if connected else "degraded",
+        "agents": list(engine_ref.agents.keys()),
+        "broker": engine_ref.config.default_broker,
+        "connected": connected,
+    }
+
+
+@app.get("/positions")
+async def get_positions(request: Request):
+    user_id = get_request_user_id(request)
+    if not engine_ref:
+        return []
+    positions = await engine_ref.broker.get_positions()
+    user_positions = [p for p in positions if p.user_id == user_id] if user_id != "anonymous" else positions
+    return [
+        {
+            "id": p.id,
+            "symbol": p.symbol,
+            "direction": p.direction.value,
+            "volume": p.volume,
+            "entry_price": p.entry_price,
+            "current_price": p.current_price,
+            "stop_loss": p.stop_loss,
+            "take_profit": p.take_profit,
+            "unrealized_pnl": p.unrealized_pnl,
+            "open_time": p.open_time.isoformat(),
+        }
+        for p in user_positions
+    ]
+
+
+@app.get("/account")
+async def get_account(request: Request):
+    user_id = get_request_user_id(request)
+    if not engine_ref:
+        return {"balance": 0, "equity": 0, "margin": 0, "margin_free": 0, "currency": "USD", "user_id": user_id}
+    account = await engine_ref.broker.get_account()
+    if not account:
+        return {
+            "balance": 0,
+            "equity": 0,
+            "margin": 0,
+            "margin_free": 0,
+            "currency": "USD",
+            "user_id": user_id,
+        }
+    return {
+        "balance": account.balance,
+        "equity": account.equity,
+        "margin": account.margin,
+        "margin_free": account.margin_free,
+        "currency": account.currency,
+        "user_id": user_id,
+    }
 
 
 class SignalRequest(BaseModel):
@@ -89,41 +153,11 @@ class ControlRequest(BaseModel):
     action: str
 
 
-def get_engine() -> Engine:
-    if not engine_ref:
-        raise HTTPException(status_code=503, detail="Engine not ready")
-    return engine_ref
-
-
-@app.get("/health")
-async def health():
-    if not engine_ref:
-        return {"status": "not_ready"}
-    connected = await engine_ref.broker.is_connected()
-    return {
-        "status": "running" if connected else "degraded",
-        "agents": list(engine_ref.agents.keys()),
-        "broker": engine_ref.config.default_broker,
-        "connected": connected,
-    }
-
-
-@app.get("/positions")
-async def get_positions():
-    engine = get_engine()
-    return await engine.broker.get_positions()
-
-
-@app.get("/account")
-async def get_account():
-    engine = get_engine()
-    return await engine.broker.get_account()
-
-
 @app.post("/signal")
-async def submit_signal(req: SignalRequest):
-    engine = get_engine()
-
+async def submit_signal(req: SignalRequest, request: Request):
+    user_id = get_request_user_id(request)
+    if not engine_ref:
+        return {"status": "error", "detail": "Engine not ready"}
     signal = Signal(
         id="",
         action=SignalAction(req.action.upper()),
@@ -134,26 +168,28 @@ async def submit_signal(req: SignalRequest):
         confidence=req.confidence,
         reason=req.reason,
         agent=req.agent,
-        user_id="default",
+        user_id=user_id,
     )
-    await engine.signal_bus.emit_signal(signal)
+    await engine_ref.signal_bus.emit_signal(signal)
     return {"status": "submitted", "signal_id": signal.id}
 
 
 @app.post("/control")
 async def control(req: ControlRequest):
-    engine = get_engine()
+    if not engine_ref:
+        return {"status": "error", "detail": "Engine not ready"}
 
     if req.action == "start":
-        await engine.start()
+        await engine_ref.start()
         return {"status": "started"}
     elif req.action == "stop":
-        await engine.stop()
+        await engine_ref.stop()
         return {"status": "stopped"}
     elif req.action == "status":
         return {
-            "running": engine.running,
-            "agents": len(engine.agents),
-            "pending_signals": engine.gate.pending_count,
+            "running": engine_ref.running,
+            "agents": len(engine_ref.agents),
+            "pending_signals": engine_ref.gate.pending_count,
         }
+    from fastapi import HTTPException
     raise HTTPException(status_code=400, detail=f"Unknown action: {req.action}")

@@ -58,11 +58,12 @@ class EngineConfig:
 
     # Trailing Stop
     trailing_stop_enabled: bool = True
-    trailing_stop_activation_atr: float = 1.0  # Activate after price moves 1x ATR in profit
-    trailing_stop_distance_atr: float = 1.5   # Trail SL at 1.5x ATR from current price
+    trailing_stop_activation_atr: float = 1.0
+    trailing_stop_distance_atr: float = 1.5
 
     # API
     api_key: str = ""
+    database_url: str = ""
 
     # MQL5
     mql5_community_key: str = ""
@@ -105,6 +106,7 @@ class EngineConfig:
             trailing_stop_activation_atr=float(os.getenv("TRAILING_STOP_ACTIVATION_ATR", "1.0")),
             trailing_stop_distance_atr=float(os.getenv("TRAILING_STOP_DISTANCE_ATR", "1.5")),
             api_key=os.getenv("XMBOT_API_KEY", ""),
+            database_url=os.getenv("DATABASE_URL", ""),
             mql5_community_key=os.getenv("MQL5_COMMUNITY_KEY", ""),
             encryption_key=os.getenv("ENCRYPTION_KEY", ""),
             sentry_dsn=os.getenv("SENTRY_DSN", ""),

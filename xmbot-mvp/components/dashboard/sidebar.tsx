@@ -15,12 +15,16 @@ import {
   Menu,
   CreditCard,
   Terminal,
+  Brain,
+  Wifi,
 } from "lucide-react"
 import { useState } from "react"
 
 const navItems = [
   { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Agents", href: "/dashboard/agents", icon: Brain },
   { title: "Bots", href: "/dashboard/bots", icon: Bot },
+  { title: "Brokers", href: "/dashboard/brokers", icon: Wifi },
   { title: "Trades", href: "/dashboard/trades", icon: BarChart3 },
   { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -30,15 +34,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full flex-col bg-slate-900 border-r border-slate-800">
+    <div className="flex h-full flex-col bg-card border-r border-border">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2.5 px-6 border-b border-slate-800">
-        <div className="corner-frame w-8 h-8 rounded-md border border-white/15 bg-white/[0.03] flex items-center justify-center">
-          <Terminal className="h-4 w-4 text-gold-400" />
+      <div className="flex h-16 items-center gap-2.5 px-6 border-b border-border">
+        <div className="corner-frame w-8 h-8 rounded-md border border-gold-500/30 bg-gold-500/5 flex items-center justify-center">
+          <Terminal className="h-4 w-4 text-gold-600" />
         </div>
         <span className="text-lg font-bold tracking-aggressive">
-          <span className="text-white">XM</span>
-          <span className="text-gold-400">Bot</span>
+          <span className="text-foreground">XM</span>
+          <span className="text-gold-600">One</span>
         </span>
       </div>
 
@@ -52,8 +56,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
               pathname === item.href
-                ? "bg-gold-500/10 text-gold-400"
-                : "text-slate-400 hover:text-white hover:bg-slate-800"
+                ? "bg-gold-500/10 text-gold-700 font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
             )}
           >
             <item.icon className="h-4 w-4" />
@@ -63,10 +67,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       {/* Sign out */}
-      <div className="border-t border-slate-800 p-3">
+      <div className="border-t border-border p-3">
         <Button
           variant="ghost"
-          className="w-full justify-start text-slate-400 hover:text-white"
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
           onClick={() => signOut({ callbackUrl: "/" })}
         >
           <LogOut className="h-4 w-4 mr-3" />

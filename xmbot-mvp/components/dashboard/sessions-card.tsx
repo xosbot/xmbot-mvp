@@ -74,7 +74,7 @@ export function SessionsCard() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-slate-500">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading sessions...
       </div>
@@ -84,7 +84,7 @@ export function SessionsCard() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           {sessions.length} active session{sessions.length !== 1 ? "s" : ""}
         </p>
         {sessions.length > 1 && (
@@ -102,20 +102,20 @@ export function SessionsCard() {
 
       <div className="space-y-3">
         {sessions.map((s) => (
-          <Card key={s.id} className="bg-white/[0.03] border-white/10 rounded-md">
+          <Card key={s.id} className="bg-card border-border rounded-md">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Monitor className="h-5 w-5 text-slate-400" />
+                <Monitor className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-white">Browser Session</span>
+                    <span className="text-sm text-foreground">Browser Session</span>
                     {s.isCurrent && (
-                      <Badge className="text-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                      <Badge className="text-xs bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                         Current
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Expires: {new Date(s.expires).toLocaleDateString()}
                   </p>
                 </div>
@@ -125,7 +125,7 @@ export function SessionsCard() {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleRevokeOne(s.id)}
-                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
                 >
                   Revoke
                 </Button>

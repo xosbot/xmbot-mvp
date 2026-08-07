@@ -7,7 +7,7 @@ xmbot.online {
 
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ws://localhost:8080 ws://*.xmbot.online; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         X-Content-Type-Options "nosniff"
         X-Frame-Options "DENY"
         Referrer-Policy "strict-origin-when-cross-origin"
@@ -16,6 +16,9 @@ xmbot.online {
 
     reverse_proxy /api/* web:3000
     reverse_proxy /_next/* web:3000
+    reverse_proxy /api/engine/* engine:8080
+    reverse_proxy /health engine:8080
+    reverse_proxy /metrics engine:8080
     reverse_proxy /* web:3000
 }
 

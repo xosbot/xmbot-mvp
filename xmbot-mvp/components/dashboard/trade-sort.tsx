@@ -33,11 +33,11 @@ export function TradeSort({ currentSort }: TradeSortProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <ArrowUpDown className="h-3 w-3 text-slate-400" />
+      <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
       <select
         value={currentSort || "openTime-desc"}
         onChange={(e) => handleSort(e.target.value)}
-        className="flex h-7 w-[140px] rounded-md border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-gold-500"
+        className="flex h-7 w-[140px] rounded-md border border-border bg-card px-3 py-1 text-xs text-muted-foreground shadow-sm focus:outline-none focus:ring-1 focus:ring-gold-500"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

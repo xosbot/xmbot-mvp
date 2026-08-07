@@ -47,15 +47,15 @@ export function ProofSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700 mb-6">
               // Backtested Results
             </div>
-            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
               Simple Doesn&apos;t Mean
               <br />
               <span className="text-gradient-emerald">Unproven</span>
             </h2>
-            <p className="mt-6 text-lg text-stone-400 leading-relaxed">
+            <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
               Validated on 6 months of XAUUSD M5 data with walk-forward analysis — before it ever touched real money.
             </p>
           </div>
@@ -75,8 +75,8 @@ export function ProofSection() {
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
-                  <div className="mt-3 text-sm font-medium text-stone-300">{stat.label}</div>
-                  <div className="mt-1 text-xs text-stone-500">{stat.sub}</div>
+                  <div className="mt-3 text-sm font-medium text-muted-foreground">{stat.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground/70">{stat.sub}</div>
                 </GlareCard>
               ) : (
                 <CardSpotlight className="p-8 text-center h-full">
@@ -84,15 +84,15 @@ export function ProofSection() {
                     {stat.icon}
                   </div>
                   <AnimatedNumber target={stat.value} prefix={stat.prefix || ""} suffix={stat.suffix} />
-                  <div className="mt-3 text-sm font-medium text-stone-300">{stat.label}</div>
-                  <div className="mt-1 text-xs text-stone-500">{stat.sub}</div>
+                  <div className="mt-3 text-sm font-medium text-muted-foreground">{stat.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground/70">{stat.sub}</div>
                 </CardSpotlight>
               )}
             </StaggerItem>
           ))}
         </StaggerChildren>
 
-        <p className="text-center text-xs text-stone-400 mt-10 max-w-lg mx-auto">
+        <p className="text-center text-xs text-muted-foreground mt-10 max-w-lg mx-auto">
           * Past performance does not guarantee future results. Trading involves significant risk of loss.
           Results based on backtested data from Jul–Dec 2025.
         </p>

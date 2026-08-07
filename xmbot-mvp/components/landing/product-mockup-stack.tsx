@@ -14,14 +14,14 @@ import { TrendingUp } from "lucide-react"
 
 function TelegramApprovalCard() {
   return (
-    <div className="corner-frame relative w-full max-w-sm rounded-xl border border-foreground/10 bg-[#17212b] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.55)] overflow-hidden">
+    <div className="corner-frame relative w-full max-w-sm rounded-xl border border-border bg-[#17212b] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.35)] overflow-hidden">
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-white/5">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/15 text-gold-400 font-mono text-sm font-semibold">
           &gt;_
         </div>
         <div className="leading-tight">
           <div className="flex items-center gap-1 text-sm font-medium text-white/90">
-            XMBot
+            XMOne
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-[#4ba3e3]" aria-hidden="true">
               <path d="M12 2 14.5 4.5 18 3.5 18.5 7 22 8.5 20 12 22 15.5 18.5 17 18 20.5 14.5 19.5 12 22 9.5 19.5 6 20.5 5.5 17 2 15.5 4 12 2 8.5 5.5 7 6 3.5 9.5 4.5Z" />
               <path d="M9.5 12.2 11.3 14 15 9.8" stroke="#17212b" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -59,22 +59,22 @@ function TelegramApprovalCard() {
 
 function DashboardPositionCard() {
   return (
-    <div className="w-full max-w-xs rounded-xl border border-border bg-card p-4">
+    <div className="w-full max-w-xs rounded-xl border border-border bg-card p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <span className="mono-label text-[10px] text-muted-foreground">Positions</span>
         <div className="flex items-center gap-1.5">
           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] text-emerald-400 font-mono">LIVE</span>
+          <span className="text-[10px] text-emerald-600 font-mono">LIVE</span>
         </div>
       </div>
 
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-gold-400" />
+            <TrendingUp className="h-3.5 w-3.5 text-gold-600" />
             <span className="text-sm font-medium text-foreground">XAUUSD</span>
           </div>
-          <span className="font-mono text-sm text-emerald-400">+$47.20</span>
+          <span className="font-mono text-sm text-emerald-600">+$47.20</span>
         </div>
         <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
           <div>
@@ -87,7 +87,7 @@ function DashboardPositionCard() {
           </div>
           <div>
             <div className="text-muted-foreground">P&amp;L</div>
-            <div className="text-emerald-400">+1.45%</div>
+            <div className="text-emerald-600">+1.45%</div>
           </div>
         </div>
       </div>

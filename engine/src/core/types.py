@@ -127,6 +127,7 @@ class Position:
     realized_pnl: float = 0.0
     open_time: datetime = field(default_factory=lambda: datetime.now(UTC))
     broker_position_id: str | None = None
+    user_id: str = ""
 
 
 @dataclass

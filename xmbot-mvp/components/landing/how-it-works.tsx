@@ -18,7 +18,7 @@ const steps = [
     number: "02",
     time: "Runs 24/5",
     title: "AI Scans the Market",
-    description: "Multi-agent engine analyzes XAUUSD every 5 minutes — RSI, Supertrend, ADX — then an AI validator double-checks every candidate signal.",
+    description: "Multi-agent engine analyzes gold, stocks, crypto, and forex every 5 minutes — then AI validators double-check every candidate signal.",
   },
   {
     icon: CheckCircle,
@@ -29,7 +29,7 @@ const steps = [
   },
   {
     icon: BarChart3,
-    number: "04",
+    number: "Anytime",
     time: "Anytime",
     title: "Track & Optimize",
     description: "Watch P&L on your dashboard, review past signals, and adjust risk settings whenever you want. Monthly reports keep you honest.",
@@ -44,15 +44,15 @@ export function HowItWorks() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-400 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700 mb-6">
               // How It Works
             </div>
-            <h2 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium text-foreground tracking-tight">
+            <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
               Four Steps.
               <br />
               <span className="text-gradient-gold">15 Minutes Total.</span>
             </h2>
-            <p className="mt-6 text-lg text-stone-400 leading-relaxed">
+            <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
               Start to finish, on your phone. No coding, no charts to learn, no software to install.
             </p>
           </div>
@@ -61,7 +61,7 @@ export function HowItWorks() {
         {/* Timeline */}
         <div className="relative max-w-4xl mx-auto">
           {/* Tracing beam line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gold-500/25" />
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gold-200" />
 
           <StaggerChildren className="space-y-12" staggerDelay={0.2}>
             {steps.map((step) => (
@@ -70,8 +70,8 @@ export function HowItWorks() {
                   {/* Step number circle */}
                   <div className="relative z-10 flex-shrink-0">
                     <LampEffect>
-                      <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-card border border-border">
-                        <step.icon className="h-7 w-7 text-foreground/70" />
+                      <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-card border border-border shadow-sm">
+                        <step.icon className="h-7 w-7 text-muted-foreground" />
                       </div>
                     </LampEffect>
                   </div>
@@ -83,9 +83,9 @@ export function HowItWorks() {
                         {step.number}
                       </span>
                       <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
-                      <span className="ml-auto text-xs font-mono text-stone-500">{step.time}</span>
+                      <span className="ml-auto text-xs font-mono text-muted-foreground">{step.time}</span>
                     </div>
-                    <p className="text-sm text-stone-400 leading-relaxed">{step.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                   </GlareCard>
                 </div>
               </StaggerItem>

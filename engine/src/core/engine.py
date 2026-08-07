@@ -57,6 +57,8 @@ class Engine:
         self._position_atr: dict[str, float] = {}  # position_id -> ATR at entry
         self._regime_cache: dict[str, dict] = {}  # symbol -> regime info
         self._regime_cache_ttl = 3600  # 1 hour cache
+        self._closed_trades: dict[str, dict] = {}  # position_id -> closed trade info
+        self._open_positions: dict[str, Position] = {}  # position_id -> Position object for closure detection
 
     @property
     def agents(self) -> dict[str, Agent]:
@@ -190,33 +192,99 @@ class Engine:
         log.info(f"Broker switched to {broker_type}")
 
     async def _sync_loop(self) -> None:
-        """Periodically push trade data to the sync API store."""
+        """Periodically push trade data to the sync API store.
+        
+        Tracks position lifecycle: detects when positions close (via stop-loss,
+        take-profit, or manual close) and records them as completed trades.
+        """
+        from ..api.routes.sync import USER_STORES
+        
         while self._running:
             try:
                 positions = await self.broker.get_positions()
                 account = await self.broker.get_account()
-
-                store = get_sync_store()
-
-                if positions:
-                    store["trades"] = [
-                        {
-                            "id": p.id,
-                            "symbol": p.symbol,
-                            "action": p.direction.value,
-                            "open_price": p.entry_price,
-                            "close_price": None,
-                            "lot_size": p.volume,
-                            "profit": p.unrealized_pnl,
-                            "stop_loss": p.stop_loss,
-                            "take_profit": p.take_profit,
-                            "open_time": p.open_time.isoformat(),
-                            "close_time": None,
-                            "status": "OPEN",
-                        }
-                        for p in positions
-                    ]
-
+                
+                current_position_ids = {p.id for p in positions}
+                previous_position_ids = set(self._open_positions.keys())
+                closed_position_ids = previous_position_ids - current_position_ids
+                
+                for pos_id in closed_position_ids:
+                    if pos_id in self._closed_trades:
+                        continue
+                    
+                    old_pos = self._open_positions.get(pos_id)
+                    if old_pos is None:
+                        continue
+                    
+                    user_id = getattr(old_pos, 'user_id', 'default')
+                    
+                    closed_trade = {
+                        "id": pos_id,
+                        "user_id": user_id,
+                        "symbol": old_pos.symbol,
+                        "action": old_pos.direction.value,
+                        "open_price": old_pos.entry_price,
+                        "close_price": old_pos.current_price,
+                        "lot_size": old_pos.volume,
+                        "profit": old_pos.unrealized_pnl,
+                        "stop_loss": old_pos.stop_loss,
+                        "take_profit": old_pos.take_profit,
+                        "open_time": old_pos.open_time.isoformat(),
+                        "close_time": datetime.now(UTC).isoformat(),
+                        "status": "CLOSED",
+                        "broker_position_id": old_pos.broker_position_id,
+                    }
+                    
+                    self._closed_trades[pos_id] = closed_trade
+                    log.info(f"Position closed: {pos_id}, P&L: {closed_trade['profit']:.2f}")
+                
+                for pos in positions:
+                    self._open_positions[pos.id] = pos
+                
+                for pos_id in closed_position_ids:
+                    if pos_id in self._open_positions:
+                        del self._open_positions[pos_id]
+                
+                user_id = "default"
+                if user_id not in USER_STORES:
+                    USER_STORES[user_id] = {
+                        "trades": [],
+                        "metrics": {
+                            "total_trades": 0,
+                            "winning_trades": 0,
+                            "win_rate": 0.0,
+                            "total_pnl": 0.0,
+                            "open_trades": 0,
+                            "account_balance": 10000.0,
+                            "account_equity": 10000.0,
+                        },
+                        "last_sync": None,
+                    }
+                
+                store = USER_STORES[user_id]
+                
+                open_trades = [
+                    {
+                        "id": p.id,
+                        "user_id": getattr(p, 'user_id', 'anonymous'),
+                        "symbol": p.symbol,
+                        "action": p.direction.value,
+                        "open_price": p.entry_price,
+                        "close_price": None,
+                        "lot_size": p.volume,
+                        "profit": p.unrealized_pnl,
+                        "stop_loss": p.stop_loss,
+                        "take_profit": p.take_profit,
+                        "open_time": p.open_time.isoformat(),
+                        "close_time": None,
+                        "status": "OPEN",
+                    }
+                    for p in positions
+                ]
+                
+                closed_trades_list = list(self._closed_trades.values())
+                store["trades"] = open_trades + closed_trades_list
+                
                 if account:
                     self._cached_balance = account.balance
                     total = len(store["trades"])

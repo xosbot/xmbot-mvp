@@ -6,7 +6,7 @@ export function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-slate-800", className)}
+      className={cn("animate-pulse rounded-md bg-muted", className)}
       {...props}
     />
   )
@@ -14,7 +14,7 @@ export function Skeleton({
 
 export function StatCardSkeleton() {
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
+    <div className="rounded-lg border border-border bg-card p-6">
       <div className="flex items-center justify-between pb-2">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-4 w-4" />
@@ -37,12 +37,12 @@ export function DashboardSkeleton() {
           <StatCardSkeleton />
           <StatCardSkeleton />
         </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
+        <div className="rounded-lg border border-border bg-card p-6">
           <Skeleton className="h-4 w-32 mb-4" />
           <Skeleton className="h-20 w-full" />
         </div>
       </div>
-      <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
+      <div className="rounded-lg border border-border bg-card p-6">
         <Skeleton className="h-4 w-32 mb-4" />
         <div className="space-y-3">
           <Skeleton className="h-16 w-full" />
@@ -56,7 +56,7 @@ export function DashboardSkeleton() {
 
 export function TradeRowSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-4 border-b border-slate-800">
+    <div className="flex items-center gap-4 p-4 border-b border-border">
       <Skeleton className="h-4 w-24" />
       <Skeleton className="h-4 w-16" />
       <Skeleton className="h-6 w-12" />
@@ -77,7 +77,7 @@ export function TradesPageSkeleton() {
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-4 w-32" />
       </div>
-      <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-6">
+      <div className="rounded-lg border border-border bg-card p-6">
         <Skeleton className="h-6 w-32 mb-4" />
         <TradeRowSkeleton />
         <TradeRowSkeleton />

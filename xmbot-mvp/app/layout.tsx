@@ -24,27 +24,28 @@ const sourceSerif = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "XMBot — AI-Powered Gold Trading Platform",
-    template: "%s | XMBot",
+    default: "XMOne — AI Investment Platform",
+    template: "%s | XMOne",
   },
   description:
-    "Multi-agent AI system for XAUUSD trading with human-in-the-loop approval. 64% backtested win rate. Trade gold with AI agents — you stay in control.",
+    "AI-powered investment platform for gold, stocks, crypto, and mutual funds. Multi-agent AI finds opportunities across India and global markets. You stay in control.",
   keywords: [
+    "AI investment platform",
     "trading bot",
     "gold trading",
     "XAUUSD",
-    "AI trading",
+    "stocks India",
+    "NSE BSE",
+    "mutual funds",
+    "crypto trading",
+    "forex",
     "algorithmic trading",
-    "automated trading",
-    "forex bot",
-    "gold bot",
-    "PAXG",
-    "Binance",
+    "AI portfolio advisor",
     "Telegram trading",
   ],
-  authors: [{ name: "XMBot" }],
-  creator: "XMBot",
-  publisher: "XMBot",
+  authors: [{ name: "XMOne" }],
+  creator: "XMOne",
+  publisher: "XMOne",
   alternates: {
     canonical: "https://xmbot.online",
   },
@@ -52,24 +53,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://xmbot.online",
-    siteName: "XMBot",
-    title: "XMBot — AI-Powered Gold Trading Platform",
+    siteName: "XMOne",
+    title: "XMOne — AI Investment Platform",
     description:
-      "Multi-agent AI system for XAUUSD trading with human-in-the-loop approval. 64% backtested win rate.",
+      "AI-powered investment platform for gold, stocks, crypto, and mutual funds. Multi-agent AI finds opportunities across India and global markets.",
     images: [
       {
         url: "https://xmbot.online/og-image.png",
         width: 1200,
         height: 630,
-        alt: "XMBot — AI Gold Trading",
+        alt: "XMOne — AI Investment Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "XMBot — AI-Powered Gold Trading",
+    title: "XMOne — AI Investment Platform",
     description:
-      "Multi-agent AI system for XAUUSD trading. You approve every trade.",
+      "AI-powered investment platform for gold, stocks, crypto, and mutual funds. You stay in control.",
     images: ["https://xmbot.online/og-image.png"],
   },
   icons: {
@@ -91,7 +92,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#171512",
+  themeColor: "#FAFAF8",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -103,7 +104,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <StructuredData />
       </head>

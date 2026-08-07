@@ -49,39 +49,39 @@ export function TradesTable({ trades }: TradesTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="border-slate-800">
-              <TableHead className="text-slate-400">Date</TableHead>
-              <TableHead className="text-slate-400">Symbol</TableHead>
-              <TableHead className="text-slate-400">Type</TableHead>
-              <TableHead className="text-slate-400">Lot</TableHead>
-              <TableHead className="text-slate-400">Open</TableHead>
-              <TableHead className="text-slate-400">Close</TableHead>
-              <TableHead className="text-slate-400">P&L</TableHead>
-              <TableHead className="text-slate-400">Status</TableHead>
+            <TableRow className="border-border">
+              <TableHead className="text-muted-foreground">Date</TableHead>
+              <TableHead className="text-muted-foreground">Symbol</TableHead>
+              <TableHead className="text-muted-foreground">Type</TableHead>
+              <TableHead className="text-muted-foreground">Lot</TableHead>
+              <TableHead className="text-muted-foreground">Open</TableHead>
+              <TableHead className="text-muted-foreground">Close</TableHead>
+              <TableHead className="text-muted-foreground">P&L</TableHead>
+              <TableHead className="text-muted-foreground">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {trades.map((trade) => (
               <TableRow
                 key={trade.id}
-                className="border-slate-800 cursor-pointer hover:bg-slate-800/50 transition-colors"
+                className="border-border cursor-pointer hover:bg-accent/50 transition-colors"
                 onClick={() => handleRowClick(trade)}
               >
-                <TableCell className="text-slate-300 text-xs whitespace-nowrap">
+                <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
                   {formatDate(trade.openTime)}
                 </TableCell>
-                <TableCell className="text-white font-medium">{trade.symbol}</TableCell>
+                <TableCell className="text-foreground font-medium">{trade.symbol}</TableCell>
                 <TableCell>
                   <Badge variant={trade.type === "BUY" ? "default" : "destructive"} className="text-xs">
                     {trade.type}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-slate-300">{trade.lotSize}</TableCell>
-                <TableCell className="text-slate-300">{formatPrice(trade.openPrice)}</TableCell>
-                <TableCell className="text-slate-300">
+                <TableCell className="text-muted-foreground">{trade.lotSize}</TableCell>
+                <TableCell className="text-muted-foreground">{formatPrice(trade.openPrice)}</TableCell>
+                <TableCell className="text-muted-foreground">
                   {trade.closePrice ? formatPrice(trade.closePrice) : "—"}
                 </TableCell>
-                <TableCell className={trade.profit && trade.profit >= 0 ? "text-emerald-500" : "text-red-400"}>
+                <TableCell className={trade.profit && trade.profit >= 0 ? "text-emerald-600" : "text-red-500"}>
                   {trade.profit !== null ? formatPnL(trade.profit) : "—"}
                 </TableCell>
                 <TableCell>

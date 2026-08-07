@@ -17,7 +17,7 @@ export function ExpandableCard({
   return (
     <div
       className={cn(
-        "border-b border-white/10 last:border-0",
+        "border-b border-border last:border-0",
         className
       )}
     >
@@ -26,12 +26,12 @@ export function ExpandableCard({
         className="flex items-center justify-between w-full py-5 text-left group"
         aria-expanded={isOpen}
       >
-        <span className="text-base font-medium text-white group-hover:text-gold-400 transition-colors pr-4">
+        <span className="text-base font-medium text-foreground group-hover:text-gold-600 transition-colors pr-4">
           {title}
         </span>
         <div
           className={cn(
-            "h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-300",
+            "h-5 w-5 text-muted-foreground flex-shrink-0 transition-transform duration-300",
             isOpen ? "rotate-180" : ""
           )}
         >
@@ -50,7 +50,7 @@ export function ExpandableCard({
           isOpen ? "max-h-96 pb-5 opacity-100" : "max-h-0 opacity-0"
         )}
       >
-        <div className="text-sm text-slate-400 leading-relaxed">{children}</div>
+        <div className="text-sm text-muted-foreground leading-relaxed">{children}</div>
       </div>
     </div>
   )

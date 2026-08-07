@@ -30,41 +30,41 @@ export default async function PaymentStatusPage({
       <CardHeader className="text-center">
         {status === "success" ? (
           <>
-            <CheckCircle className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl text-white">Payment Successful!</CardTitle>
+            <CheckCircle className="h-16 w-16 text-emerald-600 mx-auto mb-4" />
+            <CardTitle className="text-2xl text-foreground">Payment Successful!</CardTitle>
           </>
         ) : status === "failed" ? (
           <>
             <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl text-white">Payment Failed</CardTitle>
+            <CardTitle className="text-2xl text-foreground">Payment Failed</CardTitle>
           </>
         ) : (
           <>
             <Bot className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-            <CardTitle className="text-2xl text-white">Processing Payment</CardTitle>
+            <CardTitle className="text-2xl text-foreground">Processing Payment</CardTitle>
           </>
         )}
       </CardHeader>
       <CardContent className="text-center">
         {status === "success" && (
-          <p className="text-slate-400">
-            Your account has been activated. Welcome to XMBot! Head to your dashboard to get started.
+          <p className="text-muted-foreground">
+            Your account has been activated. Welcome to XMOne! Head to your dashboard to get started.
           </p>
         )}
         {status === "failed" && (
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Something went wrong with your payment. Please try again or contact support.
           </p>
         )}
         {(status === "pending" || status === "unknown") && (
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Your payment is being processed. This may take a few moments. Check your dashboard for updates.
           </p>
         )}
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
         <Link href="/dashboard" className="w-full">
-          <Button className="w-full bg-gold-500 hover:bg-gold-400 text-neutral-950 font-semibold">
+          <Button className="w-full bg-gold-500 hover:bg-gold-600 text-neutral-950 font-semibold">
             Go to Dashboard
           </Button>
         </Link>

@@ -54,28 +54,28 @@ export function TradeFilters({ currentSymbol, currentType, currentStatus }: Trad
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <div className="flex items-center gap-1 text-xs text-slate-400">
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Filter className="h-3 w-3" />
         Filters
       </div>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-7 text-xs border-slate-700 text-slate-300">
+          <Button variant="outline" size="sm" className="h-7 text-xs border-border text-muted-foreground">
             Symbol
             {currentSymbol && <Badge variant="secondary" className="ml-1 h-4 px-1">{currentSymbol}</Badge>}
             <ChevronDown className="h-3 w-3 ml-1" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="bg-slate-900 border-slate-700">
-          <DropdownMenuLabel className="text-xs text-slate-400">Filter by Symbol</DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-slate-800" />
+        <DropdownMenuContent align="start" className="bg-card border-border">
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Filter by Symbol</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-border" />
           {SYMBOLS.map((symbol) => (
             <DropdownMenuCheckboxItem
               key={symbol}
               checked={currentSymbol === symbol}
               onCheckedChange={() => updateFilter("symbol", currentSymbol === symbol ? null : symbol)}
-              className="text-xs text-slate-300 focus:bg-slate-800"
+              className="text-xs text-muted-foreground focus:bg-accent"
             >
               {symbol}
             </DropdownMenuCheckboxItem>
@@ -85,21 +85,21 @@ export function TradeFilters({ currentSymbol, currentType, currentStatus }: Trad
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-7 text-xs border-slate-700 text-slate-300">
+          <Button variant="outline" size="sm" className="h-7 text-xs border-border text-muted-foreground">
             Type
             {currentType && <Badge variant="secondary" className="ml-1 h-4 px-1">{currentType}</Badge>}
             <ChevronDown className="h-3 w-3 ml-1" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="bg-slate-900 border-slate-700">
-          <DropdownMenuLabel className="text-xs text-slate-400">Filter by Type</DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-slate-800" />
+        <DropdownMenuContent align="start" className="bg-card border-border">
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Filter by Type</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-border" />
           {TYPES.map((type) => (
             <DropdownMenuCheckboxItem
               key={type}
               checked={currentType === type}
               onCheckedChange={() => updateFilter("type", currentType === type ? null : type)}
-              className="text-xs text-slate-300 focus:bg-slate-800"
+              className="text-xs text-muted-foreground focus:bg-accent"
             >
               {type}
             </DropdownMenuCheckboxItem>
@@ -109,21 +109,21 @@ export function TradeFilters({ currentSymbol, currentType, currentStatus }: Trad
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="h-7 text-xs border-slate-700 text-slate-300">
+          <Button variant="outline" size="sm" className="h-7 text-xs border-border text-muted-foreground">
             Status
             {currentStatus && <Badge variant="secondary" className="ml-1 h-4 px-1">{currentStatus}</Badge>}
             <ChevronDown className="h-3 w-3 ml-1" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="bg-slate-900 border-slate-700">
-          <DropdownMenuLabel className="text-xs text-slate-400">Filter by Status</DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-slate-800" />
+        <DropdownMenuContent align="start" className="bg-card border-border">
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Filter by Status</DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-border" />
           {STATUSES.map((status) => (
             <DropdownMenuCheckboxItem
               key={status}
               checked={currentStatus === status}
               onCheckedChange={() => updateFilter("status", currentStatus === status ? null : status)}
-              className="text-xs text-slate-300 focus:bg-slate-800"
+              className="text-xs text-muted-foreground focus:bg-accent"
             >
               {status}
             </DropdownMenuCheckboxItem>
@@ -135,7 +135,7 @@ export function TradeFilters({ currentSymbol, currentType, currentStatus }: Trad
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 text-xs text-slate-400 hover:text-white"
+          className="h-7 text-xs text-muted-foreground hover:text-foreground"
           onClick={clearFilters}
         >
           <X className="h-3 w-3 mr-1" />

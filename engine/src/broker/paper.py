@@ -57,6 +57,7 @@ class PaperBroker(Broker):
                 current_price=filled_price,
                 stop_loss=order.stop_loss,
                 take_profit=order.take_profit,
+                user_id=order.user_id,
             ))
         elif order.action == SignalAction.SELL:
             self._positions.append(Position(
@@ -68,6 +69,7 @@ class PaperBroker(Broker):
                 current_price=filled_price,
                 stop_loss=order.stop_loss,
                 take_profit=order.take_profit,
+                user_id=order.user_id,
             ))
 
         order.status = OrderStatus.FILLED

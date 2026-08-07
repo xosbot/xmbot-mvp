@@ -46,9 +46,9 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="bg-neutral-950 border-white/10 rounded-md max-w-md">
+      <DialogContent className="bg-card border-border rounded-md max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
+          <DialogTitle className="text-foreground flex items-center gap-2">
             <span className="text-lg font-bold">{trade.symbol}</span>
             <Badge variant={isBuy ? "default" : "destructive"} className="text-xs">
               {isBuy ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
@@ -58,30 +58,30 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
               {trade.status}
             </Badge>
           </DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogDescription className="text-muted-foreground">
             Trade opened {formatDate(trade.openTime)}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-white/[0.05] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardContent className="p-3">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                   <TrendingUp className="h-3 w-3" />
                   Entry Price
                 </div>
-                <p className="text-white font-medium">{formatPrice(trade.openPrice)}</p>
+                <p className="text-foreground font-medium">{formatPrice(trade.openPrice)}</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/[0.05] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardContent className="p-3">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                   <TrendingDown className="h-3 w-3" />
                   {isOpen ? "Current Price" : "Exit Price"}
                 </div>
-                <p className="text-white font-medium">
+                <p className="text-foreground font-medium">
                   {trade.closePrice ? formatPrice(trade.closePrice) : "—"}
                 </p>
               </CardContent>
@@ -89,23 +89,23 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-white/[0.05] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardContent className="p-3">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                   <Target className="h-3 w-3" />
                   Lot Size
                 </div>
-                <p className="text-white font-medium">{trade.lotSize}</p>
+                <p className="text-foreground font-medium">{trade.lotSize}</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/[0.05] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardContent className="p-3">
-                <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                   <Shield className="h-3 w-3" />
                   P&L
                 </div>
-                <p className={`font-medium ${pnlPositive ? "text-emerald-500" : "text-red-400"}`}>
+                <p className={`font-medium ${pnlPositive ? "text-emerald-600" : "text-red-500"}`}>
                   {trade.profit !== null ? formatPnL(trade.profit) : "—"}
                 </p>
               </CardContent>
@@ -115,32 +115,32 @@ export function TradeDetailModal({ trade, open, onClose }: TradeDetailModalProps
           {(trade.stopLoss || trade.takeProfit) && (
             <div className="grid grid-cols-2 gap-4">
               {trade.stopLoss && trade.stopLoss > 0 && (
-                <Card className="bg-white/[0.05] border-white/10 rounded-md">
+                <Card className="bg-card border-border rounded-md">
                   <CardContent className="p-3">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
-                      <Shield className="h-3 w-3 text-red-400" />
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                      <Shield className="h-3 w-3 text-red-500" />
                       Stop Loss
                     </div>
-                    <p className="text-red-400 font-medium">{formatPrice(trade.stopLoss)}</p>
+                    <p className="text-red-500 font-medium">{formatPrice(trade.stopLoss)}</p>
                   </CardContent>
                 </Card>
               )}
 
               {trade.takeProfit && trade.takeProfit > 0 && (
-                <Card className="bg-white/[0.05] border-white/10 rounded-md">
+                <Card className="bg-card border-border rounded-md">
                   <CardContent className="p-3">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
-                      <Target className="h-3 w-3 text-emerald-500" />
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+                      <Target className="h-3 w-3 text-emerald-600" />
                       Take Profit
                     </div>
-                    <p className="text-emerald-500 font-medium">{formatPrice(trade.takeProfit)}</p>
+                    <p className="text-emerald-600 font-medium">{formatPrice(trade.takeProfit)}</p>
                   </CardContent>
                 </Card>
               )}
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             {isOpen ? "Open since" : "Closed"}: {formatDate(trade.closeTime || trade.openTime)}
             {trade.botInstance?.broker && (

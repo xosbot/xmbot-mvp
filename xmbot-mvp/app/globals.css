@@ -4,34 +4,26 @@
 
 @layer base {
   :root {
-    /* "Institutional Desk" — warm charcoal, not navy-black; muted brass-gold,
-       not bright coin-gold. Restraint over shine. */
-    --background: 30 8% 8%;
-    --foreground: 40 25% 95%;
-    --card: 30 8% 11%;
-    --card-foreground: 40 25% 95%;
-    --popover: 30 8% 11%;
-    --popover-foreground: 40 25% 95%;
+    --background: 40 10% 98%;
+    --foreground: 40 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 40 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 40 10% 10%;
     --primary: 38 42% 52%;
-    --primary-foreground: 30 8% 8%;
-    --secondary: 30 8% 15%;
-    --secondary-foreground: 40 25% 95%;
-    --muted: 30 8% 15%;
-    --muted-foreground: 30 8% 62%;
-    --accent: 30 8% 15%;
-    --accent-foreground: 40 25% 95%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 40 25% 95%;
-    --border: 30 8% 18%;
-    --input: 30 8% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 10% 95%;
+    --secondary-foreground: 40 10% 20%;
+    --muted: 40 10% 95%;
+    --muted-foreground: 40 10% 45%;
+    --accent: 40 10% 94%;
+    --accent-foreground: 40 10% 15%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 10% 89%;
+    --input: 40 10% 89%;
     --ring: 38 42% 52%;
-    /* Deliberate two-tier shape language: --radius drives small controls
-       (buttons/inputs land ~8px via rounded-md) while cards use Tailwind's
-       untouched rounded-xl (12px) directly — generous containers, modest
-       controls, not one uniform radius for everything. */
     --radius: 0.625rem;
-    /* Brand: gold is the identity/action color (logo, CTAs, chrome).
-       Emerald is reserved for positive financial data (P&L, win rate, returns) — never decorative. */
     --gain: 160 84% 39%;
   }
 
@@ -50,8 +42,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      linear-gradient(rgba(0, 0, 0, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.018) 1px, transparent 1px);
     background-size: 48px 48px;
     background-attachment: fixed;
   }
@@ -63,38 +55,39 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #171512;
+  background: #f5f5f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a332c;
+  background: #d6d3d1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8a7a63}
+  background: #a8a29e;
+}
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #3a332c #171512;
+  scrollbar-color: #d6d3d1 #f5f5f4;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(184, 135, 63, 0.35);
-  color: white;
+  background: rgba(184, 135, 63, 0.25);
+  color: #1a1a1a;
 }
 
-/* Brand accent text — solid, not glossy. Precision over decoration. */
+/* Brand accent text */
 .text-gradient,
 .text-gradient-gold {
-  color: #c39a52;
+  color: #96702f;
 }
 
 /* Reserved for positive financial data (win rate, returns, P&L) */
 .text-gradient-emerald {
-  color: #34d399;
+  color: #059669;
 }
 
 /* Animations */
@@ -125,7 +118,7 @@
   letter-spacing: -0.04em;
 }
 
-/* Monospace eyebrow / section labels — terminal-style tags */
+/* Monospace eyebrow / section labels */
 .mono-label {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   text-transform: uppercase;
@@ -149,15 +142,15 @@
 .corner-frame::before {
   top: -1px;
   left: -1px;
-  border-top: 1.5px solid rgba(184, 135, 63, 0.6);
-  border-left: 1.5px solid rgba(184, 135, 63, 0.6);
+  border-top: 1.5px solid rgba(184, 135, 63, 0.5);
+  border-left: 1.5px solid rgba(184, 135, 63, 0.5);
 }
 
 .corner-frame::after {
   top: -1px;
   right: -1px;
-  border-top: 1.5px solid rgba(184, 135, 63, 0.6);
-  border-right: 1.5px solid rgba(184, 135, 63, 0.6);
+  border-top: 1.5px solid rgba(184, 135, 63, 0.5);
+  border-right: 1.5px solid rgba(184, 135, 63, 0.5);
 }
 
 /* Reduced motion preference */

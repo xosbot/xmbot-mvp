@@ -23,31 +23,40 @@ export function LoadMoreTrades() {
   const searchParams = useSearchParams()
   const [trades, setTrades] = useState<Trade[]>([])
   const [loading, setLoading] = useState(false)
-  const [cursor, setCursor] = useState<string | null>(null)
+  const [offset, setOffset] = useState(0)
   const [hasMore, setHasMore] = useState(true)
+  const PAGE_SIZE = 25
 
   const loadMore = async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ limit: "25" })
-      if (cursor) params.set("cursor", cursor)
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) })
 
       const symbol = searchParams.get("symbol")
       const type = searchParams.get("type")
       const status = searchParams.get("status")
-      const sort = searchParams.get("sort")
       if (symbol) params.set("symbol", symbol)
-      if (type) params.set("type", type)
+      if (type) params.set("action", type)
       if (status) params.set("status", status)
-      if (sort) params.set("sort", sort)
 
-      const res = await fetch(`/api/trades?${params}`)
+      const res = await fetch(`/api/engine/history?${params}`)
       const data = await res.json()
 
       if (data.trades) {
-        setTrades((prev) => [...prev, ...data.trades])
-        setCursor(data.nextCursor)
-        setHasMore(data.hasMore)
+        const mapped = data.trades.map((t: any) => ({
+          id: t.id,
+          symbol: t.symbol,
+          type: t.action,
+          openPrice: t.entry_price,
+          closePrice: t.exit_price,
+          lotSize: t.volume,
+          profit: t.pnl,
+          status: t.status,
+          openTime: t.open_time,
+        }))
+        setTrades((prev) => [...prev, ...mapped])
+        setOffset((prev) => prev + PAGE_SIZE)
+        setHasMore(mapped.length === PAGE_SIZE)
       }
     } finally {
       setLoading(false)
@@ -61,21 +70,21 @@ export function LoadMoreTrades() {
       {trades.map((trade) => (
         <div
           key={trade.id}
-          className="flex items-center gap-4 border-t border-slate-800 px-6 py-3 text-sm"
+          className="flex items-center gap-4 border-t border-border px-6 py-3 text-sm"
         >
-          <span className="text-slate-400 w-32">{formatDate(trade.openTime)}</span>
-          <span className="text-white font-medium w-16">{trade.symbol}</span>
+          <span className="text-muted-foreground w-32">{formatDate(trade.openTime)}</span>
+          <span className="text-foreground font-medium w-16">{trade.symbol}</span>
           <span className="w-14">
             <Badge variant={trade.type === "BUY" ? "default" : "destructive"} className="text-xs">
               {trade.type}
             </Badge>
           </span>
-          <span className="text-slate-300 w-12">{trade.lotSize}</span>
-          <span className="text-slate-300 w-20">{formatPrice(trade.openPrice)}</span>
-          <span className="text-slate-300 w-20">
+          <span className="text-muted-foreground w-12">{trade.lotSize}</span>
+          <span className="text-muted-foreground w-20">{formatPrice(trade.openPrice)}</span>
+          <span className="text-muted-foreground w-20">
             {trade.closePrice ? formatPrice(trade.closePrice) : "—"}
           </span>
-          <span className={`w-20 ${trade.profit && trade.profit >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+          <span className={`w-20 ${trade.profit && trade.profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>
             {trade.profit !== null ? formatPnL(trade.profit) : "—"}
           </span>
           <span>
@@ -92,7 +101,7 @@ export function LoadMoreTrades() {
             size="sm"
             onClick={loadMore}
             disabled={loading}
-            className="border-slate-700 text-slate-400"
+            className="border-border text-muted-foreground"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

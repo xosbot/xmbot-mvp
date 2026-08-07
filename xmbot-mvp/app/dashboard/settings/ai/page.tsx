@@ -63,7 +63,7 @@ export default function AISettingsPage() {
       <>
         <Topbar title="AI Settings" />
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <p className="text-slate-500">Loading...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </main>
       </>
     )
@@ -73,9 +73,9 @@ export default function AISettingsPage() {
     <>
       <Topbar title="AI Settings" />
       <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
-        <Card className="bg-white/[0.03] border-white/10 rounded-md">
+        <Card className="bg-card border-border rounded-md">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <Brain className="h-5 w-5" />
               AI Configuration
             </CardTitle>
@@ -85,7 +85,7 @@ export default function AISettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <Label>Enable AI</Label>
-                <p className="text-xs text-slate-500">Master switch for all AI features</p>
+                <p className="text-xs text-muted-foreground">Master switch for all AI features</p>
               </div>
               <Switch
                 checked={config.enabled}
@@ -93,17 +93,17 @@ export default function AISettingsPage() {
               />
             </div>
 
-            <Separator className="bg-slate-800" />
+            <Separator className="bg-border" />
 
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-slate-300">Provider</h4>
+              <h4 className="text-sm font-medium text-muted-foreground">Provider</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>AI Provider</Label>
                   <select
                     value={config.provider}
                     onChange={(e) => setConfig({ ...config, provider: e.target.value })}
-                    className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground"
                   >
                     <option value="gemini">Google Gemini (Recommended)</option>
                     <option value="claude">Anthropic Claude</option>
@@ -114,7 +114,7 @@ export default function AISettingsPage() {
                   <select
                     value={config.model}
                     onChange={(e) => setConfig({ ...config, model: e.target.value })}
-                    className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white"
+                    className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground"
                   >
                     {config.provider === "gemini" ? (
                       <>
@@ -132,17 +132,17 @@ export default function AISettingsPage() {
               </div>
             </div>
 
-            <Separator className="bg-slate-800" />
+            <Separator className="bg-border" />
 
             <div className="space-y-4">
-              <h4 className="text-sm font-medium text-slate-300">AI Features</h4>
+              <h4 className="text-sm font-medium text-muted-foreground">AI Features</h4>
 
-              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-700">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="h-5 w-5 text-gold-400" />
+                  <TrendingUp className="h-5 w-5 text-gold-500" />
                   <div>
                     <Label>Market Regime Detection</Label>
-                    <p className="text-xs text-slate-500">AI classifies market as trending/ranging (hourly)</p>
+                    <p className="text-xs text-muted-foreground">AI classifies market as trending/ranging (hourly)</p>
                   </div>
                 </div>
                 <Switch
@@ -151,12 +151,12 @@ export default function AISettingsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-700">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-blue-500" />
                   <div>
                     <Label>Trade Validation</Label>
-                    <p className="text-xs text-slate-500">AI validates signals before execution</p>
+                    <p className="text-xs text-muted-foreground">AI validates signals before execution</p>
                   </div>
                 </div>
                 <Switch
@@ -165,12 +165,12 @@ export default function AISettingsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-700">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                 <div className="flex items-center gap-3">
                   <BarChart className="h-5 w-5 text-purple-500" />
                   <div>
                     <Label>Daily Reports</Label>
-                    <p className="text-xs text-slate-500">AI generates daily market analysis</p>
+                    <p className="text-xs text-muted-foreground">AI generates daily market analysis</p>
                   </div>
                 </div>
                 <Switch
@@ -180,15 +180,15 @@ export default function AISettingsPage() {
               </div>
             </div>
 
-            <Separator className="bg-slate-800" />
+            <Separator className="bg-border" />
 
-            <div className="rounded-lg border border-slate-700 p-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-2">Cost Estimate</h4>
-              <div className="text-xs text-slate-400 space-y-1">
+            <div className="rounded-lg border border-border p-4">
+              <h4 className="text-sm font-medium text-muted-foreground mb-2">Cost Estimate</h4>
+              <div className="text-xs text-muted-foreground space-y-1">
                 <p>• Regime Detection: ~1K tokens/hour = ~$0.01/day</p>
                 <p>• Trade Validation: ~500 tokens/trade (disabled)</p>
                 <p>• Daily Reports: ~2K tokens/day (disabled)</p>
-                <p className="text-slate-300 font-medium">Estimated monthly cost: ~$0.30</p>
+                <p className="text-foreground font-medium">Estimated monthly cost: ~$0.30</p>
               </div>
             </div>
 

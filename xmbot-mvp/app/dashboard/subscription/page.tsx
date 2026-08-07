@@ -18,9 +18,9 @@ export default function SubscriptionPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <Star className="h-5 w-5" />
                   Available Plans
                 </CardTitle>
@@ -33,25 +33,25 @@ export default function SubscriptionPage() {
                     className={`p-4 rounded-md border ${
                       plan.popular
                         ? "border-gold-500/30 bg-gold-500/5"
-                        : "border-slate-700 bg-slate-800/30"
+                        : "border-border bg-accent"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-medium text-white">{plan.name}</h4>
+                        <h4 className="text-sm font-medium text-foreground">{plan.name}</h4>
                         {plan.popular && (
-                          <Badge className="bg-gold-500/20 text-gold-400 border-gold-500/30 text-xs rounded-sm">
+                          <Badge className="bg-gold-500/20 text-gold-600 border-gold-500/30 text-xs rounded-sm">
                             Popular
                           </Badge>
                         )}
                       </div>
                       <div className="text-right">
-                        <span className="text-lg font-bold text-white">{plan.label}</span>
-                        <span className="text-sm text-slate-500">{plan.period}</span>
+                        <span className="text-lg font-bold text-foreground">{plan.label}</span>
+                        <span className="text-sm text-muted-foreground">{plan.period}</span>
                       </div>
                     </div>
 {"discountLabel" in plan && plan.discountLabel && (
-                      <p className="text-xs text-gold-400">{plan.discountLabel}</p>
+                      <p className="text-xs text-gold-600">{plan.discountLabel}</p>
                     )}
                   </div>
                 ))}
@@ -59,7 +59,7 @@ export default function SubscriptionPage() {
                 <div className="pt-4">
                   <a
                     href="/pricing"
-                    className="text-sm text-gold-400 hover:underline"
+                    className="text-sm text-gold-600 hover:underline"
                   >
                     Compare all features →
                   </a>
@@ -67,17 +67,17 @@ export default function SubscriptionPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardHeader>
-                <CardTitle className="text-white">Need Help?</CardTitle>
+                <CardTitle className="text-foreground">Need Help?</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   Questions about billing or your subscription?
                 </p>
                 <a
                   href="/contact"
-                  className="inline-flex items-center text-sm text-gold-400 hover:underline"
+                  className="inline-flex items-center text-sm text-gold-600 hover:underline"
                 >
                   Contact Support →
                 </a>

@@ -258,23 +258,23 @@ export default function SettingsPage() {
       <Topbar title="Settings" />
       <main className="flex-1 overflow-y-auto p-4 lg:p-6">
         {/* Quick setup progress */}
-        <div className="mb-6 p-4 rounded-lg border border-white/10 bg-white/[0.02]">
+        <div className="mb-6 p-4 rounded-lg border border-border bg-accent/50">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-white">Setup Progress</h3>
-            <span className="text-xs text-slate-500">
+            <h3 className="text-sm font-medium text-foreground">Setup Progress</h3>
+            <span className="text-xs text-muted-foreground">
               {[linkedTelegram, broker !== "paper", enableAI].filter(Boolean).length}/3 complete
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${linkedTelegram ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${linkedTelegram ? "border-emerald-200 bg-emerald-500/10 text-emerald-600" : "border-border text-muted-foreground"}`}>
               {linkedTelegram ? <CheckCircle2 className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />}
               Telegram
             </div>
-            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${broker !== "paper" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${broker !== "paper" ? "border-emerald-200 bg-emerald-500/10 text-emerald-600" : "border-border text-muted-foreground"}`}>
               {broker !== "paper" ? <CheckCircle2 className="h-3 w-3" /> : <Wallet className="h-3 w-3" />}
               Binance
             </div>
-            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${enableAI ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-white/10 text-slate-500"}`}>
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${enableAI ? "border-emerald-200 bg-emerald-500/10 text-emerald-600" : "border-border text-muted-foreground"}`}>
               {enableAI ? <CheckCircle2 className="h-3 w-3" /> : <Brain className="h-3 w-3" />}
               AI Enabled
             </div>
@@ -282,20 +282,20 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="quickstart" className="space-y-6">
-          <TabsList className="bg-slate-900 border border-slate-800 p-1">
-            <TabsTrigger value="quickstart" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+          <TabsList className="bg-card border border-border p-1">
+            <TabsTrigger value="quickstart" className="data-[state=active]:bg-accent data-[state=active]:text-foreground">
               <ArrowRight className="h-4 w-4 mr-2" />
               Quick Start
             </TabsTrigger>
-            <TabsTrigger value="profile" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+            <TabsTrigger value="profile" className="data-[state=active]:bg-accent data-[state=active]:text-foreground">
               <User className="h-4 w-4 mr-2" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="bot" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+            <TabsTrigger value="bot" className="data-[state=active]:bg-accent data-[state=active]:text-foreground">
               <Bot className="h-4 w-4 mr-2" />
               Bot Config
             </TabsTrigger>
-            <TabsTrigger value="account" className="data-[state=active]:bg-slate-800 data-[state=active]:text-white">
+            <TabsTrigger value="account" className="data-[state=active]:bg-accent data-[state=active]:text-foreground">
               <Shield className="h-4 w-4 mr-2" />
               Account
             </TabsTrigger>
@@ -304,10 +304,10 @@ export default function SettingsPage() {
           {/* Quick Start - for new users */}
           <TabsContent value="quickstart">
             <div className="space-y-4">
-              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+              <Card className="bg-card border-border rounded-md">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-gold-400" />
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5 text-gold-600" />
                     1. Connect Telegram
                   </CardTitle>
                   <CardDescription>Link your Telegram to receive trade signals</CardDescription>
@@ -315,16 +315,16 @@ export default function SettingsPage() {
                 <CardContent>
                   <div className="space-y-4 max-w-lg">
                     {linkedTelegram ? (
-                      <div className="flex items-center gap-2 p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                      <div className="flex items-center gap-2 p-3 rounded-lg border border-emerald-200 bg-emerald-500/10">
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                         <span className="text-sm text-emerald-300">Connected to Chat ID: {linkedTelegram}</span>
                       </div>
                     ) : (
                       <>
-                        <div className="rounded-lg border border-slate-700 p-4 space-y-3">
-                          <ol className="text-xs text-slate-400 space-y-2 list-decimal list-inside">
-                            <li>Open Telegram and search for <span className="text-white font-medium">@XM1_Gold_Bot</span></li>
-                            <li>Start a chat and send <span className="text-white font-medium">/start</span></li>
+                        <div className="rounded-lg border border-border p-4 space-y-3">
+                          <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside">
+                            <li>Open Telegram and search for <span className="text-foreground font-medium">@XM1_Gold_Bot</span></li>
+                            <li>Start a chat and send <span className="text-foreground font-medium">/start</span></li>
                             <li>The bot will reply with your Chat ID</li>
                             <li>Copy and paste the Chat ID below</li>
                           </ol>
@@ -345,10 +345,10 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+              <Card className="bg-card border-border rounded-md">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Wallet className="h-5 w-5 text-gold-400" />
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-gold-600" />
                     2. Connect Binance
                   </CardTitle>
                   <CardDescription>Add your Binance API keys for live trading</CardDescription>
@@ -358,17 +358,17 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+              <Card className="bg-card border-border rounded-md">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-gold-400" />
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-gold-600" />
                     3. Configure Risk & AI
                   </CardTitle>
                   <CardDescription>Set your risk limits and enable AI analysis</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loadingConfig ? (
-                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Loading config...
                     </div>
@@ -387,7 +387,7 @@ export default function SettingsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <Label htmlFor="enableAI">AI-Powered Trade Analysis</Label>
-                          <p className="text-xs text-slate-500">Use AI to validate trade signals before execution</p>
+                          <p className="text-xs text-muted-foreground">Use AI to validate trade signals before execution</p>
                         </div>
                         <Switch checked={enableAI} onCheckedChange={setEnableAI} />
                       </div>
@@ -404,16 +404,16 @@ export default function SettingsPage() {
 
           {/* Profile */}
           <TabsContent value="profile">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardHeader>
-                <CardTitle className="text-white">Profile</CardTitle>
+                <CardTitle className="text-foreground">Profile</CardTitle>
                 <CardDescription>Update your personal information</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSaveProfile} className="space-y-4 max-w-md">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" value={session?.user?.email ?? ""} disabled className="bg-slate-800/50" />
+                    <Input id="email" value={session?.user?.email ?? ""} disabled className="bg-accent" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
@@ -434,9 +434,9 @@ export default function SettingsPage() {
 
           {/* Bot Config (advanced) */}
           <TabsContent value="bot">
-            <Card className="bg-white/[0.03] border-white/10 rounded-md">
+            <Card className="bg-card border-border rounded-md">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <Bot className="h-5 w-5" />
                   Bot Configuration
                 </CardTitle>
@@ -444,14 +444,14 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 {loadingConfig ? (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Loading config...
                   </div>
                 ) : (
                   <div className="space-y-6 max-w-lg">
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Bot className="h-4 w-4" /> Broker
                       </h4>
                       <div className="grid grid-cols-2 gap-4">
@@ -469,10 +469,10 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <div className="h-px bg-slate-800" />
+                    <div className="h-px bg-accent" />
 
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Shield className="h-4 w-4" /> Risk Management
                       </h4>
                       <div className="grid grid-cols-2 gap-4">
@@ -495,16 +495,16 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <div className="h-px bg-slate-800" />
+                    <div className="h-px bg-accent" />
 
                     <div className="space-y-4">
-                      <h4 className="text-sm font-medium text-slate-300 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Brain className="h-4 w-4" /> AI Analysis
                       </h4>
                       <div className="flex items-center justify-between">
                         <div>
                           <Label htmlFor="enableAI">AI-Powered Trade Analysis</Label>
-                          <p className="text-xs text-slate-500">Use AI to validate trade signals before execution</p>
+                          <p className="text-xs text-muted-foreground">Use AI to validate trade signals before execution</p>
                         </div>
                         <Switch checked={enableAI} onCheckedChange={setEnableAI} />
                       </div>
@@ -523,9 +523,9 @@ export default function SettingsPage() {
           {/* Account (security + subscription + sessions) */}
           <TabsContent value="account">
             <div className="space-y-4">
-              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+              <Card className="bg-card border-border rounded-md">
                 <CardHeader>
-                  <CardTitle className="text-white">Change Password</CardTitle>
+                  <CardTitle className="text-foreground">Change Password</CardTitle>
                   <CardDescription>Update your account password</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -571,9 +571,9 @@ export default function SettingsPage() {
 
               <SubscriptionCard />
 
-              <Card className="bg-white/[0.03] border-white/10 rounded-md">
+              <Card className="bg-card border-border rounded-md">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Monitor className="h-5 w-5" />
                     Active Sessions
                   </CardTitle>

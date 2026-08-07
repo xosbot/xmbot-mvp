@@ -88,12 +88,12 @@ export function EngineStatus() {
 
   if (loading && !status) {
     return (
-      <Card className="bg-white/[0.03] border-white/10 rounded-md">
+      <Card className="bg-card border-border rounded-md">
         <CardHeader>
-          <CardTitle className="text-white text-sm">Engine Status</CardTitle>
+          <CardTitle className="text-foreground text-sm">Engine Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <RefreshCw className="h-3 w-3 animate-spin" />
             Connecting to engine...
           </div>
@@ -104,12 +104,12 @@ export function EngineStatus() {
 
   if (error && !status) {
     return (
-      <Card className="bg-white/[0.03] border-white/10 rounded-md">
+      <Card className="bg-card border-border rounded-md">
         <CardHeader>
-          <CardTitle className="text-white text-sm">Engine Status</CardTitle>
+          <CardTitle className="text-foreground text-sm">Engine Status</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-xs text-red-400">{error}</p>
+          <p className="text-xs text-red-500">{error}</p>
           <Button
             variant="outline"
             size="sm"
@@ -128,29 +128,29 @@ export function EngineStatus() {
   const statusVariant = isRunning ? "default" : status?.engine === "error" ? "destructive" : "secondary"
 
   return (
-    <Card className="bg-white/[0.03] border-white/10 rounded-md">
+    <Card className="bg-card border-border rounded-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-slate-400">Engine Status</CardTitle>
-        <Activity className={`h-4 w-4 ${isRunning ? "text-emerald-500" : "text-slate-500"}`} />
+        <CardTitle className="text-sm font-medium text-muted-foreground">Engine Status</CardTitle>
+        <Activity className={`h-4 w-4 ${isRunning ? "text-emerald-600" : "text-muted-foreground"}`} />
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">Engine</span>
+          <span className="text-xs text-muted-foreground">Engine</span>
           <Badge variant={statusVariant} className="text-xs">
             {status?.engine}
           </Badge>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">Broker</span>
+          <span className="text-xs text-muted-foreground">Broker</span>
           <div className="flex items-center gap-1.5">
-            <Wifi className={`h-3 w-3 ${status?.brokerConnected ? "text-emerald-500" : "text-red-400"}`} />
-            <span className="text-xs text-white">{status?.broker}</span>
+            <Wifi className={`h-3 w-3 ${status?.brokerConnected ? "text-emerald-600" : "text-red-500"}`} />
+            <span className="text-xs text-foreground">{status?.broker}</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">Agents</span>
+          <span className="text-xs text-muted-foreground">Agents</span>
           <div className="flex gap-1">
             {status?.agents.map((a) => (
               <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
@@ -159,25 +159,25 @@ export function EngineStatus() {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">Pending Signals</span>
-          <span className="text-xs text-white font-medium">{status?.pendingSignals}</span>
+          <span className="text-xs text-muted-foreground">Pending Signals</span>
+          <span className="text-xs text-foreground font-medium">{status?.pendingSignals}</span>
         </div>
 
         {account && (
           <>
-            <div className="border-t border-slate-800 pt-3" />
+            <div className="border-t border-border pt-3" />
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400">Balance</span>
-              <span className="text-xs text-white font-medium">${account.balance.toFixed(2)}</span>
+              <span className="text-xs text-muted-foreground">Balance</span>
+              <span className="text-xs text-foreground font-medium">${account.balance.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400">Equity</span>
-              <span className="text-xs text-white font-medium">${account.equity.toFixed(2)}</span>
+              <span className="text-xs text-muted-foreground">Equity</span>
+              <span className="text-xs text-foreground font-medium">${account.equity.toFixed(2)}</span>
             </div>
           </>
         )}
 
-        <div className="border-t border-slate-800 pt-3">
+        <div className="border-t border-border pt-3">
           <div className="flex gap-2">
             {isRunning ? (
               <>
@@ -186,7 +186,7 @@ export function EngineStatus() {
                   size="sm"
                   onClick={() => handleControl("stop")}
                   disabled={controlLoading !== null}
-                  className="flex-1 h-7 text-xs border-slate-700 text-red-400 hover:text-red-300"
+                  className="flex-1 h-7 text-xs border-red-200 text-red-600 hover:text-red-500"
                 >
                   {controlLoading === "stop" ? (
                     <RefreshCw className="h-3 w-3 animate-spin" />
@@ -200,7 +200,7 @@ export function EngineStatus() {
                   size="sm"
                   onClick={() => handleControl("restart")}
                   disabled={controlLoading !== null}
-                  className="flex-1 h-7 text-xs border-slate-700 text-slate-400"
+                  className="flex-1 h-7 text-xs border-border text-muted-foreground"
                 >
                   {controlLoading === "restart" ? (
                     <RefreshCw className="h-3 w-3 animate-spin" />
@@ -216,7 +216,7 @@ export function EngineStatus() {
                 size="sm"
                 onClick={() => handleControl("start")}
                 disabled={controlLoading !== null}
-                className="w-full h-7 text-xs border-slate-700 text-emerald-400 hover:text-emerald-300"
+                className="w-full h-7 text-xs border-emerald-200 text-emerald-600 hover:text-emerald-500"
               >
                 {controlLoading === "start" ? (
                   <RefreshCw className="h-3 w-3 animate-spin" />
@@ -230,13 +230,13 @@ export function EngineStatus() {
         </div>
 
         {lastUpdate && (
-          <p className="text-[10px] text-slate-600 pt-1">
+          <p className="text-[10px] text-muted-foreground pt-1">
             Updated {lastUpdate.toLocaleTimeString()}
           </p>
         )}
 
         {error && (
-          <p className="text-[10px] text-red-400">{error}</p>
+          <p className="text-[10px] text-red-500">{error}</p>
         )}
       </CardContent>
     </Card>
