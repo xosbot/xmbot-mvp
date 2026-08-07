@@ -152,7 +152,10 @@ export function HeroSection() {
               className="mt-10"
             >
               <StatsBar />
-              <p className="text-[10px] text-muted-foreground mt-2">* Backtested results. Past performance does not guarantee future returns.</p>
+              <p className="text-[10px] text-muted-foreground mt-2">
+                * Backtested on 6 months of PAXG/USDT (tokenized gold) data, not live XAUUSD execution.
+                Past performance does not guarantee future returns.
+              </p>
               <TrustBadges />
             </motion.div>
           </div>
