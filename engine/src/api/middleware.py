@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import time
 from collections import defaultdict
-from datetime import UTC, datetime
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware

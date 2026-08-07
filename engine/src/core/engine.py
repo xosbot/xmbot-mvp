@@ -8,17 +8,18 @@ from datetime import UTC, datetime
 
 from ..agents.base import Agent, AgentStatus
 from ..ai.registry import AIRegistry
-from ..api.routes.sync import get_store as get_sync_store
 from ..broker.base import Broker
 from ..gate.human_gate import GateDecision, HumanGate
 from ..risk.engine import RiskEngine
 from .config import EngineConfig
+from .instruments import get_contract_size
 from .session import get_session_name, is_active_session
 from .signal_bus import SignalBus
-from .instruments import get_contract_size, get_instrument
 from .types import (
+    AgentConfig,
     Order,
     OrderStatus,
+    Position,
     RiskVerdict,
     Signal,
     SignalAction,
@@ -360,7 +361,10 @@ class Engine:
                             if new_sl > pos.stop_loss:
                                 success = await self.broker.modify_position(pos.id, stop_loss=new_sl)
                                 if success:
-                                    log.info(f"Trailing stop: {pos.symbol} SL moved to {new_sl:.2f} (was {pos.stop_loss:.2f})")
+                                    log.info(
+                                        f"Trailing stop: {pos.symbol} SL moved to "
+                                        f"{new_sl:.2f} (was {pos.stop_loss:.2f})"
+                                    )
 
                     elif pos.direction == SignalAction.SELL:
                         profit_distance = pos.entry_price - pos.current_price
@@ -369,7 +373,10 @@ class Engine:
                             if new_sl < pos.stop_loss:
                                 success = await self.broker.modify_position(pos.id, stop_loss=new_sl)
                                 if success:
-                                    log.info(f"Trailing stop: {pos.symbol} SL moved to {new_sl:.2f} (was {pos.stop_loss:.2f})")
+                                    log.info(
+                                        f"Trailing stop: {pos.symbol} SL moved to "
+                                        f"{new_sl:.2f} (was {pos.stop_loss:.2f})"
+                                    )
 
             except Exception as e:
                 log.error(f"Position monitor error: {e}")
@@ -414,8 +421,13 @@ class Engine:
 
                 user_config = self._user_configs.get(signal.user_id, UserConfig(user_id=signal.user_id))
                 open_positions = await self.broker.get_positions()
-                user_position_count = sum(1 for p in open_positions if p.symbol in user_config.agent_configs.get(signal.agent, AgentConfig(name="default")).markets if hasattr(p, 'symbol'))
-                risk_verdict = await self.risk.check_signal(signal, user_config, len(open_positions), user_position_count)
+                agent_config = user_config.agent_configs.get(signal.agent, AgentConfig(name="default"))
+                user_position_count = sum(
+                    1 for p in open_positions if hasattr(p, "symbol") and p.symbol in agent_config.markets
+                )
+                risk_verdict = await self.risk.check_signal(
+                    signal, user_config, len(open_positions), user_position_count
+                )
 
                 if risk_verdict == RiskVerdict.BLOCK:
                     log.warning(f"Risk blocked signal: {signal.action} {signal.market}")

@@ -1,11 +1,9 @@
 """Strategy registry for managing multiple strategies."""
 from __future__ import annotations
 
-import importlib
 import logging
-from pathlib import Path
 
-from .base import Strategy, StrategyConfig, StrategyStatus, StrategyType
+from .base import Strategy, StrategyConfig, StrategyStatus
 
 log = logging.getLogger("xmbot.strategy.registry")
 
@@ -153,10 +151,10 @@ class StrategyRegistry:
 
 def load_builtin_strategies(registry: StrategyRegistry) -> None:
     """Load all built-in strategy types."""
-    from .templates.scalping import ScalpingStrategy
-    from .templates.swing import SwingStrategy
     from .templates.mean_reversion import MeanReversionStrategy
     from .templates.momentum import MomentumStrategy
+    from .templates.scalping import ScalpingStrategy
+    from .templates.swing import SwingStrategy
 
     registry.register_class("scalping", ScalpingStrategy)
     registry.register_class("swing", SwingStrategy)

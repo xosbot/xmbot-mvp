@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import logging
-from ..base import Strategy, StrategyConfig, StrategyType
+
 from ...core.types import Market, Signal, SignalAction
+from ..base import Strategy, StrategyConfig, StrategyType
 
 log = logging.getLogger("xmbot.strategy.momentum")
 

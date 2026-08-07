@@ -5,7 +5,7 @@ import asyncio
 import logging
 from dataclasses import dataclass, field
 
-from .base import AIProvider, AIResponse
+from .base import AIProvider
 
 log = logging.getLogger("xmbot.ai.consensus")
 

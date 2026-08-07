@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from ..core.types import Market, Signal, SignalAction
+from ..core.types import Market, Signal
 
 log = logging.getLogger("xmbot.strategy")
 
