@@ -1,39 +1,38 @@
 "use client"
 
 import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
-import { Globe, TrendingUp, Bitcoin, BarChart3, Building2, Landmark } from "lucide-react"
+import { Globe, Building2, Landmark, Clock } from "lucide-react"
 
 const markets = [
   {
-    region: "India",
-    color: "orange" as const,
-    icon: Landmark,
-    markets: [
-      { name: "NSE / BSE Stocks", desc: "5,000+ listed companies" },
-      { name: "Mutual Funds", desc: "Direct plan recommendations" },
-      { name: "Gold (XAUUSD)", desc: "Via MCX & international" },
-      { name: "ETFs", desc: "Equity & debt ETFs" },
-    ],
-  },
-  {
-    region: "United States",
-    color: "blue" as const,
-    icon: Building2,
-    markets: [
-      { name: "NYSE / NASDAQ", desc: "10,000+ stocks & ETFs" },
-      { name: "Crypto", desc: "BTC, ETH, 200+ coins" },
-      { name: "Forex", desc: "Major & minor pairs" },
-      { name: "Commodities", desc: "Gold, silver, oil" },
-    ],
-  },
-  {
-    region: "Global",
+    region: "Live Today",
     color: "gold" as const,
     icon: Globe,
+    status: "live" as const,
     markets: [
-      { name: "Gold (XAUUSD)", desc: "Our core strength" },
-      { name: "Crypto (Binance)", desc: "Futures & spot" },
-      { name: "Forex Majors", desc: "EUR/USD, GBP/USD, USD/JPY" },
+      { name: "Gold (XAUUSD)", desc: "Via Binance PAXG/USDT, plus paper trading" },
+      { name: "Crypto (Binance)", desc: "Spot & futures" },
+    ],
+  },
+  {
+    region: "India — Roadmap",
+    color: "orange" as const,
+    icon: Landmark,
+    status: "roadmap" as const,
+    markets: [
+      { name: "NSE / BSE Stocks", desc: "Via Zerodha/Upstox integration" },
+      { name: "Mutual Funds", desc: "Direct plan recommendations" },
+      { name: "MCX Gold & Commodities", desc: "Domestic gold futures" },
+    ],
+  },
+  {
+    region: "Global — Roadmap",
+    color: "blue" as const,
+    icon: Building2,
+    status: "roadmap" as const,
+    markets: [
+      { name: "NYSE / NASDAQ", desc: "Via Interactive Brokers" },
+      { name: "Forex", desc: "Via MetaTrader 5" },
       { name: "Index CFDs", desc: "S&P 500, Nasdaq 100" },
     ],
   },
@@ -75,10 +74,17 @@ function MarketCard({ market, index }: { market: typeof markets[0]; index: numbe
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">{market.region}</h3>
-            <div className={`inline-flex items-center gap-1.5 text-xs mono-label px-2 py-0.5 rounded-sm border ${colors.badge}`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
-              Live
-            </div>
+            {market.status === "live" ? (
+              <div className={`inline-flex items-center gap-1.5 text-xs mono-label px-2 py-0.5 rounded-sm border ${colors.badge}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+                Live
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 text-xs mono-label px-2 py-0.5 rounded-sm border border-border bg-accent text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                Coming Soon
+              </div>
+            )}
           </div>
         </div>
 
@@ -110,13 +116,13 @@ export function MarketCoverageSection() {
               // Market Coverage
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
-              Every Market.
+              Gold Today.
               <br />
-              <span className="text-gradient-gold">One Platform.</span>
+              <span className="text-gradient-gold">Every Market On The Roadmap.</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              From NSE stocks to global crypto — AI scans opportunities across every major market.
-              India-first, global-ready.
+              XMOne trades XAUUSD gold live today. Stocks, mutual funds, and forex are next —
+              built on the same AI pipeline and risk engine.
             </p>
           </div>
         </ScrollReveal>
@@ -132,7 +138,7 @@ export function MarketCoverageSection() {
             <div className="inline-flex items-center gap-3 rounded-xl border border-border bg-card px-6 py-3 shadow-sm">
               <Globe className="h-4 w-4 text-gold-600" />
               <span className="text-sm text-muted-foreground">
-                <span className="text-foreground font-medium">50+ markets</span> across 3 continents — and growing
+                <span className="text-foreground font-medium">Gold live today.</span> New markets ship as they're built — not before.
               </span>
             </div>
           </div>

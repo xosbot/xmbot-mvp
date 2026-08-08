@@ -44,7 +44,8 @@ You review the analysis and tap **Approve** or **Reject**. The trade only execut
 
 ## Backtested Results
 
-We validated XMBot on 6 months of XAUUSD M5 data:
+We validated the strategy on 6 months of PAXG/USDT (tokenized gold, traded on Binance) M5 data —
+not live XAUUSD forex/CFD execution, which will differ in spread and slippage:
 - **64% win rate** over 1,083 trades
 - **+84.3% return** on $10,000 initial capital
 - **4.3% max drawdown** with risk management
@@ -52,20 +53,22 @@ We validated XMBot on 6 months of XAUUSD M5 data:
 
 ## Beta Launch
 
-We're opening the beta with 50% off for early adopters. Join now at [xmbot.online/register](https://xmbot.online/register).
+We're opening the beta for early adopters. Join now at [xmbot.online/register](https://xmbot.online/register).
     `,
   },
   {
     slug: "backtest-results-explained",
     title: "XMBot Backtest Results: What 1,083 Trades Taught Us",
-    excerpt: "Deep dive into our 6-month backtest on XAUUSD M5 — win rate, profit factor, drawdown, and what walk-forward analysis reveals.",
+    excerpt: "Deep dive into our 6-month backtest on PAXG/USDT (tokenized gold) M5 data — win rate, profit factor, drawdown, and what walk-forward analysis reveals.",
     date: "2026-01-10",
     author: "XMBot Team",
     category: "Strategy",
     content: `
 ## Methodology
 
-We backtested the RSI Sniper + ADX Filter strategy on XAUUSD M5 data from July–December 2025. The test used:
+We backtested the RSI Sniper + ADX Filter strategy on PAXG/USDT (tokenized gold, traded on Binance)
+M5 data from July–December 2025 — not live XAUUSD forex/CFD data. Spreads, slippage, and execution
+on a real XAUUSD broker account will differ from this backtest. The test used:
 - $10,000 initial capital
 - 2% max risk per trade
 - 0.05 lot default size
@@ -93,7 +96,9 @@ Without the 2% risk rule, the same strategy would have seen 12%+ drawdown. The r
 
 ## Disclaimer
 
-Past performance does not guarantee future results. Trading involves significant risk of loss.
+This backtest ran on PAXG/USDT, a tokenized gold proxy — not live XAUUSD execution. Past performance
+does not guarantee future results, and backtested results in particular tend to overstate real-world
+performance. Trading involves significant risk of loss.
     `,
   },
   {
@@ -123,14 +128,16 @@ Most platforms "recommend" risk settings. XMBot **enforces** them at the engine 
 - Daily loss limits trigger automatic pausing
 - Max drawdown protection kicks in at configured thresholds
 
-## The Math
+## The Math (Illustrative, Not a Forecast)
 
-With 2% risk per trade and a 64% win rate:
+This is a simplified theoretical illustration using our backtested (not live) 64% win rate as an
+input — it is not a prediction or promise of what any real account will earn:
 - Expected value per trade: +0.28%
-- After 100 trades: +32% expected return
-- Max theoretical drawdown: ~15% (unlikely with 64% win rate)
+- After 100 trades: +32% theoretical return, assuming the backtested edge holds
+- Max theoretical drawdown: ~15%, assuming the backtested win rate holds
 
-This is why risk management beats win rate every time.
+Real results will vary and can be worse than backtested figures. This is why risk management
+matters regardless of what any backtest shows.
     `,
   },
 ]

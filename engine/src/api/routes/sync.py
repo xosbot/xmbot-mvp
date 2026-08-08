@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
+
+from ..user_auth import verified_user_id
 
 router = APIRouter(prefix="/api/sync", tags=["sync"])
 
@@ -14,11 +17,24 @@ _persistence = None
 def init_persistence(persistence) -> None:
     global _persistence
     _persistence = persistence
+    data = persistence.load()
+    if not data:
+        return
+    if "trades" in data or "metrics" in data:
+        # Pre-multi-tenant on-disk format: a single flat store, not keyed by user_id.
+        # Migrate it under the default user rather than dropping it.
+        USER_STORES[_default_user_id] = data
+    else:
+        USER_STORES.update(data)
 
 
 def get_user_id(request: Request) -> str:
-    user_id = request.headers.get("X-User-Id", "")
-    return user_id if user_id else "anonymous"
+    state_user_id = getattr(request.state, "user_id", None)
+    if state_user_id:
+        return state_user_id
+    from ..server import _api_key
+
+    return verified_user_id(request, _api_key)
 
 
 def get_user_store(request: Request):
@@ -162,7 +178,7 @@ async def update_store(request: Request, data: dict, store: dict = Depends(get_u
         USER_STORES[user_id].setdefault("metrics", {})
         USER_STORES[user_id]["metrics"].update(data["metrics"])
     USER_STORES[user_id]["last_sync"] = datetime.now(UTC).isoformat()
-    
+
     if _persistence:
-        await _persistence.save(USER_STORES[user_id])
+        await _persistence.save(USER_STORES)
     return {"status": "ok"}

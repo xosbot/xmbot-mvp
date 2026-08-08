@@ -56,7 +56,7 @@ export function ProofSection() {
               <span className="text-gradient-emerald">Unproven</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Validated on 6 months of XAUUSD M5 data with walk-forward analysis — before it ever touched real money.
+              Validated on 6 months of PAXG/USDT (tokenized gold) M5 data with walk-forward analysis — before it ever touched real money.
             </p>
           </div>
         </ScrollReveal>
@@ -94,7 +94,8 @@ export function ProofSection() {
 
         <p className="text-center text-xs text-muted-foreground mt-10 max-w-lg mx-auto">
           * Past performance does not guarantee future results. Trading involves significant risk of loss.
-          Results based on backtested data from Jul–Dec 2025.
+          Results based on backtested data from Jul–Dec 2025 on PAXG/USDT (a tokenized-gold proxy traded
+          on Binance) — spreads, slippage, and execution on live XAUUSD forex/CFD accounts will differ.
         </p>
       </div>
     </section>

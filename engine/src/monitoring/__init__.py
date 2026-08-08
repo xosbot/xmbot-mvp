@@ -3,10 +3,11 @@ from __future__ import annotations
 import logging
 import time
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 log = logging.getLogger("xmbot.monitoring")
 
@@ -312,16 +313,25 @@ class PerformanceMonitor:
     def record_request(self, endpoint: str, method: str, status_code: int, duration_ms: float) -> None:
         """Record an API request."""
         self._request_count += 1
-        self._metrics.record_counter("http_requests_total", labels={"endpoint": endpoint, "method": method, "status": str(status_code)})
-        self._metrics.record_histogram("http_request_duration_ms", duration_ms, labels={"endpoint": endpoint, "method": method})
+        self._metrics.record_counter(
+            "http_requests_total",
+            labels={"endpoint": endpoint, "method": method, "status": str(status_code)},
+        )
+        self._metrics.record_histogram(
+            "http_request_duration_ms", duration_ms, labels={"endpoint": endpoint, "method": method}
+        )
 
         if status_code >= 500:
             self._error_count += 1
-            self._metrics.record_counter("http_errors_total", labels={"endpoint": endpoint, "status": str(status_code)})
+            self._metrics.record_counter(
+                "http_errors_total", labels={"endpoint": endpoint, "status": str(status_code)}
+            )
 
     def record_trade(self, broker: str, symbol: str, success: bool) -> None:
         """Record a trade execution."""
-        self._metrics.record_counter("trades_total", labels={"broker": broker, "symbol": symbol, "success": str(success)})
+        self._metrics.record_counter(
+            "trades_total", labels={"broker": broker, "symbol": symbol, "success": str(success)}
+        )
 
     def record_price(self, symbol: str, price: float) -> None:
         """Record a price update."""

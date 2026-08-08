@@ -6,13 +6,13 @@ const capabilities = [
   {
     icon: Brain,
     title: "Multi-Agent AI",
-    description: "Six specialized agents analyze every signal from multiple angles — technical, fundamental, regime, risk, consensus, and journal.",
+    description: "Five specialized agents analyze every gold signal from multiple angles — technical, regime, risk, AI consensus, and journal.",
     href: "/product/ai-agents",
   },
   {
     icon: Globe,
-    title: "Multi-Market",
-    description: "Gold, stocks, crypto, forex, mutual funds — across India (NSE/BSE), US (NYSE/NASDAQ), and global exchanges.",
+    title: "Gold Today, Multi-Market Roadmap",
+    description: "XAUUSD gold and crypto are live now. Stocks, forex, and mutual funds — across India (NSE/BSE), US (NYSE/NASDAQ), and global exchanges — are on the roadmap.",
     href: "/product/integrations",
   },
   {
@@ -25,18 +25,18 @@ const capabilities = [
     icon: Shield,
     title: "Risk Engine",
     description: "2% max risk per trade, daily loss limits, drawdown protection, and per-user position sizing enforced automatically.",
-    href: "/product/investing",
+    href: "/product/ai-agents",
   },
   {
     icon: BarChart3,
-    title: "Investment Advisory",
-    description: "Beyond trading — portfolio review, mutual fund recommendations, stock picks, tax optimization, and goal-based planning.",
+    title: "Investment Advisory (Roadmap)",
+    description: "Beyond trading — portfolio review, mutual fund recommendations, stock picks, tax optimization, and goal-based planning. Planned, not yet built.",
     href: "/product/investing",
   },
   {
     icon: Zap,
     title: "Multi-Broker",
-    description: "Paper trading, Binance, Zerodha, Interactive Brokers, MT5. Switch brokers without changing your strategy.",
+    description: "Paper trading and Binance are live today. Zerodha, Interactive Brokers, and MT5 are on the roadmap — switch brokers without changing your strategy.",
     href: "/product/integrations",
   },
 ]
@@ -51,18 +51,18 @@ export default function ProductPage() {
             // The Platform
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
-            AI Investment Platform
+            AI Gold Trading Today.
             <br />
-            <span className="text-gradient-gold">for Every Market.</span>
+            <span className="text-gradient-gold">A Platform In The Making.</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            Six AI agents. Multiple markets. Human control.
+            Five AI agents. Gold, live today. Human control, always.
             XMOne combines algorithmic precision with your judgment — the way investing should work.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href="/register">
               <Button size="lg" className="bg-gold-600 hover:bg-gold-500 text-white font-semibold px-8 h-12 shadow-sm shadow-gold-600/20">
-                Start Free Trial
+                Start Free — Paper Trading
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -103,7 +103,7 @@ export default function ProductPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
               { step: "01", title: "Connect", desc: "Link Telegram and set your risk preferences. No code, no install." },
-              { step: "02", title: "AI Analyzes", desc: "Six agents scan markets 24/5. Consensus required before any signal." },
+              { step: "02", title: "AI Analyzes", desc: "Five agents scan gold 24/5. Consensus required before any signal." },
               { step: "03", title: "You Decide", desc: "Signal card on Telegram. Tap Approve or Reject. You're in control." },
             ].map((s) => (
               <div key={s.step} className="text-center">

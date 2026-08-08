@@ -9,11 +9,11 @@ import { TradeFilters } from "@/components/dashboard/trade-filters"
 import { TradeSort } from "@/components/dashboard/trade-sort"
 import { TradesTable } from "@/components/dashboard/trades-table"
 import { LoadMoreTrades } from "./load-more"
+import { engineAuthHeaders } from "@/lib/engine-client"
 
 export const dynamic = "force-dynamic"
 
 const ENGINE_URL = process.env.ENGINE_API_URL || "http://localhost:8080"
-const API_KEY = process.env.XMBOT_API_KEY || ""
 const PAGE_SIZE = 25
 
 interface EngineTrade {
@@ -79,11 +79,7 @@ export default async function TradesPage({ searchParams }: TradesPageProps) {
 
   const offset = (page - 1) * PAGE_SIZE
 
-  const engineHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
-    "X-User-Id": session.user.id,
-  }
-  if (API_KEY) engineHeaders["x-api-key"] = API_KEY
+  const engineHeaders = engineAuthHeaders(session.user.id)
 
   const engineParams = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) })
   if (symbol) engineParams.set("symbol", symbol)

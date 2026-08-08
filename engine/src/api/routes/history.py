@@ -2,12 +2,9 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-
-from ...core.types import Order, OrderStatus, SignalAction
 
 log = logging.getLogger("xmbot.api.history")
 

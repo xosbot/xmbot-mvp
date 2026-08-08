@@ -3,24 +3,16 @@
 import { ScrollReveal, StaggerChildren, StaggerItem } from "./scroll-reveal"
 import { GlareCard } from "@/components/ui/aceternity/glare-card"
 import { Spotlight } from "@/components/ui/aceternity/spotlight"
-import { Brain, BarChart3, Shield, Activity, BookOpen, Zap, Target, TrendingUp, Search } from "lucide-react"
+import { Brain, Shield, Activity, BookOpen, Zap, Search } from "lucide-react"
 
 const agents = [
   {
     icon: Search,
     name: "Technical Analyst",
     role: "Scans charts, patterns, and momentum",
-    markets: "Gold, Stocks, Crypto, Forex",
+    markets: "Gold, Crypto",
     tools: "RSI, Supertrend, ADX, MACD",
     color: "gold" as const,
-  },
-  {
-    icon: BarChart3,
-    name: "Fundamental Analyst",
-    role: "Earnings, news, and macro data",
-    markets: "Stocks, Mutual Funds, Bonds",
-    tools: "P/E, Revenue Growth, Macro",
-    color: "emerald" as const,
   },
   {
     icon: Brain,
@@ -107,10 +99,10 @@ export function AIAgentsSection() {
             <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
               Your Multi-Agent
               <br />
-              <span className="text-gradient-gold">Investment Team.</span>
+              <span className="text-gradient-gold">Trading Team.</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              Six specialized AI agents working 24/5. Each one is an expert in their domain.
+              Five specialized AI agents working 24/5 on gold. Each one is an expert in their domain.
               Together, they find opportunities no single indicator could.
             </p>
           </div>

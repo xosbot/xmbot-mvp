@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 
 from .base import AIProvider
-from .consensus import ConsensusValidator, ConsensusResult
-from .regime_enhanced import EnhancedRegimeDetector, RegimeResult
-from .trade_journal import TradeJournal, JournalEntry
-from .risk_advisor import RiskAdvisor, RiskSuggestion
+from .consensus import ConsensusValidator
+from .regime_enhanced import EnhancedRegimeDetector
+from .risk_advisor import RiskAdvisor
+from .trade_journal import TradeJournal
 
 log = logging.getLogger("xmbot.ai.registry")
 

@@ -1,12 +1,11 @@
 """Natural language trade journal using AI."""
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from .base import AIProvider, AIResponse
+from .base import AIProvider
 
 log = logging.getLogger("xmbot.ai.journal")
 

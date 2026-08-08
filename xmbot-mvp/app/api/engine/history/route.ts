@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
+import { engineAuthHeaders } from "@/lib/engine-client"
 
 const ENGINE_URL = process.env.ENGINE_API_URL || "http://localhost:8080"
-const API_KEY = process.env.XMBOT_API_KEY || ""
 
 export const dynamic = "force-dynamic"
 
@@ -44,13 +44,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-User-Id": session.user.id,
-    }
-    if (API_KEY) {
-      headers["x-api-key"] = API_KEY
-    }
+    const headers = engineAuthHeaders(session.user.id)
 
     const url = new URL(req.url)
     const limit = url.searchParams.get("limit") || "50"

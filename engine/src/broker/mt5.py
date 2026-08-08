@@ -80,7 +80,9 @@ class MT5Broker(Broker):
             return False
 
         if self._login and self._password:
-            authorized = await self._run_sync(self._mt5.login, login=self._login, password=self._password, server=self._server)
+            authorized = await self._run_sync(
+                self._mt5.login, login=self._login, password=self._password, server=self._server
+            )
             if not authorized:
                 error = await self._run_sync(self._mt5.last_error)
                 log.error(f"MT5 login failed: {error}")
@@ -159,7 +161,9 @@ class MT5Broker(Broker):
                 filled_volume=result.volume,
             )
         else:
-            error_msg = f"Order failed: retcode={result.retcode if result else 'N/A'}, comment={result.comment if result else 'N/A'}"
+            retcode = result.retcode if result else "N/A"
+            comment = result.comment if result else "N/A"
+            error_msg = f"Order failed: retcode={retcode}, comment={comment}"
             log.error(f"MT5 {error_msg}")
             return OrderResult(success=False, order_id=order.id, error=error_msg)
 

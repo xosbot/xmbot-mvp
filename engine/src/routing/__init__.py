@@ -1,7 +1,7 @@
 from .symbol_router import (
     AssetType,
-    SymbolMapping,
     BrokerConfig,
+    SymbolMapping,
     SymbolRouter,
     get_router,
 )

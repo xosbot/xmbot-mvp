@@ -14,7 +14,8 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
-from .instruments import get_sessions, is_session_active as _registry_active
+from .instruments import get_sessions
+from .instruments import is_session_active as _registry_active
 
 log = logging.getLogger("xmbot.session")
 

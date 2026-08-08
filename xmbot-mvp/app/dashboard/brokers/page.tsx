@@ -138,7 +138,7 @@ export default function BrokersPage() {
               {[
                 { step: "01", title: "Generate API Keys", desc: "Create API keys on your broker's platform with trade-only permissions" },
                 { step: "02", title: "Enter in XMOne", desc: "Paste your API keys in the broker settings. Encrypted and stored securely." },
-                { step: "03", title: "AI Starts Analyzing", desc: "Engine connects and begins scanning markets with all six AI agents" },
+                { step: "03", title: "AI Starts Analyzing", desc: "Engine connects and begins scanning gold markets with all five AI agents" },
                 { step: "04", title: "Approve via Telegram", desc: "Signals arrive on Telegram. Tap Approve — trade executes on your broker" },
               ].map((s) => (
                 <div key={s.step} className="p-3 rounded-lg border border-border bg-accent text-center">

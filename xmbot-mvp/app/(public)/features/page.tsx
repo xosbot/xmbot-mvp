@@ -26,7 +26,7 @@ const features = [
   {
     icon: BarChart3,
     title: "Backtested & Walk-Forward Validated",
-    description: "64% win rate over 1,083 trades in 6 months. +84.3% return on $10,000 initial capital. 4.3% max drawdown. Walk-forward analysis on unseen data shows +19% — the system generalizes, not just overfits.",
+    description: "64% win rate over 1,083 trades in 6 months, backtested on PAXG/USDT (tokenized gold), not live XAUUSD. +84.3% return on $10,000 initial capital. 4.3% max drawdown. Walk-forward analysis on unseen data shows +19%.",
     color: "emerald" as const,
   },
   {

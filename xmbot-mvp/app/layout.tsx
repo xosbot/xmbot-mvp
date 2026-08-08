@@ -24,24 +24,19 @@ const sourceSerif = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "XMOne — AI Investment Platform",
+    default: "XMOne — AI Gold Trading, Human-Approved",
     template: "%s | XMOne",
   },
   description:
-    "AI-powered investment platform for gold, stocks, crypto, and mutual funds. Multi-agent AI finds opportunities across India and global markets. You stay in control.",
+    "AI-powered gold (XAUUSD) trading bot with a multi-agent signal pipeline. Every trade requires your approval on Telegram. Free paper trading, no free trial gimmicks.",
   keywords: [
-    "AI investment platform",
-    "trading bot",
+    "AI trading bot",
     "gold trading",
     "XAUUSD",
-    "stocks India",
-    "NSE BSE",
-    "mutual funds",
     "crypto trading",
-    "forex",
     "algorithmic trading",
-    "AI portfolio advisor",
     "Telegram trading",
+    "paper trading",
   ],
   authors: [{ name: "XMOne" }],
   creator: "XMOne",
@@ -54,23 +49,23 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: "https://xmbot.online",
     siteName: "XMOne",
-    title: "XMOne — AI Investment Platform",
+    title: "XMOne — AI Gold Trading, Human-Approved",
     description:
-      "AI-powered investment platform for gold, stocks, crypto, and mutual funds. Multi-agent AI finds opportunities across India and global markets.",
+      "AI-powered gold (XAUUSD) trading bot with a multi-agent signal pipeline. Every trade requires your approval on Telegram.",
     images: [
       {
         url: "https://xmbot.online/og-image.png",
         width: 1200,
         height: 630,
-        alt: "XMOne — AI Investment Platform",
+        alt: "XMOne — AI Gold Trading, Human-Approved",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "XMOne — AI Investment Platform",
+    title: "XMOne — AI Gold Trading, Human-Approved",
     description:
-      "AI-powered investment platform for gold, stocks, crypto, and mutual funds. You stay in control.",
+      "AI-powered gold (XAUUSD) trading bot with a multi-agent signal pipeline. You approve every trade.",
     images: ["https://xmbot.online/og-image.png"],
   },
   icons: {

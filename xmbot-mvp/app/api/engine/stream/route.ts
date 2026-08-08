@@ -1,9 +1,9 @@
 import { auth } from "@/auth"
+import { engineAuthHeaders } from "@/lib/engine-client"
 
 export const dynamic = "force-dynamic"
 
 const ENGINE_URL = process.env.ENGINE_API_URL || "http://localhost:8080"
-const API_KEY = process.env.XMBOT_API_KEY || ""
 
 export async function GET() {
   const session = await auth()
@@ -21,11 +21,7 @@ export async function GET() {
 
       // Send initial data
       try {
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-          "X-User-Id": session.user.id,
-        }
-        if (API_KEY) headers["x-api-key"] = API_KEY
+        const headers = engineAuthHeaders(session.user.id)
 
         const [healthRes, positionsRes, accountRes, metricsRes] = await Promise.allSettled([
           fetch(`${ENGINE_URL}/health`, { headers }),
@@ -53,11 +49,7 @@ export async function GET() {
       // Poll and send updates every 5 seconds
       const interval = setInterval(async () => {
         try {
-          const headers: Record<string, string> = {
-            "Content-Type": "application/json",
-            "X-User-Id": session.user.id,
-          }
-          if (API_KEY) headers["x-api-key"] = API_KEY
+          const headers = engineAuthHeaders(session.user.id)
 
           const [positionsRes, accountRes, metricsRes] = await Promise.allSettled([
             fetch(`${ENGINE_URL}/positions`, { headers }),
