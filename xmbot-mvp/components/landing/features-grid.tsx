@@ -9,7 +9,7 @@ const features = [
   {
     icon: Brain,
     title: "Multi-Agent AI Analysis",
-    description: "Six specialized agents scan gold, stocks, crypto, and forex 24/5. Gemini and Claude validate every signal. You get only high-probability setups across every market.",
+    description: "Five specialized agents scan gold and crypto 24/5. Gemini and Claude validate every signal. You get only high-probability setups.",
     color: "gold" as const,
     featured: true,
   },
@@ -22,8 +22,8 @@ const features = [
   },
   {
     icon: Globe,
-    title: "Multi-Market Coverage",
-    description: "India (NSE/BSE), US (NYSE/NASDAQ), Crypto, Forex, Commodities — all from one platform. AI adapts strategies per market.",
+    title: "Gold Today, More Markets Ahead",
+    description: "XAUUSD gold and crypto are live now. Stocks (NSE/BSE, NYSE/NASDAQ), forex, and mutual funds are on the roadmap.",
     color: "gold" as const,
     featured: false,
   },
@@ -36,15 +36,15 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: "Investment Advisory",
-    description: "Beyond trading — portfolio review, MF recommendations, stock picks, tax optimization. Complete financial guidance.",
+    title: "Investment Advisory (Roadmap)",
+    description: "Beyond trading — portfolio review, MF recommendations, stock picks, tax optimization. Planned, not yet built.",
     color: "emerald" as const,
     featured: false,
   },
   {
     icon: BarChart3,
-    title: "Proven Results",
-    description: "64% win rate. +84.3% return. 4.3% max drawdown. Validated on 6 months of real market data with walk-forward analysis.",
+    title: "Backtested Results",
+    description: "64% win rate. +84.3% return. 4.3% max drawdown. Backtested on 6 months of PAXG/USDT data with walk-forward analysis — not live trading results.",
     color: "emerald" as const,
     featured: false,
   },
@@ -65,7 +65,7 @@ const features = [
   {
     icon: Layers,
     title: "Multi-Broker Support",
-    description: "Paper trading, Binance, Zerodha, Interactive Brokers, MT5. Switch brokers without changing your strategy.",
+    description: "Paper trading and Binance are live today. Zerodha, Interactive Brokers, and MT5 are on the roadmap.",
     color: "neutral" as const,
     featured: false,
   },
@@ -116,8 +116,8 @@ export function FeaturesGrid() {
               <span className="text-gradient-gold">A Full-Time Job.</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              XMOne handles the analysis across every market. You handle the decisions.
-              That&apos;s how disciplined investing works.
+              XMOne handles the gold analysis. You handle the decisions.
+              That&apos;s how disciplined trading works.
             </p>
           </div>
         </ScrollReveal>

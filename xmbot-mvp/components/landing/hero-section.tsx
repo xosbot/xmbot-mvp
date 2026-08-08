@@ -74,7 +74,7 @@ export function HeroSection() {
               className="mb-8 inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
-              <span>Beta Open // 7-Day Free Trial</span>
+              <span>Beta Open // Start Free with Paper Trading</span>
             </motion.div>
 
             <motion.div
@@ -85,11 +85,11 @@ export function HeroSection() {
               <LampEffect>
                 <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.05]">
                   <span className="text-foreground">
-                    <TextGenerateEffect words="AI Investment" filter={false} />
+                    <TextGenerateEffect words="AI Gold Trading" filter={false} />
                   </span>
                   <br />
                   <span className="text-gradient-gold">
-                    <FlipWords words={["Partner for Every Market.", "Across Every Asset.", "That Grows With You."]} duration={3000} />
+                    <FlipWords words={["You Approve. AI Analyzes.", "Built to Expand Beyond Gold.", "That Grows With You."]} duration={3000} />
                   </span>
                 </h1>
               </LampEffect>
@@ -101,9 +101,10 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-8 text-lg text-muted-foreground leading-relaxed"
             >
-              Gold, stocks, crypto, mutual funds — AI finds opportunities across India and global markets.
-              You decide. No charts. No code. No stress.
-              <span className="text-foreground font-medium"> Just disciplined growth.</span>
+              A multi-agent AI system trades XAUUSD gold for you — technical analysis, AI validation,
+              and a risk engine, with every signal requiring your approval on Telegram.
+              <span className="text-foreground font-medium"> No charts to watch. No code to write.</span>
+              {" "}More markets are on the roadmap.
             </motion.p>
 
             <motion.div
@@ -114,7 +115,7 @@ export function HeroSection() {
             >
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-gold-600" />
-                <span>India + US + Global markets</span>
+                <span>Non-custodial — we never hold your funds</span>
               </div>
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4 text-gold-600" />
@@ -134,7 +135,7 @@ export function HeroSection() {
             >
               <Link href="/register">
                 <Button size="lg" className="bg-gold-600 hover:bg-gold-500 text-white font-semibold px-10 h-14 text-base transition-colors duration-200 group shadow-sm shadow-gold-600/20">
-                  Start Free Trial
+                  Start Free — Paper Trading
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

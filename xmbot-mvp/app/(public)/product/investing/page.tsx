@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, PieChart, TrendingUp, Shield, Target, BarChart3, Wallet, CheckCircle2, Landmark, Building2, Globe } from "lucide-react"
+import { ArrowRight, PieChart, TrendingUp, Shield, Target, BarChart3, Wallet, CheckCircle2, Landmark, Building2, Globe, Clock } from "lucide-react"
 
 const advisoryServices = [
   {
@@ -65,17 +65,19 @@ export default function InvestingPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700 mb-6">
-            // Investment Advisory
+          <div className="inline-flex items-center gap-2 rounded-sm border border-border bg-accent px-3 py-1.5 text-xs mono-label text-muted-foreground mb-6">
+            <Clock className="h-3 w-3" />
+            Roadmap — Not Yet Available
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
-            More Than Trading.
+            More Than Trading,
             <br />
-            <span className="text-gradient-gold">Complete Financial Advisory.</span>
+            <span className="text-gradient-gold">Down the Road.</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-            From short-term trades to long-term wealth building — AI guides every decision.
-            Your personal financial advisor, powered by six specialized agents.
+            XMOne is a gold (XAUUSD) trading bot today — that&apos;s the only thing you can actually
+            use right now. Everything below is where we want to take the platform, not a service
+            you can sign up for. We&apos;re publishing it so you know the direction, not to sell it.
           </p>
         </div>
 
@@ -83,8 +85,13 @@ export default function InvestingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {advisoryServices.map((service) => (
             <div key={service.title} className="p-6 rounded-xl border border-border bg-card hover:border-gold-200 hover:shadow-md transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-gold-500/10 flex items-center justify-center mb-4">
-                <service.icon className="h-6 w-6 text-gold-600" />
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gold-500/10 flex items-center justify-center">
+                  <service.icon className="h-6 w-6 text-gold-600" />
+                </div>
+                <span className="inline-flex items-center gap-1 text-[10px] mono-label px-2 py-0.5 rounded-sm border border-border bg-accent text-muted-foreground">
+                  <Clock className="h-2.5 w-2.5" /> Roadmap
+                </span>
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">{service.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{service.description}</p>
@@ -104,9 +111,9 @@ export default function InvestingPage() {
         <div className="mb-20">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl sm:text-4xl font-medium text-foreground tracking-tight">
-              Market Coverage
+              Market Coverage — Roadmap
             </h2>
-            <p className="mt-4 text-muted-foreground">Investment advisory across India, US, and global markets.</p>
+            <p className="mt-4 text-muted-foreground">Where we want investment advisory to reach across India, US, and global markets. None of this is live yet.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {marketSupport.map((market) => (
@@ -134,14 +141,15 @@ export default function InvestingPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-sm border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs mono-label text-emerald-700 mb-4">
                 <Shield className="h-3 w-3" />
-                Built-In Risk Engine
+                Built-In Risk Engine — Live Today
               </div>
               <h2 className="font-serif text-3xl font-medium text-foreground tracking-tight mb-4">
                 Your Capital, Protected by Design
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Risk management isn&apos;t a feature — it&apos;s the architecture. Every trade goes through the Risk Advisor before execution.
-                Position sizing, drawdown limits, and daily loss caps are enforced at the engine level.
+                Unlike the advisory features above, this part is real and running today, on gold trading.
+                Every trade goes through the Risk Advisor before execution — position sizing, drawdown
+                limits, and daily loss caps are enforced at the engine level.
               </p>
               <div className="space-y-3">
                 {["2% max risk per trade", "Daily loss limits", "Max drawdown protection", "Per-user position limits", "Real-time portfolio risk monitoring"].map((item) => (
@@ -155,7 +163,7 @@ export default function InvestingPage() {
             <div className="p-6 rounded-xl border border-border bg-accent">
               <div className="text-center mb-6">
                 <div className="text-4xl font-bold font-mono text-foreground">4.3%</div>
-                <div className="text-sm text-muted-foreground mt-1">Max Drawdown (Backtested)</div>
+                <div className="text-sm text-muted-foreground mt-1">Max Drawdown (Backtested on PAXG/USDT)</div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 rounded-lg bg-card border border-border">
@@ -174,14 +182,14 @@ export default function InvestingPage() {
         {/* CTA */}
         <div className="text-center">
           <h2 className="font-serif text-3xl sm:text-4xl font-medium text-foreground tracking-tight mb-4">
-            Start Building Wealth
+            What You Can Actually Use Today
           </h2>
           <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-            Free tier includes paper trading and basic advisory. Upgrade for full AI analysis and live trading.
+            Free paper trading and live gold (XAUUSD) trading, backed by the risk engine above.
           </p>
           <Link href="/register">
             <Button size="lg" className="bg-gold-600 hover:bg-gold-500 text-white font-semibold px-10 h-14 shadow-sm shadow-gold-600/20">
-              Start Free Trial
+              Start Free — Paper Trading
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

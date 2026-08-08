@@ -8,18 +8,9 @@ const agents = [
     name: "Technical Analyst",
     tagline: "Scans charts, patterns, and momentum",
     description: "The first line of analysis. Scans price action across multiple timeframes using RSI, Supertrend, ADX, MACD, and Bollinger Bands. Identifies high-probability setups and flags momentum shifts before they become obvious.",
-    markets: ["Gold", "Stocks", "Crypto", "Forex"],
+    markets: ["Gold", "Crypto"],
     tools: ["RSI", "Supertrend", "ADX", "MACD", "Bollinger Bands"],
     color: "gold",
-  },
-  {
-    icon: BarChart3,
-    name: "Fundamental Analyst",
-    tagline: "Earnings, news, and macro data",
-    description: "Looks beyond the charts. Analyzes company earnings, revenue growth, P/E ratios, macroeconomic indicators, and sector trends. For mutual funds, evaluates NAV history, expense ratios, and fund manager track records.",
-    markets: ["Stocks", "Mutual Funds", "Bonds"],
-    tools: ["P/E Ratio", "Revenue Growth", "Macro Data", "Sector Analysis"],
-    color: "emerald",
   },
   {
     icon: Brain,
@@ -78,9 +69,9 @@ export default function AIAgentsPage() {
             // AI Agents
           </div>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
-            Six Specialized Agents.
+            Five Specialized Agents.
             <br />
-            <span className="text-gradient-gold">One Investment Team.</span>
+            <span className="text-gradient-gold">One Trading Team.</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             Each agent is an expert in its domain. Together, they find opportunities no single indicator could.
@@ -92,12 +83,12 @@ export default function AIAgentsPage() {
         <div className="mb-20 rounded-xl border border-border bg-card p-8 sm:p-10">
           <h2 className="text-lg font-semibold text-foreground mb-6 text-center">Signal Pipeline</h2>
           <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-            {["Technical Scan", "Fundamental Check", "Regime Filter", "AI Consensus", "Risk Validation", "Signal Sent"].map((step, i) => (
+            {["Technical Scan", "Regime Filter", "AI Consensus", "Risk Validation", "Signal Sent"].map((step, i) => (
               <div key={step} className="flex items-center gap-3">
                 <div className="px-4 py-2 rounded-lg bg-gold-500/10 border border-gold-200 text-gold-700 font-medium text-xs mono-label">
                   {step}
                 </div>
-                {i < 5 && <span className="text-muted-foreground">→</span>}
+                {i < 4 && <span className="text-muted-foreground">→</span>}
               </div>
             ))}
           </div>
@@ -157,7 +148,7 @@ export default function AIAgentsPage() {
           </p>
           <Link href="/register">
             <Button size="lg" className="bg-gold-600 hover:bg-gold-500 text-white font-semibold px-10 h-14 shadow-sm shadow-gold-600/20">
-              Start Free Trial
+              Start Free — Paper Trading
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

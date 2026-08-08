@@ -18,7 +18,7 @@ const steps = [
     number: "02",
     time: "Runs 24/5",
     title: "AI Scans the Market",
-    description: "Multi-agent engine analyzes gold, stocks, crypto, and forex every 5 minutes — then AI validators double-check every candidate signal.",
+    description: "Multi-agent engine analyzes gold every 5 minutes — then AI validators double-check every candidate signal.",
   },
   {
     icon: CheckCircle,

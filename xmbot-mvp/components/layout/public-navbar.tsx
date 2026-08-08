@@ -89,7 +89,7 @@ export function Navbar() {
             </Link>
             <Link href="/register">
               <Button className="bg-gold-600 hover:bg-gold-500 text-white font-semibold transition-colors duration-200 shadow-sm shadow-gold-600/20">
-                Start Free Trial
+                Start Free
               </Button>
             </Link>
           </div>
@@ -136,7 +136,7 @@ export function Navbar() {
             </Link>
             <Link href="/register" onClick={() => setMobileOpen(false)}>
               <Button className="w-full bg-gold-600 hover:bg-gold-500 text-white font-semibold shadow-sm shadow-gold-600/20">
-                Start Free Trial
+                Start Free
               </Button>
             </Link>
           </div>

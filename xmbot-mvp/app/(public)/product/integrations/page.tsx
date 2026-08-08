@@ -56,7 +56,7 @@ const brokers = [
 const connectionSteps = [
   { step: "01", title: "Generate API Keys", desc: "Create API keys on your broker's platform with trade-only permissions (no withdrawal)." },
   { step: "02", title: "Enter in XMOne", desc: "Paste your API keys in the dashboard settings. Encrypted and stored securely." },
-  { step: "03", title: "AI Starts Analyzing", desc: "Engine connects to your broker and begins scanning markets with all six AI agents." },
+  { step: "03", title: "AI Starts Analyzing", desc: "Engine connects to your broker and begins scanning gold markets with all five AI agents." },
   { step: "04", title: "Approve via Telegram", desc: "Signals arrive on Telegram. Tap Approve — trade executes on your broker account." },
 ]
 
@@ -198,13 +198,14 @@ export default function IntegrationsPage() {
             <h2 className="font-serif text-2xl font-medium text-foreground">India Market Support</h2>
           </div>
           <p className="text-muted-foreground leading-relaxed mb-6">
-            XMOne is built India-first. Full support for NSE/BSE stocks, MCX commodities, mutual funds, and Indian tax optimization.
-            Zerodha and Upstox integrations coming soon.
+            XMOne is built India-first, starting with gold. NSE/BSE stocks, MCX commodities, mutual funds,
+            and Indian tax optimization are on the roadmap, alongside Zerodha and Upstox integrations —
+            none of this is live yet.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {["NSE & BSE stocks (5,000+)", "MCX gold & silver futures", "Direct plan mutual funds", "ELSS tax-saving funds", "LTCG/STCG tax optimization", "SIP recommendations"].map((item) => (
+            {["NSE & BSE stocks", "MCX gold & silver futures", "Direct plan mutual funds", "ELSS tax-saving funds", "LTCG/STCG tax optimization", "SIP recommendations"].map((item) => (
               <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 text-orange-600" />
+                <Clock className="h-3.5 w-3.5 text-orange-600 flex-shrink-0" />
                 {item}
               </div>
             ))}
@@ -222,7 +223,7 @@ export default function IntegrationsPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/register">
               <Button size="lg" className="bg-gold-600 hover:bg-gold-500 text-white font-semibold px-10 h-14 shadow-sm shadow-gold-600/20">
-                Start Free Trial
+                Start Free — Paper Trading
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>

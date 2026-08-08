@@ -62,8 +62,13 @@ function FeatureCard({ feature }: { feature: typeof advisoryFeatures[0] }) {
     <StaggerItem>
       <Spotlight className="rounded-xl" fill={c.fill}>
         <div className={`p-6 rounded-xl border ${c.border} bg-card hover:shadow-md transition-all duration-300 h-full`}>
-          <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center mb-4`}>
-            <feature.icon className={`h-6 w-6 ${c.iconText}`} />
+          <div className="flex items-start justify-between mb-4">
+            <div className={`w-12 h-12 rounded-xl ${c.iconBg} flex items-center justify-center`}>
+              <feature.icon className={`h-6 w-6 ${c.iconText}`} />
+            </div>
+            <span className="text-[10px] mono-label px-2 py-0.5 rounded-sm border border-border bg-accent text-muted-foreground">
+              Roadmap
+            </span>
           </div>
           <h3 className="text-base font-semibold text-foreground mb-2">{feature.title}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
@@ -81,17 +86,18 @@ export function InvestmentAdvisorySection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <div className="inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700 mb-6">
-              // Investment Advisory
+            <div className="inline-flex items-center gap-2 rounded-sm border border-border bg-accent px-3 py-1.5 text-xs mono-label text-muted-foreground mb-6">
+              // On The Roadmap — Not Yet Available
             </div>
             <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-foreground tracking-tight">
-              More Than Trading.
+              More Than Trading,
               <br />
-              <span className="text-gradient-gold">Complete Financial Advisory.</span>
+              <span className="text-gradient-gold">Eventually.</span>
             </h2>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              From short-term trades to long-term wealth building — AI guides every decision.
-              Your personal financial advisor, powered by six specialized agents.
+              We&apos;re starting with gold trading, done well. Full financial advisory — mutual funds,
+              stock picks, tax planning — is the direction we&apos;re building toward, not something
+              you can use today. Here&apos;s what&apos;s planned.
             </p>
           </div>
         </ScrollReveal>
@@ -106,7 +112,7 @@ export function InvestmentAdvisorySection() {
           <div className="mt-16 text-center">
             <Link href="/product/investing">
               <Button size="lg" variant="outline" className="border-border text-muted-foreground hover:bg-accent group">
-                Explore Investment Advisory
+                See the Roadmap
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>

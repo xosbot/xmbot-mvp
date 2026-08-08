@@ -3,7 +3,7 @@
 import { Topbar } from "@/components/dashboard/topbar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Brain, Search, BarChart3, Activity, Shield, BookOpen, Zap, Target, CheckCircle2, Clock } from "lucide-react"
+import { Brain, Search, Activity, Shield, BookOpen, Zap, Target, CheckCircle2, Clock } from "lucide-react"
 
 const agents = [
   {
@@ -15,16 +15,6 @@ const agents = [
     accuracy: "68%",
     description: "Scans RSI, Supertrend, ADX across multiple timeframes",
     color: "gold",
-  },
-  {
-    icon: BarChart3,
-    name: "Fundamental Analyst",
-    status: "active",
-    lastSignal: "15 min ago",
-    signalsToday: 4,
-    accuracy: "72%",
-    description: "Earnings, P/E, macro data, sector analysis",
-    color: "emerald",
   },
   {
     icon: Brain,
@@ -92,12 +82,12 @@ export default function AgentsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              {["Technical Scan", "Fundamental Check", "Regime Filter", "AI Consensus", "Risk Validation", "Signal Sent"].map((step, i) => (
+              {["Technical Scan", "Regime Filter", "AI Consensus", "Risk Validation", "Signal Sent"].map((step, i) => (
                 <div key={step} className="flex items-center gap-2">
                   <div className="px-3 py-1.5 rounded-lg bg-gold-500/10 border border-gold-200 text-gold-700 font-medium mono-label">
                     {step}
                   </div>
-                  {i < 5 && <span className="text-muted-foreground">→</span>}
+                  {i < 4 && <span className="text-muted-foreground">→</span>}
                 </div>
               ))}
             </div>
