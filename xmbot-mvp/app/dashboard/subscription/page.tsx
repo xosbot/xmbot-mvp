@@ -50,9 +50,6 @@ export default function SubscriptionPage() {
                         <span className="text-sm text-muted-foreground">{plan.period}</span>
                       </div>
                     </div>
-{"discountLabel" in plan && plan.discountLabel && (
-                      <p className="text-xs text-gold-600">{plan.discountLabel}</p>
-                    )}
                   </div>
                 ))}
 

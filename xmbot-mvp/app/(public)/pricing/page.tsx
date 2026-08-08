@@ -7,14 +7,13 @@ import { MovingBorder } from "@/components/ui/aceternity/moving-border"
 import { GlareCard } from "@/components/ui/aceternity/glare-card"
 import { CardSpotlight } from "@/components/ui/aceternity/card-spotlight"
 import { ScrollReveal } from "@/components/landing/scroll-reveal"
+import { PLANS } from "@/lib/plans"
 
 const plans = [
   {
-    name: "Beta Access",
-    price: "₹9,999",
-    originalPrice: "₹19,999",
-    period: "/3 months",
-    discount: "50% off — Limited spots",
+    name: PLANS.beta.name,
+    price: PLANS.beta.label,
+    period: PLANS.beta.period,
     badge: { text: "Best Value", icon: Star },
     features: [
       "Full bot access for XAUUSD",
@@ -28,9 +27,9 @@ const plans = [
     highlighted: true,
   },
   {
-    name: "Monthly",
-    price: "₹2,999",
-    period: "/month",
+    name: PLANS.monthly.name,
+    price: PLANS.monthly.label,
+    period: PLANS.monthly.period,
     features: [
       "Full bot access for XAUUSD",
       "AI analysis 24/5",
@@ -42,9 +41,9 @@ const plans = [
     highlighted: false,
   },
   {
-    name: "Quarterly",
-    price: "₹7,999",
-    period: "/quarter",
+    name: PLANS.quarterly.name,
+    price: PLANS.quarterly.label,
+    period: PLANS.quarterly.period,
     popular: true,
     savings: "Save ₹1,000 vs monthly",
     features: [
@@ -58,9 +57,9 @@ const plans = [
     highlighted: true,
   },
   {
-    name: "Yearly",
-    price: "₹24,999",
-    period: "/year",
+    name: PLANS.yearly.name,
+    price: PLANS.yearly.label,
+    period: PLANS.yearly.period,
     badge: { text: "Best for Pros", icon: Zap },
     savings: "Save ₹11,000 vs monthly",
     features: [
@@ -166,14 +165,10 @@ function PlanCard({ plan }: { plan: typeof plans[number] }) {
       )}
       <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
       <div className="mt-4">
-        {plan.originalPrice && (
-          <span className="text-lg text-slate-500 line-through">{plan.originalPrice}</span>
-        )}
         <div className="flex items-baseline gap-1 mt-1">
           <span className="text-4xl font-bold text-white">{plan.price}</span>
           <span className="text-sm text-slate-400">{plan.period}</span>
         </div>
-        {plan.discount && <p className="text-xs text-emerald-400/80 mt-2">{plan.discount}</p>}
         {plan.savings && <p className="text-xs text-emerald-400/80 mt-2">{plan.savings}</p>}
       </div>
       <ul className="mt-6 space-y-3 flex-1">

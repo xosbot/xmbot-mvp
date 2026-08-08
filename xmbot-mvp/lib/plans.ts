@@ -1,5 +1,5 @@
 export const PLANS = {
-  beta: { name: "Beta Access", amount: 9999, currency: "INR", label: "₹9,999", originalLabel: "₹19,999", discountLabel: "50% off", period: "/3 months", popular: false },
+  beta: { name: "Beta Access", amount: 9999, currency: "INR", label: "₹9,999", period: "/3 months", popular: false },
   monthly: { name: "Monthly", amount: 2999, currency: "INR", label: "₹2,999", period: "/month", popular: false },
   quarterly: { name: "Quarterly", amount: 7999, currency: "INR", label: "₹7,999", period: "/quarter", popular: true },
   yearly: { name: "Yearly", amount: 24999, currency: "INR", label: "₹24,999", period: "/year", popular: false },

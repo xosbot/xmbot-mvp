@@ -79,9 +79,8 @@ export default function CheckoutPage() {
           </Badge>
           <CardTitle className="text-white text-2xl">Confirm Your Subscription</CardTitle>
           <div className="mt-4">
-            <span className="text-slate-500 line-through text-lg">{PLANS.beta.originalLabel}</span>
             <div className="text-5xl font-bold text-white mt-1">{PLANS.beta.label}</div>
-            <p className="text-sm text-emerald-400 mt-1">{PLANS.beta.discountLabel} — Limited spots</p>
+            <p className="text-sm text-slate-400 mt-1">{PLANS.beta.period}</p>
           </div>
         </CardHeader>
         <CardContent>
