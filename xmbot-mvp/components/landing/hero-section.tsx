@@ -2,12 +2,14 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, Eye, TrendingUp, Zap, CheckCircle2, Globe, BarChart3 } from "lucide-react"
+import { useState } from "react"
+import { ArrowRight, Shield, Eye, TrendingUp, CheckCircle2, Globe } from "lucide-react"
 import { motion } from "framer-motion"
 import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
 import { FlipWords } from "@/components/ui/aceternity/flip-words"
 import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
-import { ProductMockupStack } from "./product-mockup-stack"
+import { InteractiveHeroCanvas } from "./interactive-hero-canvas"
+import { SignalLattice } from "./signal-lattice"
 
 function StatsBar() {
   const stats = [
@@ -39,9 +41,9 @@ function StatsBar() {
 
 function TrustBadges() {
   const badges = [
-    "No withdrawal access — ever",
-    "API keys only",
-    "Cancel anytime",
+    "Non-custodial — we never hold your funds",
+    "You approve every trade",
+    "2% max risk per trade",
   ]
 
   return (
@@ -62,8 +64,12 @@ function TrustBadges() {
 }
 
 export function HeroSection() {
+  const [hovered, setHovered] = useState(false)
+  
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      <SignalLattice className="opacity-30" />
+      
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">
@@ -161,8 +167,9 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          <div className="hidden lg:block">
-            <ProductMockupStack />
+          <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.35)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-slate-900/30 to-gold-900/20" />
+            <InteractiveHeroCanvas />
           </div>
         </div>
       </div>
