@@ -37,7 +37,7 @@ export function ScrollReveal({
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 0, x, y }}
+      initial={{ opacity: 1, x, y }}
       animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x, y }}
       transition={{
         duration,
@@ -95,7 +95,7 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y: 30 },
+        hidden: { opacity: 1, y: 30 },
         visible: {
           opacity: 1,
           y: 0,

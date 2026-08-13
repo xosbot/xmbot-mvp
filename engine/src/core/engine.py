@@ -121,6 +121,12 @@ class Engine:
                 log.warning("start() called while already running — ignoring")
                 return
 
+            for uid, uc in self._user_configs.items():
+                if uc.is_expired:
+                    log.error(f"Subscription expired for user {uid} — refusing to start")
+                    await self._alert(f"Subscription expired for user {uid}. Engine not started.")
+                    return
+
             log.info("Engine starting...")
 
             connected = await self.broker.connect()
@@ -197,6 +203,7 @@ class Engine:
         
         Tracks position lifecycle: detects when positions close (via stop-loss,
         take-profit, or manual close) and records them as completed trades.
+        Also wires RiskAdvisor and TradeJournal on each closure.
         """
         from ..api.routes.sync import USER_STORES
         
@@ -238,6 +245,11 @@ class Engine:
                     
                     self._closed_trades[pos_id] = closed_trade
                     log.info(f"Position closed: {pos_id}, P&L: {closed_trade['profit']:.2f}")
+
+                    if account:
+                        await self.risk.record_pnl(user_id, old_pos.unrealized_pnl)
+
+                    await self._on_trade_closed(closed_trade, account)
                 
                 for pos in positions:
                     self._open_positions[pos.id] = pos
@@ -309,6 +321,62 @@ class Engine:
                 await self._alert_throttled("sync_loop", f"⚠️ Trade sync failing: {e}")
 
             await asyncio.sleep(30)
+
+    async def _on_trade_closed(self, trade: dict, account: 'AccountInfo | None') -> None:
+        """Called when a position closes. Wires AI risk advisor and trade journal."""
+        try:
+            from ..ai.risk_advisor import RiskAdvisor
+            from ..ai.trade_journal import TradeJournal
+
+            ai = self.ai_registry.default()
+
+            risk_advisor = RiskAdvisor(ai_provider=ai)
+            positions = await self.broker.get_positions()
+            daily_pnl = trade.get("profit", 0.0)
+
+            suggestions = await risk_advisor.analyze_risk(
+                current_positions=positions,
+                account_balance=account.balance if account else 0.0,
+                daily_pnl=daily_pnl,
+                recent_trades=list(self._closed_trades.values())[-10:],
+            )
+
+            if suggestions:
+                from ..api.routes.sync import USER_STORES
+                uid = trade.get("user_id", "default")
+                if uid in USER_STORES:
+                    USER_STORES[uid].setdefault("risk_suggestions", [])
+                    USER_STORES[uid]["risk_suggestions"] = [s.to_dict() for s in suggestions[-5:]]
+                log.info(f"Risk advisor: {len(suggestions)} suggestions for trade {trade['id']}")
+        except Exception as e:
+            log.warning(f"Risk advisor skipped: {e}")
+
+        try:
+            from ..ai.trade_journal import TradeJournal
+
+            ai = self.ai_registry.default()
+            journal = TradeJournal(ai_provider=ai)
+
+            await journal.record_trade(
+                trade_id=trade["id"],
+                symbol=trade["symbol"],
+                action=trade["action"],
+                entry_price=trade["open_price"],
+                exit_price=trade["close_price"],
+                volume=trade["lot_size"],
+                pnl=trade.get("profit", 0.0),
+            )
+
+            from ..api.routes.sync import USER_STORES
+            uid = trade.get("user_id", "default")
+            if uid in USER_STORES:
+                USER_STORES[uid].setdefault("journal_entries", [])
+                entry = journal._entries[-1].to_dict() if journal._entries else {}
+                if entry:
+                    USER_STORES[uid]["journal_entries"].append(entry)
+            log.info(f"Trade journal: recorded {trade['id']}")
+        except Exception as e:
+            log.warning(f"Trade journal skipped: {e}")
 
     async def _monitor_positions(self) -> None:
         """Monitor open positions and trail stop loss, check drawdown."""
@@ -393,6 +461,14 @@ class Engine:
                     await asyncio.sleep(self.config.tick_interval_seconds)
                     continue
 
+                user_id = self._resolve_user_id()
+                user_config = self._user_configs.get(user_id)
+                if user_config and user_config.is_expired:
+                    log.warning(f"Subscription expired for {user_id} — pausing agent {agent.name}")
+                    await self._alert(f"Subscription expired for {user_id}. Engine paused.")
+                    self.pause()
+                    break
+
                 if agent.config.confirmation_timeframe:
                     m5_data, h1_data = await self._fetch_markets_multi_tf(agent)
                 else:
@@ -425,8 +501,10 @@ class Engine:
                 user_position_count = sum(
                     1 for p in open_positions if hasattr(p, "symbol") and p.symbol in agent_config.markets
                 )
+                volume = await self._calculate_volume(signal, user_config)
                 risk_verdict = await self.risk.check_signal(
-                    signal, user_config, len(open_positions), user_position_count
+                    signal, user_config, len(open_positions), user_position_count,
+                    account_balance=self._account_balance, volume=volume,
                 )
 
                 if risk_verdict == RiskVerdict.BLOCK:
@@ -443,13 +521,15 @@ class Engine:
 
                 if decision.decision == SignalDecision.APPROVED:
                     await agent.on_signal_approved(signal)
-                    await self._execute_signal(signal, user_config)
+                    await self._execute_signal(signal, user_config, volume)
 
                 elif decision.decision == SignalDecision.MODIFIED:
                     signal.entry_price = decision.modified_price or signal.entry_price
                     signal.stop_loss = decision.modified_stop_loss or signal.stop_loss
                     await agent.on_signal_approved(signal)
-                    await self._execute_signal(signal, user_config)
+                    # Entry/stop moved — the pre-approval volume no longer reflects the
+                    # risk check that was actually run, so re-derive it from the modified signal.
+                    await self._execute_signal(signal, user_config, await self._calculate_volume(signal, user_config))
 
                 elif decision.decision == SignalDecision.REJECTED:
                     await agent.on_signal_rejected(signal)
@@ -500,13 +580,13 @@ class Engine:
         await self.signal_bus.emit_decision(agent.name, signal.id, decision.decision)
         return decision
 
-    async def _execute_signal(self, signal: Signal, user_config: UserConfig) -> None:
+    async def _execute_signal(self, signal: Signal, user_config: UserConfig, volume: float) -> None:
         order = Order(
             id=signal.id,
             signal_id=signal.id,
             action=signal.action,
             market=signal.market,
-            volume=await self._calculate_volume(signal, user_config),
+            volume=volume,
             price=signal.entry_price,
             stop_loss=signal.stop_loss,
             take_profit=signal.take_profit,

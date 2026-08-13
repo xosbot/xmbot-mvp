@@ -117,6 +117,48 @@ class TestRiskEngine:
         verdict = await risk.check_signal(signal, user_config, open_position_count=3)
         assert verdict == RiskVerdict.PASS
 
+    @pytest.mark.asyncio
+    async def test_check_signal_blocks_when_dollar_risk_exceeds_pct(self, risk, user_config):
+        """The hard risk gate must use the trade's real volume, not a placeholder.
+
+        PAXGUSDT has contract_size=1.0. entry=3000, sl=2990 -> price_risk=10.
+        At volume=5.0 that's $50 of risk against a $1000 balance (5%),
+        which exceeds user_config's default risk_per_trade_pct (2% = $20).
+        """
+        signal = Signal(
+            id="test-risk-amt-1",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        verdict = await risk.check_signal(
+            signal, user_config, account_balance=1000.0, volume=5.0,
+        )
+        assert verdict == RiskVerdict.BLOCK
+
+    @pytest.mark.asyncio
+    async def test_check_signal_passes_when_dollar_risk_within_pct(self, risk, user_config):
+        """Same signal, but a properly-sized volume keeps risk under the cap."""
+        signal = Signal(
+            id="test-risk-amt-2",
+            action=SignalAction.BUY,
+            market="PAXGUSDT",
+            entry_price=3000.0,
+            stop_loss=2990.0,
+            confidence=0.8,
+            agent="test",
+            user_id="test_user",
+        )
+        # $10 risk on a $1000 balance = 1%, under the 2% default cap.
+        verdict = await risk.check_signal(
+            signal, user_config, account_balance=1000.0, volume=1.0,
+        )
+        assert verdict == RiskVerdict.PASS
+
 
 class TestRiskEnginePersistence:
     """Daily risk counters must survive a process restart — previously they

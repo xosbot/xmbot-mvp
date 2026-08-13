@@ -182,3 +182,42 @@ async def update_store(request: Request, data: dict, store: dict = Depends(get_u
     if _persistence:
         await _persistence.save(USER_STORES)
     return {"status": "ok"}
+
+
+class LiveStatsOut(BaseModel):
+    active_traders: int
+    signals_generated: int
+    approval_rate: float
+
+
+@router.get("/live-stats", response_model=LiveStatsOut)
+async def get_live_stats():
+    total_traders = 0
+    total_signals = 0
+    total_approved = 0
+    total_decisions = 0
+
+    for uid, store in USER_STORES.items():
+        trades = store.get("trades", [])
+        if not trades:
+            continue
+        total_traders += 1
+        total_signals += len(trades)
+        for t in trades:
+            status = t.get("status", "")
+            if status == "CLOSED":
+                total_approved += 1
+                total_decisions += 1
+            elif status == "OPEN":
+                total_approved += 1
+                total_decisions += 1
+            elif status in ("REJECTED", "TIMEOUT"):
+                total_decisions += 1
+
+    approval_rate = (total_approved / total_decisions * 100) if total_decisions > 0 else 0.0
+
+    return LiveStatsOut(
+        active_traders=total_traders,
+        signals_generated=total_signals,
+        approval_rate=round(approval_rate, 1),
+    )

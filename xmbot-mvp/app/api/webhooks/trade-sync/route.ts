@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
+import crypto from "crypto"
 import { db } from "@/lib/db"
 
 const WEBHOOK_SECRET = process.env.TRADE_SYNC_SECRET || ""
+
+function isAuthorized(authHeader: string | null): boolean {
+  if (!WEBHOOK_SECRET || !authHeader) return false
+  const expected = Buffer.from(`Bearer ${WEBHOOK_SECRET}`)
+  const actual = Buffer.from(authHeader)
+  if (expected.length !== actual.length) return false
+  return crypto.timingSafeEqual(expected, actual)
+}
 
 interface TradePayload {
   action: "open" | "close" | "update"
@@ -22,8 +31,7 @@ interface TradePayload {
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization")
-    if (!WEBHOOK_SECRET || authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
+    if (!isAuthorized(req.headers.get("authorization"))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

@@ -67,7 +67,7 @@ class RiskEngine:
 
     async def check_signal(
         self, signal: Signal, user_config: UserConfig, open_position_count: int = 0,
-        user_position_count: int = 0,
+        user_position_count: int = 0, account_balance: float = 0.0, volume: float = 0.0,
     ) -> RiskVerdict:
         async with self._lock:
             if self._maybe_reset_daily():
@@ -77,6 +77,9 @@ class RiskEngine:
                 return RiskVerdict.BLOCK
 
             if not await self._check_user_limits(signal, user_config, user_position_count):
+                return RiskVerdict.BLOCK
+
+            if account_balance > 0 and not self._check_risk_amount(signal, user_config, account_balance, volume):
                 return RiskVerdict.BLOCK
 
             return RiskVerdict.PASS
@@ -165,4 +168,31 @@ class RiskEngine:
             log.warning(f"User {signal.user_id} max positions reached: {user_position_count}/{config.max_positions}")
             return False
 
+        return True
+
+    def _check_risk_amount(self, signal: Signal, config: UserConfig, account_balance: float, volume: float) -> bool:
+        """Hard gate: block if dollar risk exceeds risk_per_trade_pct of balance.
+
+        risk_amount = |entry - SL| * volume * contract_size
+        max_allowed = account_balance * risk_per_trade_pct / 100
+
+        `volume` must be the lot size the engine actually intends to trade
+        (from Engine._calculate_volume) — sizing already targets risk_pct, but
+        can be pushed over it when clamped up to the minimum tradable lot
+        size, which is exactly the case this gate exists to catch.
+        """
+        risk_pct = getattr(config, 'risk_per_trade_pct', 2.0)
+        max_risk_dollars = account_balance * risk_pct / 100.0
+
+        from ..core.instruments import get_contract_size
+        contract_size = get_contract_size(signal.market)
+        price_risk = abs(signal.entry_price - signal.stop_loss)
+        estimated_risk = price_risk * volume * contract_size
+
+        if estimated_risk > max_risk_dollars:
+            log.warning(
+                f"Risk blocked: estimated ${estimated_risk:.2f} > max ${max_risk_dollars:.2f} "
+                f"({risk_pct}% of ${account_balance:.2f})"
+            )
+            return False
         return True

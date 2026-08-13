@@ -202,3 +202,16 @@ async def control(req: ControlRequest):
         }
     from fastapi import HTTPException
     raise HTTPException(status_code=400, detail=f"Unknown action: {req.action}")
+
+
+@app.get("/subscription-check")
+async def subscription_check(request: Request):
+    user_id = get_request_user_id(request)
+    if not engine_ref:
+        return {"active": False, "reason": "engine_not_ready"}
+    user_config = engine_ref._user_configs.get(user_id)
+    if not user_config:
+        return {"active": False, "reason": "no_config"}
+    if user_config.is_expired:
+        return {"active": False, "reason": "expired", "expiry_date": user_config.expiry_date.isoformat() if user_config.expiry_date else None}
+    return {"active": True, "expiry_date": user_config.expiry_date.isoformat() if user_config.expiry_date else None}

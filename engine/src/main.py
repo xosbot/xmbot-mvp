@@ -34,6 +34,9 @@ from src.core.persistence import Persistence
 from src.core.types import AgentConfig, UserConfig
 from src.gate.human_gate import HumanGate
 from src.risk.engine import RiskEngine
+from src.strategies.adapter import StrategyAgent
+from src.strategies.base import StrategyConfig, StrategyType
+from src.strategies.registry import StrategyRegistry, load_builtin_strategies
 from src.telegram.bot import TelegramBot
 
 log = logging.getLogger("xmbot")
@@ -65,7 +68,7 @@ def setup_ai(config: EngineConfig) -> AIRegistry:
 
 
 def setup_agents(engine: Engine, ai_registry: AIRegistry) -> None:
-    # Technical Analysis Agent
+    # Technical Analysis Agent (default)
     ta_config = AgentConfig(
         name="technical",
         markets=["XAUUSD"],
@@ -77,8 +80,39 @@ def setup_agents(engine: Engine, ai_registry: AIRegistry) -> None:
     engine.register_agent(technical_agent)
     log.info("Registered Technical Analysis Agent")
 
-    # Future agents will be registered here:
-    # engine.register_agent(MarketResearchAgent(...))
+    # Register strategy templates as engine agents
+    strategy_registry = StrategyRegistry()
+    load_builtin_strategies(strategy_registry)
+
+    strategy_types = [
+        ("momentum", "Momentum", StrategyType.MOMENTUM, "M5", {"adx_threshold": 25}),
+        ("swing", "Swing", StrategyType.SWING, "H1", {}),
+        ("scalping", "Scalping", StrategyType.SCALPING, "M5", {}),
+        ("mean_reversion", "MeanReversion", StrategyType.MEAN_REVERSION, "M15", {}),
+    ]
+
+    for type_name, display_name, stype, tf, overrides in strategy_types:
+        try:
+            sc = StrategyConfig(
+                name=f"strategy_{type_name}",
+                strategy_type=stype,
+                symbols=["XAUUSD"],
+                timeframe=tf,
+                params=overrides,
+            )
+            strategy = strategy_registry.create(sc, type_name)
+            agent_config = AgentConfig(
+                name=f"strategy_{type_name}",
+                markets=["XAUUSD"],
+                timeframe=tf,
+                confidence_threshold=0.6,
+                max_daily_trades=5,
+            )
+            adapter = StrategyAgent(strategy, agent_config)
+            engine.register_agent(adapter)
+            log.info(f"Registered strategy agent: {display_name} ({type_name})")
+        except Exception as e:
+            log.warning(f"Failed to register strategy {type_name}: {e}")
 
 
 async def main() -> None:

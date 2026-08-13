@@ -2,20 +2,16 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
 import { ArrowRight, Shield, Eye, TrendingUp, CheckCircle2, Globe } from "lucide-react"
 import { motion } from "framer-motion"
-import { TextGenerateEffect } from "@/components/ui/aceternity/text-generate-effect"
-import { FlipWords } from "@/components/ui/aceternity/flip-words"
-import { LampEffect } from "@/components/ui/aceternity/lamp-effect"
 import { InteractiveHeroCanvas } from "./interactive-hero-canvas"
 import { SignalLattice } from "./signal-lattice"
 
 function StatsBar() {
   const stats = [
-    { label: "Win Rate", value: "64%", icon: TrendingUp, tone: "emerald" },
-    { label: "Return", value: "+84%", icon: TrendingUp, tone: "emerald" },
-    { label: "Max Drawdown", value: "4.3%", icon: Shield, tone: "emerald" },
+    { label: "Win Rate", value: "64%", icon: TrendingUp },
+    { label: "Return", value: "+84%", icon: TrendingUp },
+    { label: "Max Drawdown", value: "4.3%", icon: Shield },
   ]
 
   return (
@@ -23,7 +19,7 @@ function StatsBar() {
       {stats.map((s, i) => (
         <motion.div
           key={s.label}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 1, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 + i * 0.1, duration: 0.4 }}
           className="text-center py-3 px-2"
@@ -48,7 +44,7 @@ function TrustBadges() {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.8, duration: 0.6 }}
       className="mt-6 flex flex-wrap gap-x-4 gap-y-2"
@@ -64,19 +60,17 @@ function TrustBadges() {
 }
 
 export function HeroSection() {
-  const [hovered, setHovered] = useState(false)
-  
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-16 bg-background">
       <SignalLattice className="opacity-30" />
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
               className="mb-8 inline-flex items-center gap-2 rounded-sm border border-gold-500/30 bg-gold-500/5 px-3 py-1.5 text-xs mono-label text-gold-700"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
@@ -84,27 +78,23 @@ export function HeroSection() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 1, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <LampEffect>
-                <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.05]">
-                  <span className="text-foreground">
-                    <TextGenerateEffect words="AI Gold Trading" filter={false} />
-                  </span>
-                  <br />
-                  <span className="text-gradient-gold">
-                    <FlipWords words={["You Approve. AI Analyzes.", "Built to Expand Beyond Gold.", "That Grows With You."]} duration={3000} />
-                  </span>
-                </h1>
-              </LampEffect>
+              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-[1.05] text-foreground">
+                <span className="text-foreground">AI Gold Trading</span>
+                <br />
+                <span className="text-gradient-gold bg-clip-text text-transparent bg-gradient-to-r from-gold-600 to-gold-400">
+                  You Approve. AI Analyzes.
+                </span>
+              </h1>
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="mt-8 text-lg text-muted-foreground leading-relaxed"
             >
               A multi-agent AI system trades XAUUSD gold for you — technical analysis, AI validation,
@@ -114,9 +104,9 @@ export function HeroSection() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
               className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground"
             >
               <div className="flex items-center gap-2">
@@ -134,9 +124,9 @@ export function HeroSection() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
               className="mt-10 flex flex-col sm:flex-row gap-4"
             >
               <Link href="/register">
@@ -153,15 +143,15 @@ export function HeroSection() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
               className="mt-10"
             >
               <StatsBar />
               <p className="text-[10px] text-muted-foreground mt-2">
                 * Backtested on 6 months of PAXG/USDT (tokenized gold) data, not live XAUUSD execution.
-                Past performance does not guarantee future returns.
+                Past performance does not guarantee future results.
               </p>
               <TrustBadges />
             </motion.div>

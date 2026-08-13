@@ -164,5 +164,13 @@ class UserConfig:
     max_position_size: float = 0.5
     max_positions: int = 10
     default_stop_loss: float = 30.0
+    risk_per_trade_pct: float = 2.0
     enable_ai_analysis: bool = True
     agent_configs: dict[str, AgentConfig] = field(default_factory=dict)
+    expiry_date: datetime | None = None
+
+    @property
+    def is_expired(self) -> bool:
+        if self.expiry_date is None:
+            return False
+        return datetime.now(UTC) > self.expiry_date
