@@ -117,13 +117,15 @@ def setup_agents(engine: Engine, ai_registry: AIRegistry) -> None:
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="XMBot Engine")
-    parser.add_argument("--broker", choices=["paper", "mt5", "binance", "ibkr"], default="paper")
+    parser.add_argument("--broker", choices=["paper", "mt5", "binance", "ibkr"])
     parser.add_argument("--config", type=str, help="Path to config JSON")
     parser.add_argument("--data-dir", type=str, help="Data directory for persistence")
     args = parser.parse_args()
 
     config = load_config(args.config)
     setup_logging(config.log_level)
+    selected_broker = args.broker or config.default_broker
+    config.validate_for_startup(selected_broker)
 
     if config.sentry_dsn:
         sentry_sdk.init(
@@ -133,14 +135,10 @@ async def main() -> None:
         )
         log.info("Sentry error tracking initialized")
 
-    missing = [k for k, v in {"TELEGRAM_TOKEN": config.telegram_token}.items() if not v]
-    if config.env == "production" and missing:
-        log.warning(f"Missing critical env vars in production: {', '.join(missing)}")
+    log.info(f"XMBot Engine v0.1.0 starting (env={config.env}, broker={selected_broker})")
 
-    log.info(f"XMBot Engine v0.1.0 starting (env={config.env}, broker={args.broker})")
-
-    config.default_broker = args.broker
-    broker = create_broker(config, args.broker)
+    config.default_broker = selected_broker
+    broker = create_broker(config, selected_broker)
 
     telegram = TelegramBot(config.telegram_token, config.telegram_chat_id)
     gate = HumanGate(

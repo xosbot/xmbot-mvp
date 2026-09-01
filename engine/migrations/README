@@ -1,0 +1,4 @@
+Run migrations from the engine directory with `alembic upgrade head`.
+
+Production deployments must run reviewed migrations before starting the engine.
+Do not replace migration execution with `Base.metadata.create_all()`.
