@@ -15,12 +15,15 @@ from ..db.financial_models import (
     BrokerAccount,
     BrokerOrder,
     Execution,
+    FinancialPosition,
     LedgerEvent,
     OrderIntent,
     OrderIntentStatus,
+    PositionStatus,
     SignalStatus,
     TradingSignal,
 )
+from .exceptions import BrokerAccountMismatchError
 from .state_machine import validate_transition
 
 
@@ -44,9 +47,10 @@ class ExecutionRepository:
         risk_percent: Decimal,
         correlation_id: str,
         approval_required: bool,
+        broker_account_id: str | None = None,
     ) -> OrderIntent:
         """Transaction A: commit all pre-submission state or commit nothing."""
-        account_id = self._legacy_account_id(signal.user_id, broker)
+        account_id = broker_account_id or self._legacy_account_id(signal.user_id, broker)
         try:
             with self._session_factory.begin() as session:
                 existing = session.scalar(
@@ -57,6 +61,15 @@ class ExecutionRepository:
                     return existing
 
                 account = session.get(BrokerAccount, account_id)
+                if broker_account_id and (
+                    account is None
+                    or account.user_id != signal.user_id
+                    or account.broker != broker
+                    or account.status != "ACTIVE"
+                ):
+                    raise BrokerAccountMismatchError(
+                        "Broker account is missing, inactive, wrong-broker, or owned by another user"
+                    )
                 if account is None:
                     session.add(
                         BrokerAccount(
@@ -189,7 +202,7 @@ class ExecutionRepository:
         broker: str,
         snapshot: BrokerOrderSnapshot,
         executions: list[BrokerExecution],
-    ) -> None:
+    ) -> list[BrokerExecution]:
         """Transactions B/C combined for synchronous acknowledgement/fills."""
         with self._session_factory.begin() as session:
             intent = session.get(OrderIntent, intent_id, with_for_update=True)
@@ -227,7 +240,7 @@ class ExecutionRepository:
                 broker_order.filled_quantity = snapshot.filled_quantity
                 broker_order.average_fill_price = snapshot.average_fill_price
 
-            added = 0
+            added_fills: list[BrokerExecution] = []
             for fill in executions:
                 exists = session.scalar(
                     select(Execution.id).where(
@@ -240,6 +253,7 @@ class ExecutionRepository:
                 session.add(
                     Execution(
                         broker_order_id=broker_order.id,
+                        broker_account_id=intent.broker_account_id,
                         broker_execution_id=fill.broker_execution_id,
                         broker_trade_id=fill.broker_trade_id,
                         user_id=intent.user_id,
@@ -251,11 +265,18 @@ class ExecutionRepository:
                         commission_asset=fill.commission_asset,
                         fee=fill.fee,
                         realized_pnl=fill.realized_pnl,
+                        gross_profit=fill.gross_profit,
+                        swap=fill.swap,
+                        position_id=fill.position_id,
+                        entry_type=fill.entry_type,
+                        magic=fill.magic,
+                        comment=fill.comment,
                         execution_time=fill.timestamp,
                         raw_response=fill.raw_response,
                     )
                 )
-                added += 1
+                self._apply_fill_to_position(session, intent, fill)
+                added_fills.append(fill)
                 session.add(
                     self._event(
                         intent,
@@ -266,6 +287,63 @@ class ExecutionRepository:
                 )
             intent.status = target
             intent.updated_at = datetime.now(UTC)
+            return added_fills
+
+    @staticmethod
+    def _apply_fill_to_position(
+        session: Session, intent: OrderIntent, fill: BrokerExecution
+    ) -> None:
+        """Apply each newly ingested broker deal exactly once to the position view."""
+        if not fill.position_id or fill.entry_type not in {"IN", "OUT", "OUT_BY"}:
+            return
+        position = session.scalar(
+            select(FinancialPosition).where(
+                FinancialPosition.broker_account_id == intent.broker_account_id,
+                FinancialPosition.broker_position_id == fill.position_id,
+            )
+        )
+        if fill.entry_type == "IN":
+            if position is None:
+                session.add(
+                    FinancialPosition(
+                        user_id=intent.user_id,
+                        broker_account_id=intent.broker_account_id,
+                        strategy_id=intent.strategy_id,
+                        signal_id=intent.signal_id,
+                        symbol=fill.symbol,
+                        side=fill.side.value,
+                        quantity=fill.quantity,
+                        current_quantity=fill.quantity,
+                        average_entry_price=fill.price,
+                        stop_loss=intent.stop_loss,
+                        take_profit=intent.take_profit,
+                        broker_position_id=fill.position_id,
+                        status=PositionStatus.OPEN,
+                        opened_at=fill.timestamp,
+                    )
+                )
+                return
+            total_quantity = position.quantity + fill.quantity
+            position.average_entry_price = (
+                (position.average_entry_price * position.quantity) + (fill.price * fill.quantity)
+            ) / total_quantity
+            position.quantity = total_quantity
+            position.current_quantity += fill.quantity
+            position.status = PositionStatus.OPEN
+            return
+
+        if position is None:
+            return
+        position.current_quantity = max(Decimal("0"), position.current_quantity - fill.quantity)
+        position.realized_pnl = (position.realized_pnl or Decimal("0")) + (
+            fill.realized_pnl or Decimal("0")
+        )
+        position.fees += abs(fill.commission) + abs(fill.swap) + abs(fill.fee)
+        if position.current_quantity == 0:
+            position.status = PositionStatus.CLOSED
+            position.closed_at = fill.timestamp
+        else:
+            position.status = PositionStatus.PARTIALLY_CLOSED
 
     def outcome(self, client_order_id: str):
         with self._session_factory() as session:
@@ -318,6 +396,12 @@ def status_from_snapshot(snapshot: BrokerOrderSnapshot) -> OrderIntentStatus:
         return OrderIntentStatus.FILLED
     if normalized in {"PARTIAL", "PARTIALLY_FILLED"}:
         return OrderIntentStatus.PARTIALLY_FILLED
+    if normalized == "REJECTED":
+        return OrderIntentStatus.REJECTED
+    if normalized in {"CANCELLED", "EXPIRED"}:
+        return OrderIntentStatus.CANCELLED
+    if normalized == "UNKNOWN":
+        return OrderIntentStatus.RECONCILIATION_REQUIRED
     return OrderIntentStatus.ACKNOWLEDGED
 
 

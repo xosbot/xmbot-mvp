@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import uuid
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -32,9 +33,17 @@ class ExecutionOutcome:
 
 
 class ExecutionService:
-    def __init__(self, broker: Broker, repository: ExecutionRepository) -> None:
+    def __init__(
+        self,
+        broker: Broker,
+        repository: ExecutionRepository,
+        health_provider: Callable[[str], str] | None = None,
+        pnl_callback: Callable[[str, float], Awaitable[None]] | None = None,
+    ) -> None:
         self.broker = broker
         self.repository = repository
+        self._health_provider = health_provider
+        self._pnl_callback = pnl_callback
 
     async def execute(
         self,
@@ -42,8 +51,13 @@ class ExecutionService:
         *,
         volume: float,
         approval_required: bool = True,
+        broker_account_id: str | None = None,
     ) -> ExecutionOutcome:
         correlation_id = str(signal.metadata.get("correlation_id") or uuid.uuid4())
+        if self.broker.name == "mt5" and broker_account_id is None:
+            raise FinancialStateUncertainError(
+                "MT5 execution requires an explicit active BrokerAccount; legacy mapping is forbidden"
+            )
         client_order_id = generate_client_order_id(
             signal.user_id, signal.id, signal.action.value, self.broker.name
         )
@@ -56,6 +70,7 @@ class ExecutionService:
             risk_percent=Decimal(str(signal.risk_percent)),
             correlation_id=correlation_id,
             approval_required=approval_required,
+            broker_account_id=broker_account_id,
         )
 
         if intent.status != OrderIntentStatus.CREATED:
@@ -64,6 +79,10 @@ class ExecutionService:
         if not self.broker.supports_idempotent_execution:
             raise FinancialStateUncertainError(
                 f"{self.broker.name} is not approved for live idempotent execution"
+            )
+        if self._health_provider and self._health_provider(signal.user_id) == "UNSAFE":
+            raise FinancialStateUncertainError(
+                f"Reconciliation is UNSAFE for user {signal.user_id}; no order submitted"
             )
 
         if not self.repository.claim_for_submission(intent.id):
@@ -99,7 +118,10 @@ class ExecutionService:
             client_order_id=client_order_id,
             symbol=signal.market,
         )
-        self.repository.record_snapshot(intent.id, self.broker.name, snapshot, executions)
+        added_fills = self.repository.record_snapshot(
+            intent.id, self.broker.name, snapshot, executions
+        )
+        await self._record_authoritative_pnl(signal.user_id, added_fills)
         return self._outcome(intent.id, client_order_id)
 
     async def _resolve_existing(
@@ -148,7 +170,12 @@ class ExecutionService:
             client_order_id=client_order_id,
             symbol=symbol,
         )
-        self.repository.record_snapshot(intent_id, self.broker.name, snapshot, executions)
+        added_fills = self.repository.record_snapshot(
+            intent_id, self.broker.name, snapshot, executions
+        )
+        intent = self.repository.get_intent(client_order_id)
+        if intent:
+            await self._record_authoritative_pnl(intent.user_id, added_fills)
         outcome = self._outcome(intent_id, client_order_id)
         return ExecutionOutcome(**{**outcome.__dict__, "duplicate_prevented": True})
 
@@ -185,3 +212,10 @@ class ExecutionService:
             filled_price=broker_order.average_fill_price if broker_order else None,
             filled_quantity=broker_order.filled_quantity if broker_order else Decimal("0"),
         )
+
+    async def _record_authoritative_pnl(self, user_id: str, fills: list) -> None:
+        if not self._pnl_callback:
+            return
+        for fill in fills:
+            if fill.entry_type in {"OUT", "OUT_BY"} and fill.realized_pnl is not None:
+                await self._pnl_callback(user_id, float(fill.realized_pnl))

@@ -144,6 +144,12 @@ class BrokerExecution:
     commission_asset: str | None = None
     fee: Decimal = Decimal("0")
     realized_pnl: Decimal | None = None
+    gross_profit: Decimal | None = None
+    swap: Decimal = Decimal("0")
+    position_id: str | None = None
+    entry_type: str | None = None
+    magic: int | None = None
+    comment: str | None = None
     raw_response: dict = field(default_factory=dict)
 
 
@@ -174,6 +180,7 @@ class AccountInfo:
     currency: str = "USD"
     leverage: int = 1
     is_connected: bool = False
+    external_account_id: str | None = None
 
 
 @dataclass

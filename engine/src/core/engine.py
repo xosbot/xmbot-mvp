@@ -12,6 +12,8 @@ from ..broker.base import Broker
 from ..db.financial_models import OrderIntentStatus
 from ..execution.service import ExecutionService
 from ..gate.human_gate import GateDecision, HumanGate
+from ..reconciliation.models import ReconciliationHealth
+from ..reconciliation.service import ReconciliationService
 from ..risk.engine import RiskEngine
 from .config import EngineConfig
 from .instruments import get_contract_size
@@ -44,6 +46,7 @@ class Engine:
         ai_registry: AIRegistry | None = None,
         alert_callback: Callable[[str], Awaitable[None]] | None = None,
         execution_service: ExecutionService | None = None,
+        reconciliation_service: ReconciliationService | None = None,
     ) -> None:
         self.config = config
         self.broker = broker
@@ -53,6 +56,7 @@ class Engine:
         self.ai_registry = ai_registry or AIRegistry()
         self._alert_callback = alert_callback
         self.execution_service = execution_service
+        self.reconciliation_service = reconciliation_service
         self._last_alert_at: dict[str, datetime] = {}
         self._agents: dict[str, Agent] = {}
         self._user_configs: dict[str, UserConfig] = {}
@@ -139,6 +143,14 @@ class Engine:
                 log.error("Broker connection failed")
                 return
 
+            if self.reconciliation_service:
+                health = await self.reconciliation_service.startup_reconcile()
+                if health == ReconciliationHealth.UNSAFE:
+                    log.error("Startup reconciliation is UNSAFE — strategy loops will not start")
+                    await self._alert("🛑 Startup reconciliation unsafe. No new trades allowed.")
+                    await self.broker.disconnect()
+                    return
+
             for agent in self._agents.values():
                 await agent.on_start()
 
@@ -204,11 +216,10 @@ class Engine:
         log.info(f"Broker switched to {broker_type}")
 
     async def _sync_loop(self) -> None:
-        """Periodically push trade data to the sync API store.
-        
-        Tracks position lifecycle: detects when positions close (via stop-loss,
-        take-profit, or manual close) and records them as completed trades.
-        Also wires RiskAdvisor and TradeJournal on each closure.
+        """Refresh the cache and flag disappeared positions for reconciliation.
+
+        Position disappearance never finalizes a trade or P&L here. Only the
+        broker-authoritative reconciliation path may do that.
         """
         from ..api.routes.sync import USER_STORES
         
@@ -222,39 +233,22 @@ class Engine:
                 closed_position_ids = previous_position_ids - current_position_ids
                 
                 for pos_id in closed_position_ids:
-                    if pos_id in self._closed_trades:
-                        continue
-                    
                     old_pos = self._open_positions.get(pos_id)
                     if old_pos is None:
                         continue
-                    
-                    user_id = getattr(old_pos, 'user_id', 'default')
-                    
-                    closed_trade = {
-                        "id": pos_id,
-                        "user_id": user_id,
-                        "symbol": old_pos.symbol,
-                        "action": old_pos.direction.value,
-                        "open_price": old_pos.entry_price,
-                        "close_price": old_pos.current_price,
-                        "lot_size": old_pos.volume,
-                        "profit": old_pos.unrealized_pnl,
-                        "stop_loss": old_pos.stop_loss,
-                        "take_profit": old_pos.take_profit,
-                        "open_time": old_pos.open_time.isoformat(),
-                        "close_time": datetime.now(UTC).isoformat(),
-                        "status": "CLOSED",
-                        "broker_position_id": old_pos.broker_position_id,
-                    }
-                    
-                    self._closed_trades[pos_id] = closed_trade
-                    log.info(f"Position closed: {pos_id}, P&L: {closed_trade['profit']:.2f}")
+                    log.warning(
+                        "Position disappeared; awaiting broker reconciliation position_id=%s symbol=%s",
+                        old_pos.broker_position_id or pos_id,
+                        old_pos.symbol,
+                    )
+                    await self._alert_throttled(
+                        f"position_disappeared:{pos_id}",
+                        f"⚠️ Position {old_pos.symbol}/{old_pos.broker_position_id or pos_id} "
+                        "disappeared. P&L is unresolved; reconciliation required.",
+                    )
 
-                    if account:
-                        await self.risk.record_pnl(user_id, old_pos.unrealized_pnl)
-
-                    await self._on_trade_closed(closed_trade, account)
+                if self.reconciliation_service:
+                    await self.reconciliation_service.reconcile_all()
                 
                 for pos in positions:
                     self._open_positions[pos.id] = pos

@@ -36,6 +36,7 @@ from src.db.session import SessionLocal
 from src.execution.repository import ExecutionRepository
 from src.execution.service import ExecutionService
 from src.gate.human_gate import HumanGate
+from src.reconciliation.service import ReconciliationService
 from src.risk.engine import RiskEngine
 from src.strategies.adapter import StrategyAgent
 from src.strategies.base import StrategyConfig, StrategyType
@@ -155,7 +156,18 @@ async def main() -> None:
         global_max_positions=config.global_max_positions,
         persistence=risk_persistence,
     )
-    execution_service = ExecutionService(broker, ExecutionRepository(SessionLocal))
+    reconciliation_service = ReconciliationService(
+        broker,
+        SessionLocal,
+        pnl_callback=risk.record_pnl,
+        alert_callback=telegram.send_alert if config.telegram_token else None,
+    )
+    execution_service = ExecutionService(
+        broker,
+        ExecutionRepository(SessionLocal),
+        health_provider=lambda user_id: reconciliation_service.health_for_user(user_id).value,
+        pnl_callback=risk.record_pnl,
+    )
 
     engine = Engine(
         config=config,
@@ -164,6 +176,7 @@ async def main() -> None:
         risk=risk,
         alert_callback=telegram.send_alert if config.telegram_token else None,
         execution_service=execution_service,
+        reconciliation_service=reconciliation_service,
     )
     init_api(engine)
     init_trading_api(engine)

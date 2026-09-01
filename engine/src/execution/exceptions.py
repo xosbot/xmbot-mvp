@@ -20,3 +20,7 @@ class InvalidOrderStateTransition(ExecutionError):
 
 class FinancialStateUncertainError(ExecutionError):
     pass
+
+
+class BrokerAccountMismatchError(ExecutionError):
+    pass

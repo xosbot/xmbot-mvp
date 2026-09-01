@@ -81,8 +81,8 @@ not assumed and automatic resubmission is disabled.
 
 ## Broker-authoritative closure rule
 
-The current inferred-closure path is documented as unsafe and remains a known
-blocker. Sprint 3 must replace it: disappearance triggers reconciliation and
-actual deal-history retrieval. Until fills, fees, and realized P&L are available,
-the durable position must be `RECONCILIATION_REQUIRED`; risk counters, analytics,
-journaling, and AI must not receive guessed closure values.
+The inferred-closure path has been removed. Disappearance now emits an operator
+alert and reconciliation marks the durable position `RECONCILIATION_REQUIRED`.
+It does not update risk, analytics, journaling, or AI. MT5 deal normalization is
+implemented, but automatic multi-deal closure finalization is still incomplete;
+therefore MT5 remains fail-closed for live execution.

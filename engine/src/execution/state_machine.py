@@ -11,6 +11,7 @@ ALLOWED_TRANSITIONS: dict[OrderIntentStatus, set[OrderIntentStatus]] = {
         OrderIntentStatus.REJECTED,
         OrderIntentStatus.FAILED,
         OrderIntentStatus.SUBMISSION_UNKNOWN,
+        OrderIntentStatus.RECONCILIATION_REQUIRED,
     },
     OrderIntentStatus.SUBMITTED: {
         OrderIntentStatus.ACKNOWLEDGED,

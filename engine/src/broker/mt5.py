@@ -3,10 +3,13 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import AsyncIterator
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 from ..core.types import (
     AccountInfo,
+    BrokerExecution,
+    BrokerOrderSnapshot,
     Market,
     Order,
     OrderResult,
@@ -15,6 +18,7 @@ from ..core.types import (
     SignalAction,
 )
 from .base import Broker, BrokerStatus
+from .mt5_identity import encode_mt5_order_identity, mt5_identity_matches
 
 log = logging.getLogger("xmbot.broker.mt5")
 
@@ -44,6 +48,7 @@ class MT5Broker(Broker):
         symbol: str = "XAUUSD",
         magic_number: int = 999001,
         deviation: int = 20,
+        idempotency_verified: bool = False,
     ) -> None:
         super().__init__("mt5")
         self._path = path
@@ -56,6 +61,12 @@ class MT5Broker(Broker):
         self._connected = False
         self._mt5 = None
         self._loop: asyncio.AbstractEventLoop | None = None
+        self._idempotency_verified = idempotency_verified
+
+    @property
+    def supports_idempotent_execution(self) -> bool:
+        # Enabling this requires a separately executed MT5 demo validation.
+        return self._idempotency_verified
 
     async def _run_sync(self, func, *args, **kwargs):
         loop = self._loop or asyncio.get_running_loop()
@@ -125,6 +136,18 @@ class MT5Broker(Broker):
         if not await self.is_connected():
             return OrderResult(success=False, order_id=order.id, error="Not connected")
 
+        if not order.client_order_id:
+            return OrderResult(success=False, order_id=order.id, error="Missing client_order_id")
+        existing = await self.get_order_by_client_id(order.client_order_id, order.market)
+        if existing is not None:
+            return OrderResult(
+                success=True,
+                order_id=order.id,
+                broker_order_id=existing.broker_order_id,
+                filled_price=float(existing.average_fill_price or 0),
+                filled_volume=float(existing.filled_quantity),
+            )
+
         mt5 = self._mt5
         mt5_order_type = mt5.ORDER_TYPE_BUY if order.action == SignalAction.BUY else mt5.ORDER_TYPE_SELL
         tick = await self._run_sync(mt5.symbol_info_tick, order.market)
@@ -145,7 +168,7 @@ class MT5Broker(Broker):
             "tp": tp,
             "deviation": self._deviation,
             "magic": self._magic_number,
-            "comment": f"xmbot_{order.user_id}" if order.user_id else "xmbot",
+            "comment": encode_mt5_order_identity(order.client_order_id),
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
@@ -166,6 +189,194 @@ class MT5Broker(Broker):
             error_msg = f"Order failed: retcode={retcode}, comment={comment}"
             log.error(f"MT5 {error_msg}")
             return OrderResult(success=False, order_id=order.id, error=error_msg)
+
+    async def get_order_by_client_id(
+        self, client_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        self._require_connected()
+        candidates = list(await self._run_sync(self._mt5.orders_get, symbol=symbol) or [])
+        date_to = datetime.now(UTC)
+        candidates.extend(
+            list(await self._run_sync(self._mt5.history_orders_get, date_to - timedelta(days=30), date_to) or [])
+        )
+        for native in candidates:
+            if mt5_identity_matches(getattr(native, "comment", None), client_order_id):
+                return self._normalize_order(native, client_order_id)
+
+        deals = await self.get_executions(client_order_id=client_order_id, symbol=symbol)
+        if not deals:
+            return None
+        quantity = sum((deal.quantity for deal in deals), Decimal("0"))
+        notional = sum((deal.quantity * deal.price for deal in deals), Decimal("0"))
+        first = deals[0]
+        return BrokerOrderSnapshot(
+            broker_order_id=first.broker_order_id,
+            client_order_id=client_order_id,
+            symbol=first.symbol,
+            side=first.side,
+            order_type="MARKET",
+            status="FILLED",
+            requested_quantity=quantity,
+            filled_quantity=quantity,
+            average_fill_price=notional / quantity if quantity else None,
+            raw_response={"recovered_from_deals": True},
+        )
+
+    async def get_order(
+        self, broker_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        self._require_connected()
+        native = await self._run_sync(self._mt5.orders_get, ticket=int(broker_order_id))
+        candidates = list(native or [])
+        if not candidates:
+            date_to = datetime.now(UTC)
+            native = await self._run_sync(
+                self._mt5.history_orders_get, date_to - timedelta(days=30), date_to
+            )
+            candidates = [item for item in (native or []) if str(item.ticket) == broker_order_id]
+        if not candidates:
+            return None
+        comment = getattr(candidates[0], "comment", "")
+        return self._normalize_order(candidates[0], comment)
+
+    async def get_open_orders(self) -> list[BrokerOrderSnapshot]:
+        self._require_connected()
+        return [
+            self._normalize_order(native, getattr(native, "comment", ""))
+            for native in (await self._run_sync(self._mt5.orders_get) or [])
+        ]
+
+    async def get_executions(
+        self,
+        *,
+        broker_order_id: str | None = None,
+        client_order_id: str | None = None,
+        symbol: str | None = None,
+        since: datetime | None = None,
+        position_id: str | None = None,
+    ) -> list[BrokerExecution]:
+        self._require_connected()
+        date_to = datetime.now(UTC)
+        date_from = since or (date_to - timedelta(days=30))
+        native_deals = await self._run_sync(self._mt5.history_deals_get, date_from, date_to)
+        if native_deals is None:
+            raise RuntimeError(f"MT5 deal history unavailable: {self._mt5.last_error()}")
+        matching_order_ids: set[str] = set()
+        if client_order_id:
+            history_orders = await self._run_sync(self._mt5.history_orders_get, date_from, date_to)
+            matching_order_ids = {
+                str(item.ticket)
+                for item in (history_orders or [])
+                if mt5_identity_matches(getattr(item, "comment", None), client_order_id)
+            }
+        normalized = []
+        for deal in native_deals:
+            comment = str(getattr(deal, "comment", "") or "")
+            if broker_order_id and str(getattr(deal, "order", "")) != broker_order_id:
+                continue
+            if client_order_id and not (
+                mt5_identity_matches(comment, client_order_id)
+                or str(getattr(deal, "order", "")) in matching_order_ids
+            ):
+                continue
+            if symbol and getattr(deal, "symbol", None) != symbol:
+                continue
+            if position_id and str(getattr(deal, "position_id", "")) != position_id:
+                continue
+            normalized.append(self._normalize_deal(deal, client_order_id or comment))
+        return normalized
+
+    def _normalize_order(self, native, client_order_id: str) -> BrokerOrderSnapshot:
+        state = self._normalize_order_state(int(getattr(native, "state", -1)))
+        side = (
+            SignalAction.BUY
+            if int(getattr(native, "type", -1)) in self._buy_order_types()
+            else SignalAction.SELL
+        )
+        initial = Decimal(str(getattr(native, "volume_initial", 0)))
+        current = Decimal(str(getattr(native, "volume_current", 0)))
+        return BrokerOrderSnapshot(
+            broker_order_id=str(native.ticket),
+            client_order_id=client_order_id,
+            symbol=str(native.symbol),
+            side=side,
+            order_type="MARKET" if int(getattr(native, "type", -1)) in self._market_order_types() else "PENDING",
+            status=state,
+            requested_quantity=initial,
+            filled_quantity=max(Decimal("0"), initial - current),
+            average_fill_price=Decimal(str(getattr(native, "price_current", 0) or 0)),
+            raw_response=self._asdict(native),
+        )
+
+    def _normalize_deal(self, deal, client_order_id: str) -> BrokerExecution:
+        profit = Decimal(str(getattr(deal, "profit", 0) or 0))
+        commission = Decimal(str(getattr(deal, "commission", 0) or 0))
+        swap = Decimal(str(getattr(deal, "swap", 0) or 0))
+        fee = Decimal(str(getattr(deal, "fee", 0) or 0))
+        entry = self._deal_entry_name(int(getattr(deal, "entry", -1)))
+        return BrokerExecution(
+            broker_execution_id=str(deal.ticket),
+            broker_trade_id=str(getattr(deal, "position_id", "") or "") or None,
+            broker_order_id=str(deal.order),
+            client_order_id=client_order_id,
+            symbol=str(deal.symbol),
+            side=(SignalAction.BUY if int(deal.type) == self._mt5.DEAL_TYPE_BUY else SignalAction.SELL),
+            quantity=Decimal(str(deal.volume)),
+            price=Decimal(str(deal.price)),
+            timestamp=datetime.fromtimestamp(
+                getattr(deal, "time_msc", int(deal.time) * 1000) / 1000, tz=UTC
+            ),
+            commission=commission,
+            fee=fee,
+            realized_pnl=profit + commission + swap + fee if entry != "IN" else None,
+            gross_profit=profit,
+            swap=swap,
+            position_id=str(getattr(deal, "position_id", "") or "") or None,
+            entry_type=entry,
+            magic=int(getattr(deal, "magic", 0) or 0),
+            comment=str(getattr(deal, "comment", "") or ""),
+            raw_response=self._asdict(deal),
+        )
+
+    def _normalize_order_state(self, state: int) -> str:
+        mapping = {
+            self._mt5.ORDER_STATE_STARTED: "ACKNOWLEDGED",
+            self._mt5.ORDER_STATE_PLACED: "ACKNOWLEDGED",
+            self._mt5.ORDER_STATE_PARTIAL: "PARTIALLY_FILLED",
+            self._mt5.ORDER_STATE_FILLED: "FILLED",
+            self._mt5.ORDER_STATE_CANCELED: "CANCELLED",
+            self._mt5.ORDER_STATE_REJECTED: "REJECTED",
+            self._mt5.ORDER_STATE_EXPIRED: "CANCELLED",
+        }
+        return mapping.get(state, "UNKNOWN")
+
+    def _deal_entry_name(self, entry: int) -> str:
+        mapping = {
+            self._mt5.DEAL_ENTRY_IN: "IN",
+            self._mt5.DEAL_ENTRY_OUT: "OUT",
+            self._mt5.DEAL_ENTRY_INOUT: "INOUT",
+            self._mt5.DEAL_ENTRY_OUT_BY: "OUT_BY",
+        }
+        return mapping.get(entry, "UNKNOWN")
+
+    def _buy_order_types(self) -> set[int]:
+        return {
+            self._mt5.ORDER_TYPE_BUY,
+            self._mt5.ORDER_TYPE_BUY_LIMIT,
+            self._mt5.ORDER_TYPE_BUY_STOP,
+            self._mt5.ORDER_TYPE_BUY_STOP_LIMIT,
+        }
+
+    def _market_order_types(self) -> set[int]:
+        return {self._mt5.ORDER_TYPE_BUY, self._mt5.ORDER_TYPE_SELL}
+
+    def _require_connected(self) -> None:
+        if not self._mt5 or not self._connected:
+            raise RuntimeError("MT5 is not connected")
+
+    @staticmethod
+    def _asdict(value) -> dict:
+        return value._asdict() if hasattr(value, "_asdict") else dict(vars(value))
 
     async def cancel_order(self, order_id: str) -> bool:
         return True
@@ -234,6 +445,7 @@ class MT5Broker(Broker):
             currency=acct.currency,
             leverage=acct.leverage,
             is_connected=True,
+            external_account_id=str(acct.login),
         )
 
     async def get_market_data(

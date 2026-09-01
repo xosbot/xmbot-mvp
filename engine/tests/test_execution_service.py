@@ -10,9 +10,17 @@ from sqlalchemy.pool import StaticPool
 from src.broker.paper import PaperBroker
 from src.core.types import OrderResult, Signal, SignalAction
 from src.db import Base
-from src.db.financial_models import BrokerOrder, Execution, LedgerEvent, OrderIntent, OrderIntentStatus
+from src.db.financial_models import (
+    BrokerAccount,
+    BrokerOrder,
+    Execution,
+    LedgerEvent,
+    OrderIntent,
+    OrderIntentStatus,
+)
 from src.execution.client_order_id import generate_client_order_id
 from src.execution.exceptions import (
+    BrokerAccountMismatchError,
     BrokerOrderRejectedError,
     BrokerSubmissionUnknownError,
     FinancialStateUncertainError,
@@ -110,6 +118,28 @@ async def test_database_failure_prevents_broker_submission(
     with pytest.raises(OSError, match="database unavailable"):
         await service.execute(signal, volume=0.1)
     assert broker.calls == 0
+
+
+@pytest.mark.asyncio
+async def test_cross_user_broker_account_fails_before_submission(
+    session_factory: sessionmaker[Session], signal: Signal
+) -> None:
+    with session_factory.begin() as session:
+        session.add(
+            BrokerAccount(
+                id="other-account",
+                user_id="other-user",
+                broker="paper",
+                external_account_id="other-external",
+            )
+        )
+    broker = PaperBroker()
+    service = ExecutionService(broker, ExecutionRepository(session_factory))
+
+    with pytest.raises(BrokerAccountMismatchError):
+        await service.execute(signal, volume=0.1, broker_account_id="other-account")
+
+    assert broker._orders == []
 
 
 @pytest.mark.asyncio

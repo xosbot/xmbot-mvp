@@ -113,5 +113,9 @@ class Broker(ABC):
         client_order_id: str | None = None,
         symbol: str | None = None,
         since=None,
+        position_id: str | None = None,
     ) -> list[BrokerExecution]:
         raise BrokerCapabilityNotSupported(f"{self.name} cannot retrieve executions")
+
+    async def get_open_orders(self) -> list[BrokerOrderSnapshot]:
+        raise BrokerCapabilityNotSupported(f"{self.name} cannot retrieve open orders")

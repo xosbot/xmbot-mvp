@@ -161,6 +161,7 @@ class PaperBroker(Broker):
         client_order_id: str | None = None,
         symbol: str | None = None,
         since: datetime | None = None,
+        position_id: str | None = None,
     ) -> list[BrokerExecution]:
         return [
             execution
@@ -169,7 +170,11 @@ class PaperBroker(Broker):
             and (client_order_id is None or execution.client_order_id == client_order_id)
             and (symbol is None or execution.symbol == symbol)
             and (since is None or execution.timestamp >= since)
+            and (position_id is None or execution.position_id == position_id)
         ]
+
+    async def get_open_orders(self) -> list[BrokerOrderSnapshot]:
+        return [snapshot for snapshot in self._order_snapshots.values() if snapshot.status != "FILLED"]
 
     async def cancel_order(self, order_id: str) -> bool:
         before = len(self._positions)

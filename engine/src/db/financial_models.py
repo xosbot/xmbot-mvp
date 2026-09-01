@@ -208,6 +208,9 @@ class Execution(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     broker_order_id: Mapped[str] = mapped_column(ForeignKey("broker_orders.id"), nullable=False, index=True)
+    broker_account_id: Mapped[str | None] = mapped_column(
+        ForeignKey("broker_accounts.id"), nullable=True, index=True
+    )
     broker_execution_id: Mapped[str] = mapped_column(String(128), nullable=False)
     broker_trade_id: Mapped[str | None] = mapped_column(String(128))
     user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
@@ -219,6 +222,12 @@ class Execution(Base):
     commission_asset: Mapped[str | None] = mapped_column(String(32))
     fee: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
     realized_pnl: Mapped[Decimal | None] = mapped_column(MONEY)
+    gross_profit: Mapped[Decimal | None] = mapped_column(MONEY)
+    swap: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
+    position_id: Mapped[str | None] = mapped_column(String(128), index=True)
+    entry_type: Mapped[str | None] = mapped_column(String(16))
+    magic: Mapped[int | None] = mapped_column()
+    comment: Mapped[str | None] = mapped_column(String(64))
     execution_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     raw_response: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
@@ -227,6 +236,11 @@ class Execution(Base):
 
     __table_args__ = (
         UniqueConstraint("broker_order_id", "broker_execution_id", name="uq_execution_external"),
+        UniqueConstraint(
+            "broker_account_id",
+            "broker_execution_id",
+            name="uq_execution_account_external",
+        ),
     )
 
 
