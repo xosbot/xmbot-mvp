@@ -16,6 +16,7 @@ from .instruments import get_contract_size
 from .session import get_session_name, is_active_session
 from .signal_bus import SignalBus
 from .types import (
+    AccountInfo,
     AgentConfig,
     Order,
     OrderStatus,
@@ -322,7 +323,7 @@ class Engine:
 
             await asyncio.sleep(30)
 
-    async def _on_trade_closed(self, trade: dict, account: 'AccountInfo | None') -> None:
+    async def _on_trade_closed(self, trade: dict, account: AccountInfo | None) -> None:
         """Called when a position closes. Wires AI risk advisor and trade journal."""
         try:
             from ..ai.risk_advisor import RiskAdvisor
