@@ -1,4 +1,4 @@
-.PHONY: install dev lint test run docker-build docker-run
+.PHONY: install dev lint test run db-upgrade db-downgrade docker-build docker-run
 
 install:
 	pip install -e ".[dev]"
@@ -14,6 +14,12 @@ test:
 
 run:
 	python -m src.main
+
+db-upgrade:
+	alembic upgrade head
+
+db-downgrade:
+	alembic downgrade -1
 
 docker-build:
 	docker build -t xmbot-engine .

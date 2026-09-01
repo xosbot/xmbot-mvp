@@ -5,7 +5,20 @@ from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from enum import Enum
 
-from ..core.types import AccountInfo, Market, Order, OrderResult, Position, PriceTick
+from ..core.types import (
+    AccountInfo,
+    BrokerExecution,
+    BrokerOrderSnapshot,
+    Market,
+    Order,
+    OrderResult,
+    Position,
+    PriceTick,
+)
+
+
+class BrokerCapabilityNotSupported(NotImplementedError):
+    """Raised when safe lookup/recovery is unavailable for a broker adapter."""
 
 
 class BrokerStatus(Enum):
@@ -22,6 +35,10 @@ class Broker(ABC):
     def __init__(self, name: str) -> None:
         self.name = name
         self.status = BrokerStatus.DISCONNECTED
+
+    @property
+    def supports_idempotent_execution(self) -> bool:
+        return False
 
     @abstractmethod
     async def connect(self) -> bool:
@@ -78,3 +95,23 @@ class Broker(ABC):
         log.warning(f"[{self.name}] Reconnecting...")
         await self.disconnect()
         return await self.connect()
+
+    async def get_order_by_client_id(
+        self, client_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        raise BrokerCapabilityNotSupported(f"{self.name} cannot look up orders by client ID")
+
+    async def get_order(
+        self, broker_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        raise BrokerCapabilityNotSupported(f"{self.name} cannot look up orders")
+
+    async def get_executions(
+        self,
+        *,
+        broker_order_id: str | None = None,
+        client_order_id: str | None = None,
+        symbol: str | None = None,
+        since=None,
+    ) -> list[BrokerExecution]:
+        raise BrokerCapabilityNotSupported(f"{self.name} cannot retrieve executions")

@@ -7,6 +7,10 @@ import os
 from dataclasses import dataclass
 
 
+class ConfigurationError(ValueError):
+    """Raised when the engine would start with an unsafe configuration."""
+
+
 def _derive_key(password: str) -> bytes:
     """Derive a 32-byte Fernet key from a password using SHA-256."""
     return base64.urlsafe_b64encode(hashlib.sha256(password.encode()).digest())
@@ -139,6 +143,42 @@ class EngineConfig:
             "mt5_password": self.decrypt_secret(self.mt5_password),
             "ibkr_password": self.decrypt_secret(getattr(self, "ibkr_password", "")),
         }
+
+    def validate_for_startup(self, broker: str | None = None) -> None:
+        """Fail closed when production security boundaries are not configured.
+
+        Telegram and AI providers are intentionally optional: autonomous
+        execution must remain deterministic when either integration is absent.
+        Broker-account credentials are not validated here because the target
+        architecture loads them per isolated customer execution worker rather
+        than from process-global environment variables.
+        """
+        selected_broker = broker or self.default_broker
+        supported_brokers = {"paper", "mt5", "binance", "ibkr"}
+        if selected_broker not in supported_brokers:
+            raise ConfigurationError(f"Unsupported broker: {selected_broker}")
+
+        if self.env.lower() != "production":
+            return
+
+        missing = [
+            name
+            for name, value in (
+                ("XMBOT_API_KEY", self.api_key),
+                ("DATABASE_URL", self.database_url),
+                ("ENCRYPTION_KEY", self.encryption_key),
+            )
+            if not value
+        ]
+        if missing:
+            raise ConfigurationError(
+                "Missing required production configuration: " + ", ".join(missing)
+            )
+
+        if selected_broker == "paper":
+            raise ConfigurationError(
+                "Production cannot use the paper broker; use a dedicated staging environment"
+            )
 
 
 def load_config(path: str | None = None) -> EngineConfig:

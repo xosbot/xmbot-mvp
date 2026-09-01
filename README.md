@@ -46,6 +46,11 @@ docker compose up -d
 
 ## Architecture
 
+> **Production status:** This repository is an MVP and is not approved for live
+> customer funds. Read the [production-readiness review](docs/PRODUCTION_READINESS_REVIEW.md)
+> and [production execution plan](docs/PRODUCTION_EXECUTION_PLAN.md) before
+> planning deployment or Android development.
+
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   Web App       │────▶│   Engine API    │────▶│   Brokers       │

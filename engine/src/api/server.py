@@ -213,5 +213,9 @@ async def subscription_check(request: Request):
     if not user_config:
         return {"active": False, "reason": "no_config"}
     if user_config.is_expired:
-        return {"active": False, "reason": "expired", "expiry_date": user_config.expiry_date.isoformat() if user_config.expiry_date else None}
+        return {
+            "active": False,
+            "reason": "expired",
+            "expiry_date": user_config.expiry_date.isoformat() if user_config.expiry_date else None,
+        }
     return {"active": True, "expiry_date": user_config.expiry_date.isoformat() if user_config.expiry_date else None}

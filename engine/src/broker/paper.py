@@ -6,9 +6,12 @@ import random
 import uuid
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from ..core.types import (
     AccountInfo,
+    BrokerExecution,
+    BrokerOrderSnapshot,
     Market,
     Order,
     OrderResult,
@@ -30,6 +33,12 @@ class PaperBroker(Broker):
         self._positions: list[Position] = []
         self._orders: list[Order] = []
         self._prices: dict[str, float] = {"XAUUSD": 2650.0}
+        self._order_snapshots: dict[str, BrokerOrderSnapshot] = {}
+        self._executions: dict[str, BrokerExecution] = {}
+
+    @property
+    def supports_idempotent_execution(self) -> bool:
+        return True
 
     async def connect(self) -> bool:
         self.status = BrokerStatus.CONNECTED
@@ -44,8 +53,20 @@ class PaperBroker(Broker):
         return self.status == BrokerStatus.CONNECTED
 
     async def place_order(self, order: Order) -> OrderResult:
+        if order.client_order_id and order.client_order_id in self._order_snapshots:
+            existing = self._order_snapshots[order.client_order_id]
+            return OrderResult(
+                success=True,
+                order_id=order.id,
+                broker_order_id=existing.broker_order_id,
+                filled_price=float(existing.average_fill_price or 0),
+                filled_volume=float(existing.filled_quantity),
+            )
+
         current_price = self._prices.get(order.market, 2650.0)
         filled_price = current_price + random.uniform(-0.5, 0.5)
+        client_order_id = order.client_order_id or order.id
+        broker_order_id = str(uuid.uuid4())
 
         if order.action == SignalAction.BUY:
             self._positions.append(Position(
@@ -77,9 +98,78 @@ class PaperBroker(Broker):
         order.filled_at = datetime.now(UTC)
 
         self._orders.append(order)
+        snapshot = BrokerOrderSnapshot(
+            broker_order_id=broker_order_id,
+            client_order_id=client_order_id,
+            symbol=order.market,
+            side=order.action,
+            order_type=order.order_type,
+            status="FILLED",
+            requested_quantity=Decimal(str(order.volume)),
+            filled_quantity=Decimal(str(order.volume)),
+            average_fill_price=Decimal(str(filled_price)),
+            raw_response={"source": "paper"},
+        )
+        execution = BrokerExecution(
+            broker_execution_id=f"fill-{broker_order_id}",
+            broker_order_id=broker_order_id,
+            client_order_id=client_order_id,
+            symbol=order.market,
+            side=order.action,
+            quantity=Decimal(str(order.volume)),
+            price=Decimal(str(filled_price)),
+            timestamp=order.filled_at,
+            raw_response={"source": "paper"},
+        )
+        self._order_snapshots[client_order_id] = snapshot
+        self._executions[execution.broker_execution_id] = execution
 
         log.info(f"Paper: {order.action} {order.market} {order.volume} @ {filled_price:.2f}")
-        return OrderResult(success=True, order_id=order.id, filled_price=filled_price, filled_volume=order.volume)
+        return OrderResult(
+            success=True,
+            order_id=order.id,
+            broker_order_id=broker_order_id,
+            filled_price=filled_price,
+            filled_volume=order.volume,
+        )
+
+    async def get_order_by_client_id(
+        self, client_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        snapshot = self._order_snapshots.get(client_order_id)
+        if snapshot and symbol and snapshot.symbol != symbol:
+            return None
+        return snapshot
+
+    async def get_order(
+        self, broker_order_id: str, symbol: str | None = None
+    ) -> BrokerOrderSnapshot | None:
+        return next(
+            (
+                snapshot
+                for snapshot in self._order_snapshots.values()
+                if snapshot.broker_order_id == broker_order_id
+                and (symbol is None or snapshot.symbol == symbol)
+            ),
+            None,
+        )
+
+    async def get_executions(
+        self,
+        *,
+        broker_order_id: str | None = None,
+        client_order_id: str | None = None,
+        symbol: str | None = None,
+        since: datetime | None = None,
+    ) -> list[BrokerExecution]:
+        return [
+            execution
+            for execution in self._executions.values()
+            if (broker_order_id is None or execution.broker_order_id == broker_order_id)
+            and (client_order_id is None or execution.client_order_id == client_order_id)
+            and (symbol is None or execution.symbol == symbol)
+            and (since is None or execution.timestamp >= since)
+        ]
 
     async def cancel_order(self, order_id: str) -> bool:
         before = len(self._positions)

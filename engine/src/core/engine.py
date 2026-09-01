@@ -9,6 +9,8 @@ from datetime import UTC, datetime
 from ..agents.base import Agent, AgentStatus
 from ..ai.registry import AIRegistry
 from ..broker.base import Broker
+from ..db.financial_models import OrderIntentStatus
+from ..execution.service import ExecutionService
 from ..gate.human_gate import GateDecision, HumanGate
 from ..risk.engine import RiskEngine
 from .config import EngineConfig
@@ -16,6 +18,7 @@ from .instruments import get_contract_size
 from .session import get_session_name, is_active_session
 from .signal_bus import SignalBus
 from .types import (
+    AccountInfo,
     AgentConfig,
     Order,
     OrderStatus,
@@ -40,6 +43,7 @@ class Engine:
         signal_bus: SignalBus | None = None,
         ai_registry: AIRegistry | None = None,
         alert_callback: Callable[[str], Awaitable[None]] | None = None,
+        execution_service: ExecutionService | None = None,
     ) -> None:
         self.config = config
         self.broker = broker
@@ -48,6 +52,7 @@ class Engine:
         self.signal_bus = signal_bus or SignalBus()
         self.ai_registry = ai_registry or AIRegistry()
         self._alert_callback = alert_callback
+        self.execution_service = execution_service
         self._last_alert_at: dict[str, datetime] = {}
         self._agents: dict[str, Agent] = {}
         self._user_configs: dict[str, UserConfig] = {}
@@ -322,7 +327,7 @@ class Engine:
 
             await asyncio.sleep(30)
 
-    async def _on_trade_closed(self, trade: dict, account: 'AccountInfo | None') -> None:
+    async def _on_trade_closed(self, trade: dict, account: AccountInfo | None) -> None:
         """Called when a position closes. Wires AI risk advisor and trade journal."""
         try:
             from ..ai.risk_advisor import RiskAdvisor
@@ -595,20 +600,36 @@ class Engine:
             status=OrderStatus.PENDING,
         )
 
-        result = await self.broker.place_order(order)
-        order.status = OrderStatus.FILLED if result.success else OrderStatus.REJECTED
-        order.filled_price = result.filled_price
-        order.broker_order_id = result.broker_order_id
+        if self.execution_service is None:
+            raise RuntimeError("ExecutionService is required; direct broker submission is disabled")
 
-        await self.risk.record_trade(order)
+        outcome = await self.execution_service.execute(signal, volume=volume)
+        order.status = (
+            OrderStatus.FILLED
+            if outcome.status == OrderIntentStatus.FILLED
+            else OrderStatus.PENDING
+        )
+        order.filled_price = (
+            float(outcome.filled_price) if outcome.filled_price is not None else None
+        )
+        order.broker_order_id = outcome.broker_order_id
 
-        if result.success:
+        if outcome.status == OrderIntentStatus.FILLED:
+            if not outcome.duplicate_prevented:
+                await self.risk.record_trade(order)
             atr = signal.metadata.get("atr", 0)
             if atr > 0:
                 self._position_atr[signal.id] = atr
-            log.info(f"Executed: {order.action} {order.market} @ {result.filled_price}")
+            log.info(
+                "Executed order user_id=%s signal_id=%s intent_id=%s client_order_id=%s broker_order_id=%s",
+                signal.user_id,
+                signal.id,
+                outcome.intent_id,
+                outcome.client_order_id,
+                outcome.broker_order_id,
+            )
         else:
-            log.error(f"Execution failed: {result.error}")
+            log.warning("Order not filled; durable status=%s", outcome.status.value)
 
     def _format_signal_message(self, signal: Signal) -> str:
         message = (

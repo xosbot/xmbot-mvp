@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from decimal import Decimal
 from enum import Enum
 
 
@@ -101,6 +102,7 @@ class Order:
     filled_at: datetime | None = None
     filled_price: float | None = None
     broker_order_id: str | None = None
+    client_order_id: str | None = None
 
 
 @dataclass
@@ -111,6 +113,38 @@ class OrderResult:
     filled_price: float | None = None
     filled_volume: float | None = None
     error: str | None = None
+
+
+@dataclass(frozen=True)
+class BrokerOrderSnapshot:
+    broker_order_id: str
+    client_order_id: str
+    symbol: str
+    side: SignalAction
+    order_type: str
+    status: str
+    requested_quantity: Decimal
+    filled_quantity: Decimal = Decimal("0")
+    average_fill_price: Decimal | None = None
+    raw_response: dict = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BrokerExecution:
+    broker_execution_id: str
+    broker_order_id: str
+    client_order_id: str
+    symbol: str
+    side: SignalAction
+    quantity: Decimal
+    price: Decimal
+    timestamp: datetime
+    broker_trade_id: str | None = None
+    commission: Decimal = Decimal("0")
+    commission_asset: str | None = None
+    fee: Decimal = Decimal("0")
+    realized_pnl: Decimal | None = None
+    raw_response: dict = field(default_factory=dict)
 
 
 @dataclass

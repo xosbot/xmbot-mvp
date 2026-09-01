@@ -17,6 +17,8 @@ dependencies = [
     # these were previously only there, so `pip install -e .[dev]` didn't match
     # what runs in production.
     "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "psycopg2-binary>=2.9.0",
     "sentry-sdk>=2.0.0",
     "websockets>=12.0",
     "python-dateutil>=2.8.0",
