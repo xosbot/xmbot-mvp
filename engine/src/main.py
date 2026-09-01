@@ -159,14 +159,14 @@ async def main() -> None:
     reconciliation_service = ReconciliationService(
         broker,
         SessionLocal,
-        pnl_callback=risk.record_pnl,
+        pnl_callback=risk.record_pnl_once,
         alert_callback=telegram.send_alert if config.telegram_token else None,
     )
     execution_service = ExecutionService(
         broker,
         ExecutionRepository(SessionLocal),
         health_provider=lambda user_id: reconciliation_service.health_for_user(user_id).value,
-        pnl_callback=risk.record_pnl,
+        pnl_callback=risk.record_pnl_once,
     )
 
     engine = Engine(

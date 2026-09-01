@@ -400,7 +400,8 @@ class Engine:
                             for pos in positions:
                                 try:
                                     await self.broker.cancel_order(pos.id)
-                                    await self.risk.record_pnl(user_id, 0)  # realized at market
+                                    # Closure P&L is recorded only after broker executions are
+                                    # durably reconciled; a market-close request proves no P&L.
                                 except Exception as e:
                                     log.error(f"Failed to flatten position {pos.id}: {e}")
 

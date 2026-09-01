@@ -86,3 +86,7 @@ alert and reconciliation marks the durable position `RECONCILIATION_REQUIRED`.
 It does not update risk, analytics, journaling, or AI. MT5 deal normalization is
 implemented, but automatic multi-deal closure finalization is still incomplete;
 therefore MT5 remains fail-closed for live execution.
+
+## Exactly-once realized risk accounting
+
+Each confirmed exit deal contributes broker-authoritative net P&L incrementally. The execution commits first. Risk state atomically persists the execution ID with its P&L, then PostgreSQL marks it accounted. Replays after either crash window become no-ops and finish the marker.

@@ -24,6 +24,7 @@ from ..db.financial_models import (
     TradingSignal,
 )
 from .exceptions import BrokerAccountMismatchError
+from .position_reconstruction import reconstruct_position_from_deals
 from .state_machine import validate_transition
 
 
@@ -250,8 +251,7 @@ class ExecutionRepository:
                 )
                 if exists:
                     continue
-                session.add(
-                    Execution(
+                execution = Execution(
                         broker_order_id=broker_order.id,
                         broker_account_id=intent.broker_account_id,
                         broker_execution_id=fill.broker_execution_id,
@@ -274,8 +274,9 @@ class ExecutionRepository:
                         execution_time=fill.timestamp,
                         raw_response=fill.raw_response,
                     )
-                )
-                self._apply_fill_to_position(session, intent, fill)
+                session.add(execution)
+                session.flush()
+                self._reconstruct_position(session, intent, fill.position_id)
                 added_fills.append(fill)
                 session.add(
                     self._event(
@@ -290,60 +291,159 @@ class ExecutionRepository:
             return added_fills
 
     @staticmethod
-    def _apply_fill_to_position(
-        session: Session, intent: OrderIntent, fill: BrokerExecution
+    def _reconstruct_position(
+        session: Session, intent: OrderIntent, position_id: str | None
     ) -> None:
-        """Apply each newly ingested broker deal exactly once to the position view."""
-        if not fill.position_id or fill.entry_type not in {"IN", "OUT", "OUT_BY"}:
+        """Transactionally derive the position view from all durable broker deals."""
+        if not position_id:
             return
+        deals = list(
+            session.scalars(
+                select(Execution)
+                .where(
+                    Execution.broker_account_id == intent.broker_account_id,
+                    Execution.position_id == position_id,
+                )
+                .order_by(Execution.execution_time, Execution.broker_execution_id)
+            )
+        )
         position = session.scalar(
             select(FinancialPosition).where(
                 FinancialPosition.broker_account_id == intent.broker_account_id,
-                FinancialPosition.broker_position_id == fill.position_id,
+                FinancialPosition.broker_position_id == position_id,
             )
         )
-        if fill.entry_type == "IN":
-            if position is None:
-                session.add(
-                    FinancialPosition(
-                        user_id=intent.user_id,
-                        broker_account_id=intent.broker_account_id,
-                        strategy_id=intent.strategy_id,
-                        signal_id=intent.signal_id,
-                        symbol=fill.symbol,
-                        side=fill.side.value,
-                        quantity=fill.quantity,
-                        current_quantity=fill.quantity,
-                        average_entry_price=fill.price,
-                        stop_loss=intent.stop_loss,
-                        take_profit=intent.take_profit,
-                        broker_position_id=fill.position_id,
-                        status=PositionStatus.OPEN,
-                        opened_at=fill.timestamp,
+        reconstruction = reconstruct_position_from_deals(deals, position_id=position_id)
+        if reconstruction.status == PositionStatus.RECONCILIATION_REQUIRED:
+            if position:
+                position.status = PositionStatus.RECONCILIATION_REQUIRED
+            return
+        first_entry = next((item for item in deals if item.entry_type == "IN"), None)
+        if first_entry is None:
+            return
+        if position is None:
+            position = FinancialPosition(
+                user_id=intent.user_id,
+                broker_account_id=intent.broker_account_id,
+                strategy_id=intent.strategy_id,
+                signal_id=intent.signal_id,
+                symbol=first_entry.symbol,
+                side=first_entry.side,
+                quantity=reconstruction.entry_quantity,
+                current_quantity=reconstruction.remaining_quantity,
+                average_entry_price=reconstruction.average_entry_price,
+                stop_loss=intent.stop_loss,
+                take_profit=intent.take_profit,
+                broker_position_id=position_id,
+                status=reconstruction.status,
+                opened_at=reconstruction.opened_at or first_entry.execution_time,
+            )
+            session.add(position)
+        position.quantity = reconstruction.entry_quantity
+        position.current_quantity = reconstruction.remaining_quantity
+        position.average_entry_price = reconstruction.average_entry_price
+        position.gross_realized_pnl = reconstruction.gross_realized_pnl
+        position.commission = reconstruction.commission
+        position.swap = reconstruction.swap
+        position.fees = reconstruction.fees
+        position.realized_pnl = reconstruction.net_realized_pnl
+        position.status = reconstruction.status
+        position.closed_at = reconstruction.closed_at
+
+    def pending_risk_contributions(self, user_id: str) -> list[tuple[str, Decimal]]:
+        with self._session_factory() as session:
+            return list(
+                session.execute(
+                    select(Execution.id, Execution.realized_pnl).where(
+                        Execution.user_id == user_id,
+                        Execution.entry_type.in_(["OUT", "OUT_BY"]),
+                        Execution.realized_pnl.is_not(None),
+                        Execution.risk_accounted_at.is_(None),
                     )
                 )
-                return
-            total_quantity = position.quantity + fill.quantity
-            position.average_entry_price = (
-                (position.average_entry_price * position.quantity) + (fill.price * fill.quantity)
-            ) / total_quantity
-            position.quantity = total_quantity
-            position.current_quantity += fill.quantity
-            position.status = PositionStatus.OPEN
-            return
+            )
 
-        if position is None:
-            return
-        position.current_quantity = max(Decimal("0"), position.current_quantity - fill.quantity)
-        position.realized_pnl = (position.realized_pnl or Decimal("0")) + (
-            fill.realized_pnl or Decimal("0")
-        )
-        position.fees += abs(fill.commission) + abs(fill.swap) + abs(fill.fee)
-        if position.current_quantity == 0:
-            position.status = PositionStatus.CLOSED
-            position.closed_at = fill.timestamp
-        else:
-            position.status = PositionStatus.PARTIALLY_CLOSED
+    def mark_risk_accounted(self, execution_id: str) -> None:
+        with self._session_factory.begin() as session:
+            session.execute(
+                update(Execution)
+                .where(
+                    Execution.id == execution_id,
+                    Execution.risk_accounted_at.is_(None),
+                )
+                .values(risk_accounted_at=datetime.now(UTC))
+            )
+
+    def ingest_reconciled_execution(
+        self, broker_account_id: str, fill: BrokerExecution
+    ) -> tuple[str, str] | None:
+        """Persist a missed deal by position ownership; never associate by symbol alone."""
+        if not fill.position_id:
+            return None
+        with self._session_factory.begin() as session:
+            existing = session.scalar(
+                select(Execution).where(
+                    Execution.broker_account_id == broker_account_id,
+                    Execution.broker_execution_id == fill.broker_execution_id,
+                )
+            )
+            if existing:
+                return existing.user_id, existing.id
+            position = session.scalar(
+                select(FinancialPosition).where(
+                    FinancialPosition.broker_account_id == broker_account_id,
+                    FinancialPosition.broker_position_id == fill.position_id,
+                )
+            )
+            if position is None:
+                return None
+            intent = session.scalar(
+                select(OrderIntent).where(OrderIntent.signal_id == position.signal_id)
+            )
+            if intent is None:
+                return None
+            broker_order = session.scalar(
+                select(BrokerOrder)
+                .where(BrokerOrder.order_intent_id == intent.id)
+                .order_by(BrokerOrder.created_at)
+            )
+            if broker_order is None:
+                return None
+            execution = Execution(
+                broker_order_id=broker_order.id,
+                broker_account_id=broker_account_id,
+                broker_execution_id=fill.broker_execution_id,
+                broker_trade_id=fill.broker_trade_id,
+                user_id=intent.user_id,
+                symbol=fill.symbol,
+                side=fill.side.value,
+                quantity=fill.quantity,
+                price=fill.price,
+                commission=fill.commission,
+                commission_asset=fill.commission_asset,
+                fee=fill.fee,
+                realized_pnl=fill.realized_pnl,
+                gross_profit=fill.gross_profit,
+                swap=fill.swap,
+                position_id=fill.position_id,
+                entry_type=fill.entry_type,
+                magic=fill.magic,
+                comment=fill.comment,
+                execution_time=fill.timestamp,
+                raw_response=fill.raw_response,
+            )
+            session.add(execution)
+            session.flush()
+            self._reconstruct_position(session, intent, fill.position_id)
+            session.add(
+                self._event(
+                    intent,
+                    "MISSED_BROKER_EXECUTION_INGESTED",
+                    broker_order_id=broker_order.id,
+                    payload={"broker_execution_id": fill.broker_execution_id},
+                )
+            )
+            return intent.user_id, execution.id
 
     def outcome(self, client_order_id: str):
         with self._session_factory() as session:

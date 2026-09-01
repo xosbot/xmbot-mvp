@@ -21,6 +21,7 @@ from sqlalchemy import (
     Index,
     Numeric,
     String,
+    Text,
     UniqueConstraint,
     event,
 )
@@ -231,6 +232,7 @@ class Execution(Base):
     execution_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     raw_response: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    risk_accounted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
 
     broker_order: Mapped[BrokerOrder] = relationship(back_populates="executions")
 
@@ -266,6 +268,9 @@ class FinancialPosition(Base):
     opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     realized_pnl: Mapped[Decimal | None] = mapped_column(MONEY)
+    gross_realized_pnl: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
+    commission: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
+    swap: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
     fees: Mapped[Decimal] = mapped_column(MONEY, nullable=False, default=Decimal("0"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
@@ -297,3 +302,41 @@ class LedgerEvent(Base):
 @event.listens_for(LedgerEvent, "before_delete")
 def _prevent_ledger_mutation(*_args: object, **_kwargs: object) -> None:
     raise ValueError("LedgerEvent is append-only")
+
+
+class ReconciliationCursor(Base):
+    __tablename__ = "reconciliation_cursors"
+
+    broker_account_id: Mapped[str] = mapped_column(
+        ForeignKey("broker_accounts.id"), primary_key=True
+    )
+    last_successful_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_deal_id: Mapped[str | None] = mapped_column(String(128))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )
+
+
+class ReconciliationIssue(Base):
+    __tablename__ = "reconciliation_issues"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    broker_account_id: Mapped[str] = mapped_column(
+        ForeignKey("broker_accounts.id"), nullable=False, index=True
+    )
+    user_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    mismatch_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    severity: Mapped[str] = mapped_column(String(16), nullable=False)
+    symbol: Mapped[str | None] = mapped_column(String(64))
+    internal_id: Mapped[str | None] = mapped_column(String(128))
+    broker_id: Mapped[str | None] = mapped_column(String(128))
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="OPEN", index=True)
+    detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolution_method: Mapped[str | None] = mapped_column(Text)
+    payload_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+    __table_args__ = (
+        Index("ix_reconciliation_issue_account_status", "broker_account_id", "status"),
+    )

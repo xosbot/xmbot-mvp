@@ -16,3 +16,7 @@
 Still incomplete: automated closure finalization from multiple exit deals,
 durable reconciliation resolution records tied to stable mismatch IDs, deal
 watermarks, and fully tested crash recovery on a real MT5 demo terminal.
+
+## Crash during risk accounting
+
+The risk snapshot stores the P&L delta and execution dedupe key atomically. If the database marker was not written, replay does not update P&L twice and completes the marker. A risk-persistence failure rolls back the in-memory update and leaves the execution pending.

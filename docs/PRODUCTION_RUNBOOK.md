@@ -39,3 +39,7 @@ verify startup reconciliation becomes healthy before allowing strategies.
 Resume only after every critical mismatch has an audited resolution, broker and
 database state agree, and a second operator confirms tickets and exposure. A
 restart alone is not a resolution.
+
+## MT5 demo validation
+
+Run `python scripts/validate_mt5_demo.py` from `engine/` using the environment documented in `MT5_INTEGRATION.md`. Confirm `DEMO`, then perform its listed manual checks under operator supervision. This is not live-money approval.

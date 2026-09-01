@@ -20,3 +20,9 @@ Position disappearance now changes a durable open position to
 `RECONCILIATION_REQUIRED`. It does not create a closed trade, infer an exit
 price, call the journal/AI, or update risk P&L. Automatic deal-to-position closure
 finalization remains incomplete; therefore MT5 stays live-disabled.
+
+## Durable overlap and issue resolution
+
+Each account stores a successful-history watermark. Reconciliation requests deals from five minutes before it (or 30 days on first run), while external execution uniqueness absorbs overlap. The cursor advances only after successful processing.
+
+Mismatch IDs are stable hashes of account, type, entity IDs, and symbol. Original issues and ledger events remain append-only. A complete later snapshot resolves absent issues and emits `BROKER_RECONCILIATION_RESOLVED` referencing the original ID. Broker-read failure never resolves prior issues; health is derived from all open durable issues.

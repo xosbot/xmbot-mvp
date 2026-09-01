@@ -28,6 +28,7 @@ class RiskEngine:
         self._daily_pnl: dict[str, float] = {}
         self._daily_trades: dict[str, int] = {}
         self._peak_balance: dict[str, float] = {}
+        self._recorded_execution_ids: set[str] = set()
         self._last_reset: datetime | None = datetime.now(UTC)
         self._lock = asyncio.Lock()
         self._load_state()
@@ -46,6 +47,7 @@ class RiskEngine:
         if saved_date == today:
             self._daily_pnl = dict(data.get("daily_pnl", {}))
             self._daily_trades = dict(data.get("daily_trades", {}))
+            self._recorded_execution_ids = set(data.get("recorded_execution_ids", []))
             log.info(
                 f"Risk: restored daily state from {saved_date} ({len(self._daily_pnl)} user(s))"
             )
@@ -62,6 +64,7 @@ class RiskEngine:
                 "daily_pnl": self._daily_pnl,
                 "daily_trades": self._daily_trades,
                 "peak_balance": self._peak_balance,
+                "recorded_execution_ids": sorted(self._recorded_execution_ids),
             }
         )
 
@@ -97,6 +100,32 @@ class RiskEngine:
             self._daily_pnl[user_id] += pnl
             log.info(f"Risk: Recorded PnL for {user_id}: {pnl:+.2f} (daily total: {self._daily_pnl[user_id]:+.2f})")
             await self._save_state()
+
+    async def record_pnl_once(self, user_id: str, pnl: float, execution_id: str) -> None:
+        """Atomically persist a broker execution dedupe key with its P&L.
+
+        The JSON risk snapshot uses atomic file replacement. If the process dies
+        after this method returns but before PostgreSQL is marked, replay sees
+        the execution ID and safely becomes a no-op.
+        """
+        async with self._lock:
+            if execution_id in self._recorded_execution_ids:
+                return
+            previous = self._daily_pnl.get(user_id, 0.0)
+            self._daily_pnl[user_id] = previous + pnl
+            self._recorded_execution_ids.add(execution_id)
+            try:
+                await self._save_state()
+            except Exception:
+                self._daily_pnl[user_id] = previous
+                self._recorded_execution_ids.discard(execution_id)
+                raise
+            log.info(
+                "Risk: recorded broker execution %s for %s: %+.2f",
+                execution_id,
+                user_id,
+                pnl,
+            )
 
     async def check_drawdown(self, user_id: str, current_balance: float, max_drawdown_percent: float = 15.0) -> bool:
         """Check if max drawdown is exceeded. Returns True if limit breached."""

@@ -79,3 +79,18 @@ Run on an isolated Windows MT5 demo worker with no production credentials:
 7. Verify unknown manual orders/positions make reconciliation `UNSAFE`.
 8. Only after evidence is reviewed may demo configuration set
    `idempotency_verified=True`. This is not live-money approval.
+
+## Sprint 3 completion: multi-deal accounting
+
+XMBot reconstructs a position from every durable MT5 deal sharing the same broker account and MT5 position identifier. `IN` deals add Decimal exposure; `OUT` and `OUT_BY` deals reduce it. A remainder is `PARTIALLY_CLOSED`; only zero produces `CLOSED`. Missing identifiers, `INOUT`, unknown semantics, or inconsistent quantities produce `RECONCILIATION_REQUIRED`.
+
+MT5 financial values remain signed. Net realized P&L is `profit + commission + swap + fee`, so negative costs are added once rather than subtracted twice.
+
+Run the read-only demo harness with:
+
+```bash
+cd engine
+XMBOT_MT5_DEMO_ACK=I_UNDERSTAND_DEMO_ONLY MT5_LOGIN=... MT5_PASSWORD=... MT5_SERVER=... python scripts/validate_mt5_demo.py
+```
+
+It rejects accounts not verifiably reported as demo and prints the manual minimum-volume checks still required. It never enables execution; `idempotency_verified` remains false by default.

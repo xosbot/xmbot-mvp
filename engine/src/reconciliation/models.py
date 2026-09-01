@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -50,8 +51,22 @@ class ReconciliationMismatch:
     recommended_action: str = "Investigate broker and durable records before trading"
     auto_resolvable: bool = False
 
+    @property
+    def mismatch_id(self) -> str:
+        identity = "|".join(
+            [
+                self.broker_account_id,
+                self.type.value,
+                self.internal_id or "",
+                self.broker_id or "",
+                self.symbol or "",
+            ]
+        )
+        return hashlib.sha256(identity.encode()).hexdigest()
+
     def to_payload(self) -> dict:
         return {
+            "mismatch_id": self.mismatch_id,
             "type": self.type.value,
             "severity": self.severity.value,
             "user_id": self.user_id,

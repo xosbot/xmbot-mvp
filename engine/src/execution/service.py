@@ -38,7 +38,7 @@ class ExecutionService:
         broker: Broker,
         repository: ExecutionRepository,
         health_provider: Callable[[str], str] | None = None,
-        pnl_callback: Callable[[str, float], Awaitable[None]] | None = None,
+        pnl_callback: Callable[[str, float, str], Awaitable[None]] | None = None,
     ) -> None:
         self.broker = broker
         self.repository = repository
@@ -80,9 +80,9 @@ class ExecutionService:
             raise FinancialStateUncertainError(
                 f"{self.broker.name} is not approved for live idempotent execution"
             )
-        if self._health_provider and self._health_provider(signal.user_id) == "UNSAFE":
+        if self._health_provider and self._health_provider(signal.user_id) != "HEALTHY":
             raise FinancialStateUncertainError(
-                f"Reconciliation is UNSAFE for user {signal.user_id}; no order submitted"
+                f"Reconciliation is not HEALTHY for user {signal.user_id}; no order submitted"
             )
 
         if not self.repository.claim_for_submission(intent.id):
@@ -118,10 +118,8 @@ class ExecutionService:
             client_order_id=client_order_id,
             symbol=signal.market,
         )
-        added_fills = self.repository.record_snapshot(
-            intent.id, self.broker.name, snapshot, executions
-        )
-        await self._record_authoritative_pnl(signal.user_id, added_fills)
+        self.repository.record_snapshot(intent.id, self.broker.name, snapshot, executions)
+        await self._record_authoritative_pnl(signal.user_id)
         return self._outcome(intent.id, client_order_id)
 
     async def _resolve_existing(
@@ -170,12 +168,10 @@ class ExecutionService:
             client_order_id=client_order_id,
             symbol=symbol,
         )
-        added_fills = self.repository.record_snapshot(
-            intent_id, self.broker.name, snapshot, executions
-        )
+        self.repository.record_snapshot(intent_id, self.broker.name, snapshot, executions)
         intent = self.repository.get_intent(client_order_id)
         if intent:
-            await self._record_authoritative_pnl(intent.user_id, added_fills)
+            await self._record_authoritative_pnl(intent.user_id)
         outcome = self._outcome(intent_id, client_order_id)
         return ExecutionOutcome(**{**outcome.__dict__, "duplicate_prevented": True})
 
@@ -213,9 +209,9 @@ class ExecutionService:
             filled_quantity=broker_order.filled_quantity if broker_order else Decimal("0"),
         )
 
-    async def _record_authoritative_pnl(self, user_id: str, fills: list) -> None:
+    async def _record_authoritative_pnl(self, user_id: str) -> None:
         if not self._pnl_callback:
             return
-        for fill in fills:
-            if fill.entry_type in {"OUT", "OUT_BY"} and fill.realized_pnl is not None:
-                await self._pnl_callback(user_id, float(fill.realized_pnl))
+        for execution_id, pnl in self.repository.pending_risk_contributions(user_id):
+            await self._pnl_callback(user_id, float(pnl), execution_id)
+            self.repository.mark_risk_accounted(execution_id)

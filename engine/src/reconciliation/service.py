@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -13,12 +14,16 @@ from ..core.types import Position
 from ..db.financial_models import (
     BrokerAccount,
     BrokerOrder,
+    Execution,
     FinancialPosition,
     LedgerEvent,
     OrderIntent,
     OrderIntentStatus,
     PositionStatus,
+    ReconciliationCursor,
+    ReconciliationIssue,
 )
+from ..execution.repository import ExecutionRepository
 from .models import (
     MismatchType,
     ReconciliationHealth,
@@ -35,16 +40,30 @@ class ReconciliationService:
         broker: Broker,
         session_factory: sessionmaker[Session],
         *,
-        pnl_callback: Callable[[str, float], Awaitable[None]] | None = None,
+        pnl_callback: Callable[[str, float, str], Awaitable[None]] | None = None,
         alert_callback: Callable[[str], Awaitable[None]] | None = None,
     ) -> None:
         self.broker = broker
         self._session_factory = session_factory
         self._pnl_callback = pnl_callback
         self._alert_callback = alert_callback
+        self._execution_repository = ExecutionRepository(session_factory)
         self._health: dict[str, ReconciliationHealth] = {}
 
     def health_for_user(self, user_id: str) -> ReconciliationHealth:
+        with self._session_factory() as session:
+            open_issues = list(
+                session.scalars(
+                    select(ReconciliationIssue).where(
+                        ReconciliationIssue.user_id == user_id,
+                        ReconciliationIssue.status == "OPEN",
+                    )
+                )
+            )
+        if any(item.severity == ReconciliationSeverity.CRITICAL.value for item in open_issues):
+            return ReconciliationHealth.UNSAFE
+        if open_issues:
+            return ReconciliationHealth.DEGRADED
         default = (
             ReconciliationHealth.HEALTHY
             if self.broker.name == "paper"
@@ -97,12 +116,22 @@ class ReconciliationService:
                 user_id,
                 broker_account_id,
             )
-            return await self._finish(user_id, broker_account_id, correlation_id, [mismatch])
+            return await self._finish(
+                user_id, broker_account_id, correlation_id, [mismatch], complete_snapshot=False
+            )
 
         try:
             broker_orders = await self.broker.get_open_orders()
             broker_positions = await self.broker.get_positions()
             account_info = await self.broker.get_account()
+            with self._session_factory() as session:
+                cursor = session.get(ReconciliationCursor, broker_account_id)
+                history_since = (
+                    cursor.last_successful_at - timedelta(minutes=5)
+                    if cursor and cursor.last_successful_at
+                    else datetime.now(UTC) - timedelta(days=30)
+                )
+            broker_executions = await self.broker.get_executions(since=history_since)
         except (BrokerCapabilityNotSupported, RuntimeError) as error:
             mismatch = self._mismatch(
                 MismatchType.BROKER_UNAVAILABLE,
@@ -111,7 +140,9 @@ class ReconciliationService:
                 broker_account_id,
                 broker_state={"error": str(error)},
             )
-            return await self._finish(user_id, broker_account_id, correlation_id, [mismatch])
+            return await self._finish(
+                user_id, broker_account_id, correlation_id, [mismatch], complete_snapshot=False
+            )
 
         with self._session_factory() as session:
             account_record = session.get(BrokerAccount, broker_account_id)
@@ -160,6 +191,37 @@ class ReconciliationService:
             )
 
         mismatches: list[ReconciliationMismatch] = []
+        last_deal_id: str | None = None
+        for fill in broker_executions:
+            last_deal_id = fill.broker_execution_id
+            ingested = self._execution_repository.ingest_reconciled_execution(
+                broker_account_id, fill
+            )
+            if ingested is None:
+                with self._session_factory() as session:
+                    known = session.scalar(
+                        select(Execution.id).where(
+                            Execution.broker_account_id == broker_account_id,
+                            Execution.broker_execution_id == fill.broker_execution_id,
+                        )
+                    )
+                if not known:
+                    mismatches.append(
+                        self._mismatch(
+                            MismatchType.UNRECORDED_EXECUTION,
+                            ReconciliationSeverity.CRITICAL,
+                            user_id,
+                            broker_account_id,
+                            symbol=fill.symbol,
+                            broker_id=fill.broker_execution_id,
+                            broker_state={"position_id": fill.position_id},
+                            recommended_action="Map the deal by MT5 position identifier",
+                        )
+                    )
+        if self._pnl_callback:
+            for execution_id, pnl in self._execution_repository.pending_risk_contributions(user_id):
+                await self._pnl_callback(user_id, float(pnl), execution_id)
+                self._execution_repository.mark_risk_accounted(execution_id)
         internal_client_ids = {item.client_order_id for item in internal_orders}
         for order in broker_orders:
             if order.client_order_id not in internal_client_ids:
@@ -221,7 +283,15 @@ class ReconciliationService:
                     internal_id=intent.id,
                 )
             )
-        return await self._finish(user_id, broker_account_id, correlation_id, mismatches)
+        health = await self._finish(user_id, broker_account_id, correlation_id, mismatches)
+        with self._session_factory.begin() as session:
+            cursor = session.get(ReconciliationCursor, broker_account_id)
+            if cursor is None:
+                cursor = ReconciliationCursor(broker_account_id=broker_account_id)
+                session.add(cursor)
+            cursor.last_successful_at = datetime.now(UTC)
+            cursor.last_deal_id = last_deal_id or cursor.last_deal_id
+        return health
 
     async def _finish(
         self,
@@ -229,35 +299,92 @@ class ReconciliationService:
         broker_account_id: str,
         correlation_id: str,
         mismatches: list[ReconciliationMismatch],
+        *,
+        complete_snapshot: bool = True,
     ) -> ReconciliationHealth:
-        for mismatch in mismatches:
-            self._ledger(
-                "BROKER_RECONCILIATION_MISMATCH",
-                user_id,
-                broker_account_id,
-                correlation_id,
-                mismatch.to_payload(),
+        now = datetime.now(UTC)
+        current_ids = {item.mismatch_id for item in mismatches}
+        with self._session_factory.begin() as session:
+            for mismatch in mismatches:
+                issue = session.get(ReconciliationIssue, mismatch.mismatch_id)
+                if issue is None:
+                    issue = ReconciliationIssue(
+                        id=mismatch.mismatch_id,
+                        broker_account_id=broker_account_id,
+                        user_id=user_id,
+                        mismatch_type=mismatch.type.value,
+                        severity=mismatch.severity.value,
+                        symbol=mismatch.symbol,
+                        internal_id=mismatch.internal_id,
+                        broker_id=mismatch.broker_id,
+                        status="OPEN",
+                        detected_at=mismatch.detected_at,
+                        last_seen_at=now,
+                        payload_json=mismatch.to_payload(),
+                    )
+                    session.add(issue)
+                    session.add(
+                        self._ledger_event(
+                            "BROKER_RECONCILIATION_MISMATCH",
+                            user_id,
+                            broker_account_id,
+                            correlation_id,
+                            mismatch.to_payload(),
+                        )
+                    )
+                else:
+                    issue.status = "OPEN"
+                    issue.last_seen_at = now
+                    issue.resolved_at = None
+                    issue.resolution_method = None
+                    issue.payload_json = mismatch.to_payload()
+            if complete_snapshot:
+                unresolved = list(
+                    session.scalars(
+                        select(ReconciliationIssue).where(
+                            ReconciliationIssue.broker_account_id == broker_account_id,
+                            ReconciliationIssue.status == "OPEN",
+                        )
+                    )
+                )
+                for issue in unresolved:
+                    if issue.id in current_ids:
+                        continue
+                    issue.status = "RESOLVED"
+                    issue.resolved_at = now
+                    issue.resolution_method = "successful broker reconciliation"
+                    session.add(
+                        self._ledger_event(
+                            "BROKER_RECONCILIATION_RESOLVED",
+                            user_id,
+                            broker_account_id,
+                            correlation_id,
+                            {
+                                "mismatch_id": issue.id,
+                                "type": issue.mismatch_type,
+                                "resolution_method": issue.resolution_method,
+                            },
+                        )
+                    )
+            open_issues = list(
+                session.scalars(
+                    select(ReconciliationIssue).where(
+                        ReconciliationIssue.broker_account_id == broker_account_id,
+                        ReconciliationIssue.status == "OPEN",
+                    )
+                )
             )
-        if any(item.severity == ReconciliationSeverity.CRITICAL for item in mismatches):
+        if any(item.severity == ReconciliationSeverity.CRITICAL.value for item in open_issues):
             health = ReconciliationHealth.UNSAFE
-        elif mismatches:
+        elif open_issues:
             health = ReconciliationHealth.DEGRADED
         else:
             health = ReconciliationHealth.HEALTHY
-        previous = self._health.get(user_id)
         self._health[user_id] = health
         if health == ReconciliationHealth.UNSAFE and self._alert_callback:
             await self._alert_callback(
                 f"🛑 Reconciliation UNSAFE for user={user_id} account={broker_account_id}; "
                 f"{len(mismatches)} mismatch(es). No new trades."
-            )
-        if previous and previous != health and health == ReconciliationHealth.HEALTHY:
-            self._ledger(
-                "BROKER_RECONCILIATION_RESOLVED",
-                user_id,
-                broker_account_id,
-                correlation_id,
-                {"previous_health": previous.value},
             )
         return health
 
@@ -339,11 +466,19 @@ class ReconciliationService:
         payload: dict,
     ) -> None:
         with self._session_factory.begin() as session:
-            session.add(
-                LedgerEvent(
-                    event_type=event_type,
-                    user_id=user_id,
-                    payload_json={"broker_account_id": broker_account_id, **payload},
-                    correlation_id=correlation_id,
-                )
-            )
+            session.add(self._ledger_event(event_type, user_id, broker_account_id, correlation_id, payload))
+
+    @staticmethod
+    def _ledger_event(
+        event_type: str,
+        user_id: str,
+        broker_account_id: str,
+        correlation_id: str,
+        payload: dict,
+    ) -> LedgerEvent:
+        return LedgerEvent(
+            event_type=event_type,
+            user_id=user_id,
+            payload_json={"broker_account_id": broker_account_id, **payload},
+            correlation_id=correlation_id,
+        )

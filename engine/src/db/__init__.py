@@ -6,6 +6,8 @@ from .financial_models import (
     FinancialPosition,
     LedgerEvent,
     OrderIntent,
+    ReconciliationCursor,
+    ReconciliationIssue,
     TradingSignal,
 )
 from .models import DailyStats, Subscription, Trade, User
@@ -21,6 +23,8 @@ __all__ = [
     "FinancialPosition",
     "LedgerEvent",
     "OrderIntent",
+    "ReconciliationCursor",
+    "ReconciliationIssue",
     "SessionLocal",
     "Subscription",
     "Trade",

@@ -30,3 +30,4 @@ class Persistence:
             tmp.replace(self._file_path)
         except Exception:
             log.exception("Failed to save state to %s", self._file_path)
+            raise

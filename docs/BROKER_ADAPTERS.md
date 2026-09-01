@@ -20,3 +20,5 @@ XMBot adapter does not yet meet the safe uncertainty-recovery contract. These
 adapters must not be enabled for live submission through `ExecutionService`.
 MT5's `idempotency_verified` constructor flag defaults to false and must never
 be enabled merely because unit tests pass.
+
+Sprint 3 supports signed MT5 profit/commission/swap/fee normalization, multi-deal reconstruction, partial closes, missed-deal overlap ingestion, and stable issue resolution. `INOUT` reversal reconstruction remains fail-closed. MT5 remains disabled by default and is not live-money approved.
