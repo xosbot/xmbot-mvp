@@ -31,19 +31,16 @@ class StrategyRegistry:
         return list(self._strategy_classes.keys())
 
     def register_class(self, name: str, cls: type[Strategy]) -> None:
-        """Register a strategy class for later instantiation."""
         self._strategy_classes[name] = cls
         log.info(f"Registered strategy class: {name}")
 
     def register(self, strategy: Strategy) -> None:
-        """Register a strategy instance."""
         if strategy.name in self._strategies:
             raise ValueError(f"Strategy '{strategy.name}' already registered")
         self._strategies[strategy.name] = strategy
         log.info(f"Registered strategy: {strategy.name}")
 
     def unregister(self, name: str) -> bool:
-        """Unregister a strategy."""
         if name in self._strategies:
             strategy = self._strategies[name]
             if strategy.is_running:
@@ -54,23 +51,18 @@ class StrategyRegistry:
         return False
 
     def get(self, name: str) -> Strategy | None:
-        """Get a strategy by name."""
         return self._strategies.get(name)
 
     def create(self, config: StrategyConfig, strategy_type: str | None = None) -> Strategy:
-        """Create a new strategy from config."""
         type_name = strategy_type or config.strategy_type.value
-
         if type_name not in self._strategy_classes:
             raise ValueError(f"Unknown strategy type: {type_name}")
-
         cls = self._strategy_classes[type_name]
         strategy = cls(config)
         self.register(strategy)
         return strategy
 
     async def start(self, name: str) -> bool:
-        """Start a strategy."""
         strategy = self._strategies.get(name)
         if not strategy:
             raise KeyError(f"Strategy not found: {name}")
@@ -80,7 +72,6 @@ class StrategyRegistry:
         return True
 
     async def stop(self, name: str) -> bool:
-        """Stop a strategy."""
         strategy = self._strategies.get(name)
         if not strategy:
             raise KeyError(f"Strategy not found: {name}")
@@ -90,7 +81,6 @@ class StrategyRegistry:
         return True
 
     async def pause(self, name: str) -> bool:
-        """Pause a strategy."""
         strategy = self._strategies.get(name)
         if not strategy:
             raise KeyError(f"Strategy not found: {name}")
@@ -99,7 +89,6 @@ class StrategyRegistry:
         return True
 
     async def resume(self, name: str) -> bool:
-        """Resume a paused strategy."""
         strategy = self._strategies.get(name)
         if not strategy:
             raise KeyError(f"Strategy not found: {name}")
@@ -108,7 +97,6 @@ class StrategyRegistry:
         return True
 
     async def start_all(self) -> int:
-        """Start all enabled strategies."""
         count = 0
         for strategy in self._strategies.values():
             if strategy.config.enabled and not strategy.is_running:
@@ -117,7 +105,6 @@ class StrategyRegistry:
         return count
 
     async def stop_all(self) -> int:
-        """Stop all running strategies."""
         count = 0
         for strategy in self._strategies.values():
             if strategy.is_running:
@@ -126,16 +113,13 @@ class StrategyRegistry:
         return count
 
     def get_stats(self) -> dict:
-        """Get aggregate statistics for all strategies."""
         total_trades = 0
         total_pnl = 0.0
         winning = 0
-
         for strategy in self._strategies.values():
             total_trades += strategy.stats.total_trades
             total_pnl += strategy.stats.total_pnl
             winning += strategy.stats.winning_trades
-
         return {
             "total_strategies": len(self._strategies),
             "running_strategies": len(self.running),
@@ -145,18 +129,19 @@ class StrategyRegistry:
         }
 
     def list_strategies(self) -> list[dict]:
-        """List all registered strategies with their state."""
         return [s.get_state() for s in self._strategies.values()]
 
 
 def load_builtin_strategies(registry: StrategyRegistry) -> None:
     """Load all built-in strategy types."""
+    from .gold_scalper import GoldScalperStrategy
     from .templates.mean_reversion import MeanReversionStrategy
     from .templates.momentum import MomentumStrategy
     from .templates.scalping import ScalpingStrategy
     from .templates.swing import SwingStrategy
 
     registry.register_class("scalping", ScalpingStrategy)
+    registry.register_class("gold_scalper", GoldScalperStrategy)
     registry.register_class("swing", SwingStrategy)
     registry.register_class("mean_reversion", MeanReversionStrategy)
     registry.register_class("momentum", MomentumStrategy)
